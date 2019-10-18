@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">FitnessFlat</string>
+    <string name="clients">Клиенты</string>
+    <string name="client_edit">Редактировать клиента</string>
+    <string name="client_add">Добавить клиента</string>
+    <string name="wait_for_sms">Ожидайте СМС с кодом подтверждения</string>
+    <string name="first_name">Имя</string>
+    <string name="second_name">Фамилия</string>
+    <string name="phone">Телефон</string>
+    <string name="email">Email</string>
+    <string name="birthday">День рождения</string>
+    <string name="gender">Пол</string>
+    <string name="use_vk_avatar">Использовать аватар ВК</string>
+    <string name="vk_id">ID Вконтакте</string>
+    <string name="vk_id_base">https://vk.com/</string>
+    <string name="vk_id_formatter" formatted="false" translatable="false">https://vk.com/%s</string>
+    <string name="phone_empty">Заполните телефон</string>
+    <string name="email_empty">Заполните email</string>
+    <string name="vk_id_empty">Заполните ник или id клиента</string>
+    <string name="not_filled">не заполнен</string>
+    <string name="not_finished">Новый клиент не сохранен.\nДействительно выйти?</string>
+    <string name="delete">Удалить</string>
+    <string name="confirm_delete">Подтвердите удаление</string>
+	<string name="error_formatter" formatted="false">Ошибка: %s</string>
+	
+	<string name="check_internet_connection">Проверьте подключение к сети интернет</string>
+    <string name="serializable_object_changed">Похоже, что изменился один из сериализуемых объектов, получаемых от сервера</string>
+    <string name="internal_server_error">Извините, кажется у нас ошибка на сервере. Повторите запрос позже</string>
+    <string name="not_ready">Повторите запрос позже</string>
+    <string name="device_offline">Нет интернета</string>
+    <string name="too_many_requests">Слишком много попыток. Повторите запрос позже</string>
+    
+    <string name="permission_needed">Требуется разрешение</string>
+    <string name="permission_cancelled_msg_gps">Доступ к GPS-датчику отклонен</string>
+    <string name="permission_explanation_gps">Приложению необходим доступ к GPS-датчику. Если вы не хотите видеть этот вопрос, нажмите далее</string>
+    <string name="permission_cancelled_msg_call">Доступ к звонкам отклонен</string>
+    <string name="permission_explanation_call">Разрешите приложению совершать звонки для связи с клиентами. Если вы не хотите видеть этот вопрос, нажмите далее</string>
+    <string name="permission_explanation_storage">Разрешите приложению доступ к карте памяти для выбора изображения</string>
+    <string name="permission_cancelled_msg_storage">Доступ к карте памяти отклонен</string>
+    <string name="further">далее</string>
+    
+    <!--TODO: заполнить из профиля приложения-->
+    <integer name="com_vk_sdk_AppId" translatable="false">7173607</integer>
+</resources>
