@@ -1,4 +1,4 @@
-package com.devtau.ff.db
+package com.devtau.ff.data
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

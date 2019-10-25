@@ -1,6 +1,6 @@
 package com.devtau.ff.rest
 
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
 import com.devtau.ff.rest.response.BaseResponse
 import com.devtau.ff.rest.response.RegistrationResponse
 import com.devtau.ff.rest.response.ClientResponse

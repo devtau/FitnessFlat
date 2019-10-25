@@ -1,6 +1,6 @@
 package com.devtau.ff.ui.activities.clientDetails
 
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
 import com.devtau.ff.ui.StandardView
 import java.util.*
 

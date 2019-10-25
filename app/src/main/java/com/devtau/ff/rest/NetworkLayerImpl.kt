@@ -7,7 +7,7 @@ import androidx.annotation.StringRes
 import com.devtau.ff.BuildConfig
 import com.devtau.ff.R
 import com.devtau.ff.rest.listeners.ClientRegisteredListener
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
 import com.devtau.ff.rest.response.BaseResponse
 import com.devtau.ff.rest.response.RegistrationResponse
 import com.devtau.ff.rest.response.ClientResponse

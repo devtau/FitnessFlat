@@ -1,7 +1,7 @@
 package com.devtau.ff.rest
 
 import com.devtau.ff.rest.listeners.ClientRegisteredListener
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
 import io.reactivex.functions.Consumer
 
 interface NetworkLayer {

@@ -1,19 +1,27 @@
-package com.devtau.ff.db
+package com.devtau.ff.data
 
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
 import com.devtau.ff.BuildConfig
-import com.devtau.ff.db.dao.ClientDAO
-import com.devtau.ff.db.tables.ClientStored
+import com.devtau.ff.data.dao.ClientDao
+import com.devtau.ff.data.dao.TrainerDao
+import com.devtau.ff.data.dao.TrainingDao
+import com.devtau.ff.data.model.Client
+import com.devtau.ff.data.model.Trainer
+import com.devtau.ff.data.model.Training
 
 @Database(entities = [
-    ClientStored::class
+    Trainer::class,
+    Client::class,
+    Training::class
 ], version = SQLHelper.DB_VERSION)
 abstract class DB: RoomDatabase() {
 
-    abstract fun clientDao(): ClientDAO
+    abstract fun trainerDao(): TrainerDao
+    abstract fun clientDao(): ClientDao
+    abstract fun trainingDao(): TrainingDao
 
 
     companion object {

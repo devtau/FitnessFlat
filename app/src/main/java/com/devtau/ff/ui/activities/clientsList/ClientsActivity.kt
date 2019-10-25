@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.devtau.ff.R
 import com.devtau.ff.adapters.CustomLinearLayoutManager
 import com.devtau.ff.adapters.ClientsAdapter
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
 import com.devtau.ff.ui.DependencyRegistry
 import com.devtau.ff.ui.activities.DBViewerActivity
 import com.devtau.ff.ui.activities.clientDetails.ClientDetailsActivity

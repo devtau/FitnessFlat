@@ -1,6 +1,6 @@
 package com.devtau.ff.rest.response
 
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
 
 class RegistrationResponse : BaseResponse() {
 

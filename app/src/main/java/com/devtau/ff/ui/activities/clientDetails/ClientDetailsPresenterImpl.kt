@@ -3,10 +3,12 @@ package com.devtau.ff.ui.activities.clientDetails
 import android.app.DatePickerDialog
 import android.content.Context
 import com.devtau.ff.R
-import com.devtau.ff.db.DataLayer
+import com.devtau.ff.data.DataLayer
 import com.devtau.ff.rest.NetworkLayer
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
+import com.devtau.ff.data.model.Human
 import com.devtau.ff.ui.DBSubscriber
+import com.devtau.ff.util.AppUtils
 import com.devtau.ff.util.Constants
 import com.devtau.ff.util.Logger
 import com.devtau.ff.util.PreferencesManager
@@ -44,7 +46,7 @@ class ClientDetailsPresenterImpl(
     override fun updateClientData(firstName: String?, secondName: String?, phone: String?, gender: String?,
                                   vkId: String?, email: String?, birthDay: String?,
                                   avatarUrl: String?, avatarId: Int?) {
-        val allPartsPresent = Client.allObligatoryPartsPresent(firstName, secondName, phone, gender)
+        val allPartsPresent = Human.allObligatoryPartsPresent(firstName, secondName, phone, gender)
         val someFieldsChanged = client?.someFieldsChanged(firstName, secondName, phone, gender, vkId, email, birthDay,
             avatarUrl, avatarId) ?: true
         Logger.d(LOG_TAG, "updateClientData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
@@ -52,14 +54,14 @@ class ClientDetailsPresenterImpl(
             val clientId = if (client == null) Constants.OBJECT_ID_NA else client!!.id
             client = Client(clientId, firstName!!, secondName!!, phone!!, gender!!, vkId, email, birthDay,
                 avatarUrl, avatarId ?: client?.avatarId)
-            dataLayer.updateClient(client)
+            dataLayer.updateClients(listOf(client))
         }
     }
 
     override fun showBirthDayDialog(context: Context, selectedBirthday: String?) {
         val nowMinusCentury = Calendar.getInstance()
         nowMinusCentury.add(Calendar.YEAR, -100)
-        val birthDay = Client.parseBirthday(client?.birthDay ?: selectedBirthday)
+        val birthDay = AppUtils.parseBirthday(client?.birthDay ?: selectedBirthday)
 
         val dialog = DatePickerDialog(context,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(year, month, dayOfMonth) },
@@ -79,7 +81,7 @@ class ClientDetailsPresenterImpl(
 
     override fun deleteClient() {
         view.showMsg(R.string.confirm_delete, Action {
-            dataLayer.deleteClient(client)
+            dataLayer.deleteClients(listOf(client))
             view.closeScreen()
         })
     }

@@ -1,6 +1,6 @@
 package com.devtau.ff.ui
 
-import com.devtau.ff.db.DataLayerImpl
+import com.devtau.ff.data.DataLayerImpl
 import com.devtau.ff.rest.NetworkLayerImpl
 import com.devtau.ff.ui.activities.clientsList.ClientsActivity
 import com.devtau.ff.ui.activities.clientsList.ClientsPresenterImpl

@@ -11,7 +11,7 @@ import android.widget.TextView
 import com.devtau.ff.FFApplication
 import com.devtau.ff.R
 import com.devtau.ff.enums.Gender
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
 import com.devtau.ff.ui.DependencyRegistry
 import com.devtau.ff.ui.activities.ViewSubscriberActivity
 import com.devtau.ff.util.*
@@ -119,7 +119,7 @@ class ClientDetailsActivity: ViewSubscriberActivity(),
     }
 
     override fun onDateSet(date: Calendar) {
-        birthdayText?.text = Client.formatBirthday(date)
+        birthdayText?.text = AppUtils.formatBirthday(date)
         updateClientData("birthdayText", birthdayText?.text?.toString())
     }
 

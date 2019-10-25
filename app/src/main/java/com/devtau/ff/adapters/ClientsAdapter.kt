@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.devtau.ff.R
 import com.devtau.ff.adapters.viewHolders.ClientsViewHolder
-import com.devtau.ff.rest.model.Client
+import com.devtau.ff.data.model.Client
 import com.devtau.ff.util.Logger
 import io.reactivex.functions.Consumer
 

@@ -66,8 +66,21 @@ object AppUtils {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         return outputDate
+    }
+
+    fun formatBirthday(cal: Calendar): String =
+        SimpleDateFormat(DATE_FORMATTER_TO_SHOW, Locale.getDefault()).format(cal.time)
+
+    fun parseBirthday(birthDay: String?): Calendar {
+        val calendar = Calendar.getInstance()
+        val inputDf = SimpleDateFormat(DATE_FORMATTER_TO_SHOW, Locale.getDefault())
+        try {
+            calendar.timeInMillis = inputDf.parse(birthDay).time
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return calendar
     }
 
     fun initToolbar(activity: AppCompatActivity, titleId: Int, backArrowNeeded: Boolean) {

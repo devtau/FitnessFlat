@@ -31,7 +31,7 @@ import android.widget.TableRow.LayoutParams
 import android.widget.TextView
 import android.widget.Toast
 import com.devtau.ff.R
-import com.devtau.ff.db.SQLHelper
+import com.devtau.ff.data.SQLHelper
 import com.devtau.ff.util.Logger
 
 @Suppress("NAME_SHADOWING", "SetTextI18n", "ResourceType")
