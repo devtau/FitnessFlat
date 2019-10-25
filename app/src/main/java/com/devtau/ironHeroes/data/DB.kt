@@ -5,23 +5,23 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
 import com.devtau.ironHeroes.BuildConfig
-import com.devtau.ironHeroes.data.dao.HeroDao
-import com.devtau.ironHeroes.data.dao.ChampionDao
-import com.devtau.ironHeroes.data.dao.TrainingDao
-import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.data.model.Champion
-import com.devtau.ironHeroes.data.model.Training
+import com.devtau.ironHeroes.data.dao.*
+import com.devtau.ironHeroes.data.model.*
 
 @Database(entities = [
     Champion::class,
     Hero::class,
-    Training::class
+    Training::class,
+    Exercise::class,
+    MuscleGroup::class
 ], version = SQLHelper.DB_VERSION)
 abstract class DB: RoomDatabase() {
 
     abstract fun championDao(): ChampionDao
     abstract fun heroDao(): HeroDao
     abstract fun trainingDao(): TrainingDao
+    abstract fun exerciseDao(): ExerciseDao
+    abstract fun muscleGroupDao(): MuscleGroupDao
 
 
     companion object {

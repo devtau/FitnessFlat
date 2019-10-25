@@ -1,10 +1,8 @@
 package com.devtau.ironHeroes.data
 
 import android.content.Context
+import com.devtau.ironHeroes.data.model.*
 import com.devtau.ironHeroes.data.relations.TrainingRelation
-import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.data.model.Champion
-import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.util.Logger
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -59,6 +57,34 @@ class DataLayerImpl(context: Context): DataLayer {
         db.trainingDao().delete(list).subscribeDefault("deleteTrainings. deleted")
     }
 
+    override fun updateExercises(list: List<Exercise?>?) = if (list == null) {
+        Logger.e(LOG_TAG, "updateExercises. list is null. aborting")
+    } else {
+        Logger.d(LOG_TAG, "updateExercises. list=$list")
+        db.exerciseDao().insert(list).subscribeDefault("updateExercises. inserted")
+    }
+
+    override fun deleteExercises(list: List<Exercise?>?) = if (list == null) {
+        Logger.e(LOG_TAG, "deleteExercises. list is null. aborting")
+    } else {
+        Logger.d(LOG_TAG, "deleteExercises. list=$list")
+        db.exerciseDao().delete(list).subscribeDefault("deleteExercises. deleted")
+    }
+
+    override fun updateMuscleGroups(list: List<MuscleGroup?>?) = if (list == null) {
+        Logger.e(LOG_TAG, "updateMuscleGroups. list is null. aborting")
+    } else {
+        Logger.d(LOG_TAG, "updateMuscleGroups. list=$list")
+        db.muscleGroupDao().insert(list).subscribeDefault("updateMuscleGroups. inserted")
+    }
+
+    override fun deleteMuscleGroups(list: List<MuscleGroup?>?) = if (list == null) {
+        Logger.e(LOG_TAG, "deleteMuscleGroups. list is null. aborting")
+    } else {
+        Logger.d(LOG_TAG, "deleteMuscleGroups. list=$list")
+        db.muscleGroupDao().delete(list).subscribeDefault("deleteMuscleGroups. deleted")
+    }
+
     override fun clearDB() {
         Logger.w(LOG_TAG, "going to clearDB")
         db.heroDao().delete().subscribeDefault("clearDB. orders deleted")
@@ -88,6 +114,30 @@ class DataLayerImpl(context: Context): DataLayer {
         .map { TrainingRelation.convertToTrainings(it) }
         .subscribe({ listener.accept(it) })
         { Logger.e(LOG_TAG, "Error in getTrainings: ${it.message}") }
+
+    override fun getExercise(id: Long, listener: Consumer<Exercise?>): Disposable = db.exerciseDao().getById(id)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
+        { Logger.e(LOG_TAG, "Error in getExercise: ${it.message}") }
+
+    override fun getExercises(listener: Consumer<List<Exercise>?>): Disposable = db.exerciseDao().getList()
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ listener.accept(it) })
+        { Logger.e(LOG_TAG, "Error in getExercises: ${it.message}") }
+
+    override fun getMuscleGroup(id: Long, listener: Consumer<MuscleGroup?>): Disposable = db.muscleGroupDao().getById(id)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
+        { Logger.e(LOG_TAG, "Error in getMuscleGroup: ${it.message}") }
+
+    override fun getMuscleGroups(listener: Consumer<List<MuscleGroup>?>): Disposable = db.muscleGroupDao().getList()
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ listener.accept(it) })
+        { Logger.e(LOG_TAG, "Error in getMuscleGroups: ${it.message}") }
 
     override fun getHeroByIdAndClose(id: Long, listener: Consumer<Hero?>) {
         var disposable: Disposable? = null

@@ -12,7 +12,7 @@ interface TrainingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(list: List<Training?>): Completable
 
-    @Query("SELECT * FROM Trainings WHERE _id = :id")
+    @Query("SELECT * FROM Trainings WHERE id = :id")
     fun getById(id: Long): Flowable<Training>
 
     @Transaction

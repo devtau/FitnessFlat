@@ -1,13 +1,9 @@
 package com.devtau.ironHeroes.data.model
 
 import android.text.TextUtils
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
-import com.devtau.ironHeroes.util.Constants.EMPTY_OBJECT_ID
 
 abstract class Human(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id")
-    var id: Long = EMPTY_OBJECT_ID,
+    id: Long?,
     var firstName: String,
     var secondName: String,
     var phone: String,
@@ -18,13 +14,11 @@ abstract class Human(
     var birthDay: String?,
     var avatarUrl: String?,
     var avatarId: Int?
-) {
-
-    fun isEmpty() = id == EMPTY_OBJECT_ID
+): DataObject(id) {
 
     fun deepEquals(other: Champion?) =
         id == other?.id
-                && firstName == other.firstName
+                && firstName == other?.firstName
                 && secondName == other.secondName
                 && phone == other.phone
                 && gender == other.gender

@@ -6,7 +6,7 @@ import com.devtau.ironHeroes.enums.Gender
 
 @Entity(tableName = "Heroes")
 class Hero(
-    id: Long, firstName: String, secondName: String, phone: String, gender: String,
+    id: Long?, firstName: String, secondName: String, phone: String, gender: String,
     vkId: String? = null, email: String? = null, birthDay: String? = null, avatarUrl: String? = null, avatarId: Int? = null
 ): Human(id, firstName, secondName, phone, gender, vkId, email, birthDay, avatarUrl, avatarId) {
 
