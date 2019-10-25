@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">FitnessFlat</string>
-    <string name="clients">Клиенты</string>
-    <string name="client_edit">Редактировать клиента</string>
-    <string name="client_add">Добавить клиента</string>
+    <string name="app_name">Iron Heroes</string>
+    <string name="heroes">Герои</string>
+    <string name="champions">Чемпионы</string>
+    <string name="hero_edit">Редактировать героя</string>
+    <string name="hero_add">Добавить героя</string>
     <string name="wait_for_sms">Ожидайте СМС с кодом подтверждения</string>
     <string name="first_name">Имя</string>
     <string name="second_name">Фамилия</string>
@@ -16,9 +17,9 @@
     <string name="vk_id_formatter" formatted="false" translatable="false">https://vk.com/%s</string>
     <string name="phone_empty">Заполните телефон</string>
     <string name="email_empty">Заполните email</string>
-    <string name="vk_id_empty">Заполните ник или id клиента</string>
+    <string name="vk_id_empty">Заполните ник или id героя</string>
     <string name="not_filled">не заполнен</string>
-    <string name="not_finished">Новый клиент не сохранен.\nДействительно выйти?</string>
+    <string name="not_finished">Новый герой не сохранен.\nДействительно выйти?</string>
     <string name="delete">Удалить</string>
     <string name="confirm_delete">Подтвердите удаление</string>
 	<string name="error_formatter" formatted="false">Ошибка: %s</string>
@@ -34,7 +35,7 @@
     <string name="permission_cancelled_msg_gps">Доступ к GPS-датчику отклонен</string>
     <string name="permission_explanation_gps">Приложению необходим доступ к GPS-датчику. Если вы не хотите видеть этот вопрос, нажмите далее</string>
     <string name="permission_cancelled_msg_call">Доступ к звонкам отклонен</string>
-    <string name="permission_explanation_call">Разрешите приложению совершать звонки для связи с клиентами. Если вы не хотите видеть этот вопрос, нажмите далее</string>
+    <string name="permission_explanation_call">Разрешите приложению совершать звонки для связи с героями. Если вы не хотите видеть этот вопрос, нажмите далее</string>
     <string name="permission_explanation_storage">Разрешите приложению доступ к карте памяти для выбора изображения</string>
     <string name="permission_cancelled_msg_storage">Доступ к карте памяти отклонен</string>
     <string name="further">далее</string>

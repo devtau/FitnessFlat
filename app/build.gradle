@@ -7,13 +7,13 @@ androidExtensions { experimental = true }
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.devtau.ff"
+        applicationId "com.devtau.ironHeroes"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "DATABASE_NAME", "\"FitnessFlatDB\""
+        buildConfigField "String", "DATABASE_NAME", "\"IronHeroesDB\""
         buildConfigField "Boolean", "WITH_LOGS", "true"
         buildConfigField "String", "SERVER", "\"https://yandex.ru\""
         resConfigs "ru"
