@@ -3,7 +3,6 @@ package com.devtau.ironHeroes.data.relations
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.data.model.Champion
 import com.devtau.ironHeroes.data.model.Training
 
 class TrainingRelation {
@@ -12,7 +11,7 @@ class TrainingRelation {
     lateinit var training: Training
 
     @Relation(parentColumn = "championId", entityColumn = "id")
-    lateinit var champion: Champion
+    lateinit var champion: Hero
 
     @Relation(parentColumn = "heroId", entityColumn = "id")
     lateinit var hero: Hero

@@ -14,8 +14,8 @@ interface HeroDao {
     @Query("SELECT * FROM Heroes WHERE id = :id")
     fun getById(id: Long): Flowable<Hero>
 
-    @Query("SELECT * FROM Heroes")
-    fun getList(): Flowable<List<Hero>>
+    @Query("SELECT * FROM Heroes WHERE humanType = :humanTypeCode ORDER BY firstName")
+    fun getList(humanTypeCode: Int): Flowable<List<Hero>>
 
     @Delete
     fun delete(list: List<Hero?>?): Completable

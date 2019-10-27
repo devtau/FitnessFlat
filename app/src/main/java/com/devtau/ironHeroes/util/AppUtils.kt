@@ -13,8 +13,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER_TO_SHOW
-import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER_TO_STORE
+import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
+import com.devtau.ironHeroes.util.Constants.DATE_WITH_WEEK_DAY_FORMATTER
 import com.devtau.ironHeroes.util.Constants.PHONE_MASK
 import com.devtau.ironHeroes.util.Constants.STANDARD_DELAY_MS
 import com.redmadrobot.inputmask.MaskedTextChangedListener
@@ -55,28 +55,29 @@ object AppUtils {
 
     fun clearPhoneFromMask(savedPhone: String?): String = PhoneNumberUtils.normalizeNumber(savedPhone)
 
-    fun formatDate(storedDate: String?): String {
-        storedDate ?: return ""
-        val inputDf = SimpleDateFormat(DATE_FORMATTER_TO_STORE, Locale.getDefault())
-        val outputDf = SimpleDateFormat(DATE_FORMATTER_TO_SHOW, Locale.getDefault())
-        var outputDate = ""
-        try {
-            val parsed = inputDf.parse(storedDate)
-            outputDate = outputDf.format(parsed)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return outputDate
+    fun formatDate(cal: Calendar): String =
+        SimpleDateFormat(DATE_FORMATTER, Locale.getDefault()).format(cal.time)
+
+    fun formatDate(cal: Long?): String {
+        val date = Calendar.getInstance()
+        if (cal != null) date.timeInMillis = cal
+        return SimpleDateFormat(DATE_FORMATTER, Locale.getDefault()).format(date.time)
     }
 
-    fun formatBirthday(cal: Calendar): String =
-        SimpleDateFormat(DATE_FORMATTER_TO_SHOW, Locale.getDefault()).format(cal.time)
+    fun formatDateWithWeekDay(cal: Calendar): String =
+        SimpleDateFormat(DATE_WITH_WEEK_DAY_FORMATTER, Locale.getDefault()).format(cal.time)
 
-    fun parseBirthday(birthDay: String?): Calendar {
+    fun formatDateWithWeekDay(cal: Long?): String {
+        val date = Calendar.getInstance()
+        if (cal != null) date.timeInMillis = cal
+        return SimpleDateFormat(DATE_WITH_WEEK_DAY_FORMATTER, Locale.getDefault()).format(date.time)
+    }
+
+    fun parseDate(date: String?): Calendar {
         val calendar = Calendar.getInstance()
-        val inputDf = SimpleDateFormat(DATE_FORMATTER_TO_SHOW, Locale.getDefault())
+        val inputDf = SimpleDateFormat(DATE_FORMATTER, Locale.getDefault())
         try {
-            calendar.timeInMillis = inputDf.parse(birthDay).time
+            calendar.timeInMillis = inputDf.parse(date).time
         } catch (e: Exception) {
             e.printStackTrace()
         }

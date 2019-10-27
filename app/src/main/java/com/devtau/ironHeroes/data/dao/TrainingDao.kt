@@ -16,7 +16,7 @@ interface TrainingDao {
     fun getById(id: Long): Flowable<Training>
 
     @Transaction
-    @Query("SELECT * FROM Trainings")
+    @Query("SELECT * FROM Trainings ORDER BY date")
     fun getList(): Flowable<List<TrainingRelation>>
 
     @Delete

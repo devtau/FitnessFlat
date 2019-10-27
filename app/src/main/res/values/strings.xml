@@ -1,16 +1,26 @@
 <resources>
     <string name="app_name">Iron Heroes</string>
     <string name="heroes">Герои</string>
+    <string name="hero">Герой</string>
     <string name="champions">Чемпионы</string>
+    <string name="champion">Чемпион</string>
+    <string name="trainings">Тренировки</string>
+    <string name="choose_action">Выберите действие</string>
     <string name="hero_edit">Редактировать героя</string>
     <string name="hero_add">Добавить героя</string>
+    <string name="champion_edit">Редактировать чемпиона</string>
+    <string name="champion_add">Добавить чемпиона</string>
+    <string name="training_edit">Редактировать тренировку</string>
+    <string name="training_add">Добавить тренировку</string>
     <string name="wait_for_sms">Ожидайте СМС с кодом подтверждения</string>
     <string name="first_name">Имя</string>
     <string name="second_name">Фамилия</string>
     <string name="phone">Телефон</string>
     <string name="email">Email</string>
     <string name="birthday">День рождения</string>
+    <string name="date">Дата</string>
     <string name="gender">Пол</string>
+    <string name="is_champion">Это тренер</string>
     <string name="use_vk_avatar">Использовать аватар ВК</string>
     <string name="vk_id">ID Вконтакте</string>
     <string name="vk_id_base">https://vk.com/</string>
@@ -18,8 +28,10 @@
     <string name="phone_empty">Заполните телефон</string>
     <string name="email_empty">Заполните email</string>
     <string name="vk_id_empty">Заполните ник или id героя</string>
-    <string name="not_filled">не заполнен</string>
-    <string name="not_finished">Новый герой не сохранен.\nДействительно выйти?</string>
+    <string name="not_filled">не заполнено</string>
+    <string name="hero_not_saved">Новый герой не сохранен.\nДействительно выйти?</string>
+    <string name="champion_not_saved">Новый чемпион не сохранен.\nДействительно выйти?</string>
+    <string name="training_not_saved">Новая тренировка не сохранена.\nДействительно выйти?</string>
     <string name="delete">Удалить</string>
     <string name="confirm_delete">Подтвердите удаление</string>
 	<string name="error_formatter" formatted="false">Ошибка: %s</string>

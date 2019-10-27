@@ -12,9 +12,12 @@ import com.devtau.ironHeroes.IronHeroesApp
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.enums.Gender
 import com.devtau.ironHeroes.data.model.Hero
+import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
 import com.devtau.ironHeroes.util.*
+import com.devtau.ironHeroes.util.Constants.HERO_ID
+import com.devtau.ironHeroes.util.Constants.HUMAN_TYPE
 import com.vk.sdk.VKSdk
 import com.vk.sdk.api.VKApiConst
 import com.vk.sdk.api.VKParameters
@@ -28,7 +31,8 @@ import java.util.*
 class HeroDetailsActivity: ViewSubscriberActivity(),
     HeroDetailsView {
 
-    var presenter: HeroDetailsPresenter? = null
+    lateinit var presenter: HeroDetailsPresenter
+    var newHero: Boolean = false
     var avatarUrl: String? = null
 
 
@@ -42,13 +46,13 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
 
     override fun onStart() {
         super.onStart()
-        presenter?.restartLoaders()
+        presenter.restartLoaders()
         initInputSubscriptions()
     }
 
     override fun onStop() {
         super.onStop()
-        presenter?.onStop()
+        presenter.onStop()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -60,7 +64,7 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     }
 
     override fun onBackPressed() {
-        presenter?.onBackPressed(Action { super.onBackPressed() })
+        presenter.onBackPressed(Action { super.onBackPressed() })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -88,8 +92,12 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
     override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(LOG_TAG, msg, this, confirmedListener)
 
-    override fun showScreenTitle(newHero: Boolean) {
-        val toolbarTitle = if (newHero) R.string.hero_add else R.string.hero_edit
+    override fun showScreenTitle(newHero: Boolean, humanType: HumanType) {
+        this.newHero = newHero
+        val toolbarTitle = when (humanType) {
+            HumanType.HERO -> if (newHero) R.string.hero_add else R.string.hero_edit
+            HumanType.CHAMPION -> if (newHero) R.string.champion_add else R.string.champion_edit
+        }
         AppUtils.initToolbar(this, toolbarTitle, true)
     }
 
@@ -116,16 +124,21 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
         updateInputField(vkIdInput, hero?.vkId)
         updateInputField(emailInput, hero?.email)
         updateInputField(birthdayText, hero?.birthDay)
+        isChampion?.isChecked = hero?.humanType == HumanType.CHAMPION
     }
 
     override fun onDateSet(date: Calendar) {
-        birthdayText?.text = AppUtils.formatBirthday(date)
+        birthdayText?.text = AppUtils.formatDate(date)
         updateHeroData("birthdayText", birthdayText?.text?.toString())
     }
 
     override fun showDeleteHeroBtn(show: Boolean) {
         fab?.postDelayed({ if (show) fab.show() else fab.hide() }, Constants.STANDARD_DELAY_MS)
-        fab.setOnClickListener { presenter?.deleteHero() }
+        fab.setOnClickListener { presenter.deleteHero() }
+    }
+
+    override fun showHumanType(humanType: HumanType) {
+        isChampion?.isChecked = humanType == HumanType.CHAMPION
     }
 
     override fun closeScreen() = finish()
@@ -148,8 +161,12 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
         AppUtils.initPhoneRMR(phoneInput)
         vkText?.setOnClickListener { openVk(vkIdInput?.text?.toString()) }
         emailText?.setOnClickListener { composeEmail(emailInput?.text?.toString()) }
-        birthdayInput?.setOnClickListener { presenter?.showBirthDayDialog(this, birthdayText?.text?.toString()) }
+        birthdayInput?.setOnClickListener { presenter.showBirthDayDialog(this, birthdayText?.text?.toString()) }
         useVkAvatar?.setOnClickListener { IronHeroesApp.loginVK(this) }
+        isChampion?.setOnCheckedChangeListener { _, isChecked ->
+            updateHeroData("isChampion", isChecked.toString())
+            showScreenTitle(newHero, if (isChecked) HumanType.CHAMPION else HumanType.HERO)
+        }
     }
 
     private fun initInputSubscriptions() {
@@ -162,12 +179,14 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
 
     private fun updateHeroData(field: String, value: String?) {
         Logger.d(LOG_TAG, "updateHeroData. new data in $field detected. value=$value")
+        val humanType = if (isChampion?.isChecked == true) HumanType.CHAMPION else HumanType.HERO
         val gender = when {
             genderFemale?.isChecked == true -> Gender.FEMALE.code
             genderMale?.isChecked == true -> Gender.MALE.code
             else -> null
         }
-        presenter?.updateHeroData(
+        presenter.updateHeroData(
+            humanType,
             firstName = firstNameInput?.text?.toString(),
             secondName = secondNameInput?.text?.toString(),
             phone = AppUtils.clearPhoneFromMask(phoneInput?.text?.toString()),
@@ -221,12 +240,12 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
 
 
     companion object {
-        const val HERO_ID = "heroId"
         private const val LOG_TAG = "HeroDetailsActivity"
 
-        fun newInstance(context: Context, heroId: Long?) {
+        fun newInstance(context: Context, heroId: Long?, humanType: HumanType) {
             val intent = Intent(context, HeroDetailsActivity::class.java)
             if (heroId != null) intent.putExtra(HERO_ID, heroId)
+            intent.putExtra(HUMAN_TYPE, humanType)
             context.startActivity(intent)
         }
     }

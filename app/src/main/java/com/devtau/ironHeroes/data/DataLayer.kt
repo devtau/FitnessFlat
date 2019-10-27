@@ -5,9 +5,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 
 interface DataLayer {
-    fun updateChampions(list: List<Champion?>?)
-    fun deleteChampions(list: List<Champion?>?)
-
     fun updateHeroes(list: List<Hero?>?)
     fun deleteHeroes(list: List<Hero?>?)
 
@@ -25,6 +22,7 @@ interface DataLayer {
     //возвращают подписку
     fun getHero(id: Long, listener: Consumer<Hero?>): Disposable
     fun getHeroes(listener: Consumer<List<Hero>?>): Disposable
+    fun getChampions(listener: Consumer<List<Hero>?>): Disposable
     fun getTraining(id: Long, listener: Consumer<Training?>): Disposable
     fun getTrainings(listener: Consumer<List<Training>?>): Disposable
     fun getExercise(id: Long, listener: Consumer<Exercise?>): Disposable

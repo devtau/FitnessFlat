@@ -6,10 +6,9 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
 import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.data.model.Human
+import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
 import io.reactivex.functions.Action
@@ -21,7 +20,8 @@ class HeroDetailsPresenterImpl(
     private val dataLayer: DataLayer,
     private val networkLayer: NetworkLayer,
     private val prefs: PreferencesManager?,
-    private val heroId: Long?
+    private val heroId: Long?,
+    private val humanType: HumanType
 ): DBSubscriber(), HeroDetailsPresenter {
 
     private var hero: Hero? = null
@@ -30,29 +30,31 @@ class HeroDetailsPresenterImpl(
     //<editor-fold desc="Presenter overrides">
     override fun restartLoaders() {
         if (heroId == null) {
-            view.showScreenTitle(true)
+            view.showScreenTitle(true, humanType)
             view.showBirthdayNA()
             view.showDeleteHeroBtn(false)
+            view.showHumanType(humanType)
         } else {
             dataLayer.getHeroByIdAndClose(heroId, Consumer {
                 hero = it
+                val humanType = hero?.humanType ?: HumanType.HERO
                 view.showHeroDetails(hero)
-                view.showScreenTitle(hero == null)
+                view.showScreenTitle(hero == null, humanType)
                 view.showDeleteHeroBtn(hero != null)
+                view.showHumanType(humanType)
             })
         }
     }
 
-    override fun updateHeroData(firstName: String?, secondName: String?, phone: String?, gender: String?,
-                                  vkId: String?, email: String?, birthDay: String?,
-                                  avatarUrl: String?, avatarId: Int?) {
-        val allPartsPresent = Human.allObligatoryPartsPresent(firstName, secondName, phone, gender)
+    override fun updateHeroData(humanType: HumanType, firstName: String?, secondName: String?, phone: String?, gender: String?,
+                                vkId: String?, email: String?, birthDay: String?,
+                                avatarUrl: String?, avatarId: Int?) {
+        val allPartsPresent = Hero.allObligatoryPartsPresent(firstName, secondName, phone, gender)
         val someFieldsChanged = hero?.someFieldsChanged(firstName, secondName, phone, gender, vkId, email, birthDay,
             avatarUrl, avatarId) ?: true
         Logger.d(LOG_TAG, "updateHeroData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
         if (allPartsPresent && someFieldsChanged) {
-            val heroId = if (hero == null) Constants.OBJECT_ID_NA else hero!!.id
-            hero = Hero(heroId, firstName!!, secondName!!, phone!!, gender!!, vkId, email, birthDay,
+            hero = Hero(heroId, humanType, firstName!!, secondName!!, phone!!, gender!!, vkId, email, birthDay,
                 avatarUrl, avatarId ?: hero?.avatarId)
             dataLayer.updateHeroes(listOf(hero))
         }
@@ -61,7 +63,7 @@ class HeroDetailsPresenterImpl(
     override fun showBirthDayDialog(context: Context, selectedBirthday: String?) {
         val nowMinusCentury = Calendar.getInstance()
         nowMinusCentury.add(Calendar.YEAR, -100)
-        val birthDay = AppUtils.parseBirthday(hero?.birthDay ?: selectedBirthday)
+        val birthDay = AppUtils.parseDate(hero?.birthDay ?: selectedBirthday)
 
         val dialog = DatePickerDialog(context,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(year, month, dayOfMonth) },
@@ -73,7 +75,11 @@ class HeroDetailsPresenterImpl(
 
     override fun onBackPressed(action: Action) {
         if (hero == null) {
-            view.showMsg(R.string.not_finished, action)
+            val msg = when (humanType) {
+                HumanType.HERO -> R.string.hero_not_saved
+                HumanType.CHAMPION -> R.string.champion_not_saved
+            }
+            view.showMsg(msg, action)
         } else {
             action.run()
         }

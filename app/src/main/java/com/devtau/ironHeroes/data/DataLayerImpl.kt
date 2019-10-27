@@ -3,6 +3,7 @@ package com.devtau.ironHeroes.data
 import android.content.Context
 import com.devtau.ironHeroes.data.model.*
 import com.devtau.ironHeroes.data.relations.TrainingRelation
+import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.util.Logger
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -14,20 +15,6 @@ class DataLayerImpl(context: Context): DataLayer {
 
     private var db = DB.getInstance(context)
 
-
-    override fun updateChampions(list: List<Champion?>?) = if (list == null) {
-        Logger.e(LOG_TAG, "updateChampions. list is null. aborting")
-    } else {
-        Logger.d(LOG_TAG, "updateChampions. list=$list")
-        db.championDao().insert(list).subscribeDefault("updateChampions. inserted")
-    }
-
-    override fun deleteChampions(list: List<Champion?>?) = if (list == null) {
-        Logger.e(LOG_TAG, "deleteChampions. list is null. aborting")
-    } else {
-        Logger.d(LOG_TAG, "deleteChampions. list=$list")
-        db.championDao().delete(list).subscribeDefault("deleteChampions. deleted")
-    }
 
     override fun updateHeroes(list: List<Hero?>?) = if (list == null) {
         Logger.e(LOG_TAG, "updateHeroes. list is null. aborting")
@@ -96,7 +83,15 @@ class DataLayerImpl(context: Context): DataLayer {
         .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
         { Logger.e(LOG_TAG, "Error in getHero: ${it.message}") }
 
-    override fun getHeroes(listener: Consumer<List<Hero>?>): Disposable = db.heroDao().getList()
+    override fun getHeroes(listener: Consumer<List<Hero>?>): Disposable = db.heroDao()
+        .getList(HumanType.HERO.ordinal)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ listener.accept(it) })
+        { Logger.e(LOG_TAG, "Error in getHeroes: ${it.message}") }
+
+    override fun getChampions(listener: Consumer<List<Hero>?>): Disposable = db.heroDao()
+        .getList(HumanType.CHAMPION.ordinal)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe({ listener.accept(it) })

@@ -195,12 +195,22 @@
 					
 					<TextView
 						android:id="@+id/birthdayText"
-						tools:text="04.09.17"
+						tools:text="04.09.2017"
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
 						android:gravity="end"/>
 				</TableRow>
+				
+				<Switch
+					android:id="@+id/isChampion"
+					android:text="@string/is_champion"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:paddingTop="@dimen/marginHalf"
+					android:paddingBottom="@dimen/marginHalf"
+					android:paddingLeft="@dimen/marginNormalPlus"
+					android:paddingRight="@dimen/marginNormalPlus"/>
 				
 				<Button
 					android:id="@+id/useVkAvatar"
