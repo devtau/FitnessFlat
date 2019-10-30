@@ -2,6 +2,7 @@ package com.devtau.ironHeroes.data.dao
 
 import androidx.room.*
 import com.devtau.ironHeroes.data.model.Exercise
+import com.devtau.ironHeroes.data.relations.ExerciseRelation
 import io.reactivex.Completable
 import io.reactivex.Flowable
 
@@ -12,11 +13,11 @@ interface ExerciseDao {
     fun insert(list: List<Exercise?>): Completable
 
     @Query("SELECT * FROM Exercises WHERE id = :id")
-    fun getById(id: Long): Flowable<Exercise>
+    fun getById(id: Long): Flowable<ExerciseRelation>
 
     @Transaction
     @Query("SELECT * FROM Exercises")
-    fun getList(): Flowable<List<Exercise>>
+    fun getList(): Flowable<List<ExerciseRelation>>
 
     @Delete
     fun delete(list: List<Exercise?>): Completable

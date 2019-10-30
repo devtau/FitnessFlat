@@ -16,15 +16,17 @@ class TrainingRelation {
     @Relation(parentColumn = "heroId", entityColumn = "id")
     lateinit var hero: Hero
 
+    fun convert(): Training {
+        training.champion = champion
+        training.hero = hero
+        return training
+    }
+
 
     companion object {
-        fun convertToTrainings(list: List<TrainingRelation>): List<Training> {
+        fun convertList(list: List<TrainingRelation>): List<Training> {
             val trainings = ArrayList<Training>()
-            for (next in list) {
-                next.training.champion = next.champion
-                next.training.hero = next.hero
-                trainings.add(next.training)
-            }
+            for (next in list) trainings.add(next.convert())
             return trainings
         }
     }

@@ -32,8 +32,8 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     HeroDetailsView {
 
     lateinit var presenter: HeroDetailsPresenter
-    var newHero: Boolean = false
-    var avatarUrl: String? = null
+    private var newHero: Boolean = false
+    private var avatarUrl: String? = null
 
 
     //<editor-fold desc="Framework overrides">

@@ -13,7 +13,7 @@ interface TrainingDao {
     fun insert(list: List<Training?>): Completable
 
     @Query("SELECT * FROM Trainings WHERE id = :id")
-    fun getById(id: Long): Flowable<Training>
+    fun getById(id: Long): Flowable<TrainingRelation>
 
     @Transaction
     @Query("SELECT * FROM Trainings ORDER BY date")

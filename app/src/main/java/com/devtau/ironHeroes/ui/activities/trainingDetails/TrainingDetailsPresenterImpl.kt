@@ -8,8 +8,6 @@ import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
-import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
 import io.reactivex.functions.Action
@@ -36,11 +34,24 @@ class TrainingDetailsPresenterImpl(
             view.showBirthdayNA()
             view.showDeleteTrainingBtn(false)
         } else {
-            dataLayer.getTrainingByIdAndClose(trainingId, Consumer {
-                training = it
-                view.showTrainingDetails(training)
+            dataLayer.getTrainingByIdAndClose(trainingId, Consumer { trainingFromDB ->
+                training = trainingFromDB
                 view.showScreenTitle(training == null)
                 view.showDeleteTrainingBtn(training != null)
+
+                dataLayer.getExercisesAndClose(trainingId, Consumer { exercisesFromDB ->
+
+                    //TODO: serialize exercisesInTraining
+                    dataLayer.getExercisesInTrainingAndClose(trainingId, Consumer {
+                        if (it != null && exercisesFromDB != null)
+                            for (next in it)
+                                for (nextExercise in exercisesFromDB)
+                                    if (next.exerciseId == nextExercise.id)
+                                        next.exercise = nextExercise
+                        training?.exercises = it
+                        view.showTrainingDetails(training)
+                    })
+                })
             })
         }
         disposeOnStop(dataLayer.getChampions(Consumer {

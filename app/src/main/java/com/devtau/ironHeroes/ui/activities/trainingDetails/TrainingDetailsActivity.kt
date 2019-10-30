@@ -21,7 +21,7 @@ import java.util.*
 class TrainingDetailsActivity: ViewSubscriberActivity(),
     TrainingDetailsView {
 
-    var presenter: TrainingDetailsPresenter? = null
+    lateinit var presenter: TrainingDetailsPresenter
     private var champions: List<Hero>? = null
     private var heroes: List<Hero>? = null
 
@@ -36,16 +36,16 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     override fun onStart() {
         super.onStart()
-        presenter?.restartLoaders()
+        presenter.restartLoaders()
     }
 
     override fun onStop() {
         super.onStop()
-        presenter?.onStop()
+        presenter.onStop()
     }
 
     override fun onBackPressed() {
-        presenter?.onBackPressed(Action { super.onBackPressed() })
+        presenter.onBackPressed(Action { super.onBackPressed() })
     }
     //</editor-fold>
 
@@ -92,7 +92,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     override fun showDeleteTrainingBtn(show: Boolean) {
         fab?.postDelayed({ if (show) fab.show() else fab.hide() }, Constants.STANDARD_DELAY_MS)
-        fab.setOnClickListener { presenter?.deleteTraining() }
+        fab.setOnClickListener { presenter.deleteTraining() }
     }
 
     override fun closeScreen() = finish()
@@ -102,13 +102,13 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     //<editor-fold desc="Private methods">
     private fun initUi() {
         dateInput?.setOnClickListener {
-            presenter?.showDateDialog(this, AppUtils.parseDate(dateText?.text?.toString()).timeInMillis)
+            presenter.showDateDialog(this, AppUtils.parseDate(dateText?.text?.toString()).timeInMillis)
         }
     }
 
     private fun updateTrainingData(field: String, value: String?) {
         Logger.d(LOG_TAG, "updateTrainingData. new data in $field detected. value=$value")
-        presenter?.updateTrainingData(
+        presenter.updateTrainingData(
             champions?.get(champion.selectedItemPosition)?.id,
             heroes?.get(hero.selectedItemPosition)?.id,
             AppUtils.parseDate(dateText?.text?.toString()).timeInMillis)

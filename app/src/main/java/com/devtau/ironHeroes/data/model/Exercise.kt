@@ -1,14 +1,21 @@
 package com.devtau.ironHeroes.data.model
 
 import androidx.room.Entity
+import androidx.room.Index
 
-@Entity(tableName = "Exercises")
+@Entity(
+    tableName = "Exercises",
+    indices = [Index("muscleGroupId")],
+    ignoredColumns = ["muscleGroup"]
+)
 class Exercise(
     id: Long?,
     var name: String,
-    var muscleGroupId: Long
+    var muscleGroupId: Long,
+    var muscleGroup: MuscleGroup?
 ): DataObject(id) {
 
+    constructor(id: Long?, name: String, muscleGroupId: Long): this(id, name, muscleGroupId, null)
 
     companion object {
         fun getMock() = listOf(

@@ -14,7 +14,8 @@ import com.devtau.ironHeroes.enums.HumanType
     Hero::class,
     Training::class,
     Exercise::class,
-    MuscleGroup::class
+    MuscleGroup::class,
+    ExerciseInTraining::class
 ], version = SQLHelper.DB_VERSION)
 @TypeConverters(HumanType.Converter::class)
 abstract class DB: RoomDatabase() {
@@ -23,6 +24,7 @@ abstract class DB: RoomDatabase() {
     abstract fun trainingDao(): TrainingDao
     abstract fun exerciseDao(): ExerciseDao
     abstract fun muscleGroupDao(): MuscleGroupDao
+    abstract fun exerciseInTrainingDao(): ExerciseInTrainingDao
 
 
     companion object {

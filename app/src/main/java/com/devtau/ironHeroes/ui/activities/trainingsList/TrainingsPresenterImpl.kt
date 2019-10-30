@@ -4,6 +4,7 @@ import com.devtau.ironHeroes.data.DataLayer
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
+import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
 import io.reactivex.functions.Consumer
 

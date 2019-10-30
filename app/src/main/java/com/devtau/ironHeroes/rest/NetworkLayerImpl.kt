@@ -16,6 +16,7 @@ import com.devtau.ironHeroes.util.Constants.INTERNAL_SERVER_ERROR
 import com.devtau.ironHeroes.util.Constants.TOO_MANY_REQUESTS
 import com.devtau.ironHeroes.util.Constants.UNAUTHORIZED
 import com.devtau.ironHeroes.util.Logger
+import com.google.gson.GsonBuilder
 import io.reactivex.functions.Consumer
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -25,6 +26,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class NetworkLayerImpl(private val context: Context): NetworkLayer {
@@ -35,7 +37,7 @@ class NetworkLayerImpl(private val context: Context): NetworkLayer {
 
     override fun validatePhone(phone: String) {
         if (!AppUtils.checkConnection(context)) return
-        getBackendAPIClient(true).validatePhone(phone)
+        getBackendApiClient(true).validatePhone(phone)
             .enqueue(object: BaseCallback<BaseResponse>() {
                 override fun processBody(responseBody: BaseResponse?) = showToast(R.string.wait_for_sms)
             })
@@ -43,28 +45,28 @@ class NetworkLayerImpl(private val context: Context): NetworkLayer {
 
     override fun registerNewHero(hero: Hero, smsValidationCode: Int?, listener: HeroRegisteredListener) {
         if (!AppUtils.checkConnection(context)) return
-        getBackendAPIClient(true).registerNewHero(hero, smsValidationCode)
-                .enqueue(object: BaseCallback<RegistrationResponse>() {
-                    override fun processBody(responseBody: RegistrationResponse?) =
-                            listener.processHeroRegistered(responseBody?.token, responseBody?.hero)
-                })
+        getBackendApiClient(true).registerNewHero(hero, smsValidationCode)
+            .enqueue(object: BaseCallback<RegistrationResponse>() {
+                override fun processBody(responseBody: RegistrationResponse?) =
+                    listener.processHeroRegistered(responseBody?.token, responseBody?.hero)
+            })
     }
 
     override fun getHero(token: String?, listener: Consumer<Hero?>) {
         if (!AppUtils.checkConnection(context) || TextUtils.isEmpty(token)) return
-        getBackendAPIClient(true).getHero("Bearer $token")
-                .enqueue(object: BaseCallback<HeroResponse>() {
-                    override fun processBody(responseBody: HeroResponse?) = listener.accept(responseBody?.hero)
-                })
+        getBackendApiClient(true).getHero("Bearer $token")
+            .enqueue(object: BaseCallback<HeroResponse>() {
+                override fun processBody(responseBody: HeroResponse?) = listener.accept(responseBody?.hero)
+            })
     }
 
     override fun updateHero(hero: Hero?, token: String?) {
         if (!AppUtils.checkConnection(context) || TextUtils.isEmpty(token) || hero == null) return
-        getBackendAPIClient(true).updateHero("Bearer $token", hero)
-                .enqueue(object: BaseCallback<HeroResponse>() {
-                    override fun processBody(responseBody: HeroResponse?)
-                            = Logger.d(LOG_TAG, "hero updated. $responseBody")
-                })
+        getBackendApiClient(true).updateHero("Bearer $token", hero)
+            .enqueue(object: BaseCallback<HeroResponse>() {
+                override fun processBody(responseBody: HeroResponse?)
+                        = Logger.d(LOG_TAG, "hero updated. $responseBody")
+            })
     }
 
 
@@ -72,20 +74,21 @@ class NetworkLayerImpl(private val context: Context): NetworkLayer {
     private fun showToast(msg: String) = Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     private fun showDialog(@StringRes msgId: Int) = AppUtils.alertD(LOG_TAG, msgId, context)
 
-    private fun getBackendAPIClient(loggerNeeded: Boolean): BackendAPI {
+    private fun getBackendApiClient(loggerNeeded: Boolean): BackendAPI {
         val retrofit = Retrofit.Builder()
-                .baseUrl(BuildConfig.SERVER)
-                .client(getClient(loggerNeeded))
-                .build()
+            .baseUrl(BuildConfig.SERVER)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
+            .client(getClient(loggerNeeded))
+            .build()
         return retrofit.create(BackendAPI::class.java)
     }
 
     private fun getClient(loggerNeeded: Boolean): OkHttpClient {
         fun buildClient(loggerNeeded: Boolean): OkHttpClient {
             val builder = OkHttpClient.Builder()
-                    .connectTimeout(TIMEOUT_CONNECT, TimeUnit.SECONDS)
-                    .readTimeout(TIMEOUT_READ, TimeUnit.SECONDS)
-                    .writeTimeout(TIMEOUT_WRITE, TimeUnit.SECONDS)
+                .connectTimeout(TIMEOUT_CONNECT, TimeUnit.SECONDS)
+                .readTimeout(TIMEOUT_READ, TimeUnit.SECONDS)
+                .writeTimeout(TIMEOUT_WRITE, TimeUnit.SECONDS)
             if (BuildConfig.WITH_LOGS && loggerNeeded) {
                 builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             }
