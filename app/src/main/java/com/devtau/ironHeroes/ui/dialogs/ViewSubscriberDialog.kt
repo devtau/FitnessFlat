@@ -1,8 +1,8 @@
-package com.devtau.ironHeroes.ui.activities
+package com.devtau.ironHeroes.ui.dialogs
 
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.fragment.app.DialogFragment
 import com.devtau.ironHeroes.util.Constants.CLICKS_DEBOUNCE_RATE_MS
 import com.jakewharton.rxbinding2.widget.RxAdapterView
 import com.jakewharton.rxbinding2.widget.RxTextView
@@ -11,12 +11,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import java.util.concurrent.TimeUnit
 
-abstract class ViewSubscriberActivity: AppCompatActivity() {
+abstract class ViewSubscriberDialog: DialogFragment() {
 
     private val compositeUiDisposable = CompositeDisposable()
 
 
-    public override fun onStop() {
+    override fun onStop() {
         compositeUiDisposable.clear()
         super.onStop()
     }

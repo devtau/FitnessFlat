@@ -3,15 +3,9 @@ package com.devtau.ironHeroes.ui.activities.trainingsList
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
-import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.TrainingsAdapter
-import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsActivity
@@ -20,7 +14,7 @@ import com.devtau.ironHeroes.util.Constants
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_trainings.*
-import java.util.ArrayList
+import com.devtau.ironHeroes.R
 
 class TrainingsActivity: AppCompatActivity(), TrainingsView {
 
@@ -54,7 +48,9 @@ class TrainingsActivity: AppCompatActivity(), TrainingsView {
     override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId, confirmedListener))
     override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(LOG_TAG, msg, this, confirmedListener)
 
-    override fun updateTrainings(list: List<Training>?) = adapter?.setList(list)
+    override fun updateTrainings(list: List<Training>?) {
+        adapter?.setList(list, listView)
+    }
     //</editor-fold>
 
 

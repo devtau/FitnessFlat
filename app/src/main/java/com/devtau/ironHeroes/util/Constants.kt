@@ -7,6 +7,7 @@ object Constants {
     const val CLICKS_DEBOUNCE_RATE_MS = 700L
     const val EMPTY_OBJECT_ID = -1L
     const val OBJECT_ID_NA = 0L
+    const val INTEGER_NOT_PARSED = -1
 
     const val DATE_FORMATTER = "dd.MM.yyyy"
     const val DATE_WITH_WEEK_DAY_FORMATTER = "dd.MM.yyyy, EE"
@@ -20,4 +21,5 @@ object Constants {
     const val HERO_ID = "heroId"
     const val HUMAN_TYPE = "humanType"
     const val TRAINING_ID = "trainingId"
+    const val EXERCISE_IN_TRAINING_ID = "exerciseInTrainingId"
 }

@@ -25,7 +25,7 @@ class HeroesAdapter(
 
     override fun onBindViewHolder(holder: HeroesViewHolder, position: Int) {
         val hero = heroes?.get(position) ?: return
-        Logger.d(LOG_TAG, "onBindViewHolder. hero=$hero")
+        Logger.v(LOG_TAG, "onBindViewHolder. hero=$hero")
         Glide.with(holder.context).load(
             if (!TextUtils.isEmpty(hero.avatarUrl)) hero.avatarUrl
             else if (hero.avatarId != null) hero.avatarId
@@ -39,7 +39,7 @@ class HeroesAdapter(
 
 
     fun setList(list: List<Hero>?) {
-        this.heroes = list
+        heroes = list
         notifyDataSetChanged()
     }
 

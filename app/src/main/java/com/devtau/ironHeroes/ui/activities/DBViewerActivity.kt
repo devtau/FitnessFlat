@@ -231,7 +231,7 @@ class DBViewerActivity: AppCompatActivity() {
             } while (cursor.moveToNext())
         }
         //an array adapter with above created arrayList
-        val tableNamesAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, tableNames) {
+        val tableNamesAdapter = object: ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, tableNames) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getView(position, convertView, parent)
                 view.setBackgroundColor(Color.WHITE)
@@ -250,7 +250,7 @@ class DBViewerActivity: AppCompatActivity() {
         selectTable.adapter = tableNamesAdapter
 
         // when a table names is selected display the table contents
-        selectTable.onItemSelectedListener = object : OnItemSelectedListener {
+        selectTable.onItemSelectedListener = object: OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
                 if (pos == 0 && !isCustomQuery) {
                     secondRow.visibility = View.GONE
@@ -293,7 +293,7 @@ class DBViewerActivity: AppCompatActivity() {
                     spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item)
 
                     // a array adapter which add values to the spinner which helps in user making changes to the table
-                    val adapter = object : ArrayAdapter<String>(this@DBViewerActivity, android.R.layout.simple_spinner_item, spinnerTableValues) {
+                    val adapter = object: ArrayAdapter<String>(this@DBViewerActivity, android.R.layout.simple_spinner_item, spinnerTableValues) {
                         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                             val view = super.getView(position, convertView, parent)
                             view.setBackgroundColor(Color.WHITE)
@@ -324,7 +324,7 @@ class DBViewerActivity: AppCompatActivity() {
 
                         //the spinnerTable has the 3 items to drop , delete , add row to the table selected by the user
                         //here we handle the 3 operations.
-                        spinnerTable.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        spinnerTable.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
                             override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
                                 (parentView.getChildAt(0) as TextView).setTextColor(Color.rgb(0, 0, 0))
                                 //when user selects to drop the table the below code in if block will be executed
@@ -605,7 +605,7 @@ class DBViewerActivity: AppCompatActivity() {
         linearLayoutParams.setMargins(0, 20, 0, 0)
 
         //spinner which displays update , delete options
-        val crudAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerArray) {
+        val crudAdapter = object: ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerArray) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val view = super.getView(position, convertView, parent)
                 view.setBackgroundColor(Color.WHITE)

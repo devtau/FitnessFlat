@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/marginHalf"
+    android:paddingBottom="@dimen/marginHalf"
+    android:paddingLeft="@dimen/marginNormal"
+    android:paddingRight="@dimen/marginNormal"
+    style="@style/SelectableItemBackground"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/exercise"
+        tools:text="Жим штанги (центр)"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/secondaryTextColor"/>
+    
+    <TextView
+        android:id="@+id/weight"
+        tools:text="80"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:textColor="@color/secondaryTextColor"/>
+    
+    <TextView
+        android:text="*"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:textColor="@color/secondaryTextColor"/>
+    
+    <TextView
+        android:id="@+id/count"
+        tools:text="45"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:textColor="@color/secondaryTextColor"/>
+</LinearLayout>

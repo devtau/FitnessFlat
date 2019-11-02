@@ -7,12 +7,15 @@ import com.devtau.ironHeroes.ui.activities.heroesList.HeroesActivity
 import com.devtau.ironHeroes.ui.activities.heroesList.HeroesPresenterImpl
 import com.devtau.ironHeroes.ui.activities.heroDetails.HeroDetailsActivity
 import com.devtau.ironHeroes.ui.activities.heroDetails.HeroDetailsPresenterImpl
+import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExercisePresenterImpl
 import com.devtau.ironHeroes.ui.activities.launcher.LauncherActivity
 import com.devtau.ironHeroes.ui.activities.launcher.LauncherPresenterImpl
 import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsActivity
 import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsPresenterImpl
 import com.devtau.ironHeroes.ui.activities.trainingsList.TrainingsActivity
 import com.devtau.ironHeroes.ui.activities.trainingsList.TrainingsPresenterImpl
+import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
+import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
 import com.devtau.ironHeroes.util.Constants.HERO_ID
 import com.devtau.ironHeroes.util.Constants.HUMAN_TYPE
 import com.devtau.ironHeroes.util.Constants.TRAINING_ID
@@ -57,5 +60,24 @@ class DependencyRegistry {
         val prefs = PreferencesManager.getInstance(activity)
         val trainingId = if (activity.intent?.hasExtra(TRAINING_ID) == true) activity.intent?.extras?.getLong(TRAINING_ID) else null
         activity.presenter = TrainingDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, trainingId)
+    }
+
+    fun inject(dialog: ExerciseDialog) {
+        val context = dialog.context ?: return
+        val dataLayer = DataLayerImpl(context)
+        val networkLayer = NetworkLayerImpl(context)
+        val prefs = PreferencesManager.getInstance(context)
+        val trainingId = if (dialog.arguments?.containsKey(TRAINING_ID) == true)
+            dialog.arguments?.getLong(TRAINING_ID) else null
+        val exerciseId = if (dialog.arguments?.containsKey(EXERCISE_IN_TRAINING_ID) == true)
+            dialog.arguments?.getLong(EXERCISE_IN_TRAINING_ID) else null
+        dialog.presenter = ExercisePresenterImpl(
+            dialog,
+            dataLayer,
+            networkLayer,
+            prefs,
+            trainingId,
+            exerciseId
+        )
     }
 }

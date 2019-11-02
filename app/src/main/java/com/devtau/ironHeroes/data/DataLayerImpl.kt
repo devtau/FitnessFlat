@@ -204,7 +204,7 @@ class DataLayerImpl(context: Context): DataLayer {
             }) { Logger.e(LOG_TAG, "Error in getExerciseAndClose: ${it.message}") }
     }
 
-    override fun getExercisesAndClose(id: Long, listener: Consumer<List<Exercise>?>) {
+    override fun getExercisesAndClose(listener: Consumer<List<Exercise>?>) {
         var disposable: Disposable? = null
         disposable = db.exerciseDao().getList()
             .subscribeOn(Schedulers.io())
@@ -226,6 +226,18 @@ class DataLayerImpl(context: Context): DataLayer {
                 listener.accept(if (it.isEmpty()) null else it)
                 disposable?.dispose()
             }) { Logger.e(LOG_TAG, "Error in getExercisesInTrainingAndClose: ${it.message}") }
+    }
+
+    override fun getExerciseInTrainingAndClose(id: Long, listener: Consumer<ExerciseInTraining?>) {
+        var disposable: Disposable? = null
+        disposable = db.exerciseInTrainingDao().getById(id)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map(ExerciseInTrainingRelation::convert)
+            .subscribe({
+                listener.accept(it)
+                disposable?.dispose()
+            }) { Logger.e(LOG_TAG, "Error in getExerciseInTrainingAndClose: ${it.message}") }
     }
 
 

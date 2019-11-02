@@ -1,7 +1,7 @@
 package com.devtau.ironHeroes.ui.activities.trainingDetails
 
 import android.content.Context
-import com.devtau.ironHeroes.enums.HumanType
+import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import io.reactivex.functions.Action
 
 interface TrainingDetailsPresenter {
@@ -11,4 +11,6 @@ interface TrainingDetailsPresenter {
     fun showDateDialog(context: Context, selectedDate: Long?)
     fun onBackPressed(action: Action)
     fun deleteTraining()
+    fun provideExercises(): List<ExerciseInTraining>?
+    fun provideTrainingId(): Long?
 }

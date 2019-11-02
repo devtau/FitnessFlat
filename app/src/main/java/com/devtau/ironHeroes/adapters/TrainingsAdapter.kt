@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.viewHolders.TrainingsViewHolder
 import com.devtau.ironHeroes.data.model.Training
+import com.devtau.ironHeroes.util.Animator
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
+import com.devtau.ironHeroes.util.Threading
 import io.reactivex.functions.Consumer
 
 class TrainingsAdapter(
@@ -23,7 +25,7 @@ class TrainingsAdapter(
 
     override fun onBindViewHolder(holder: TrainingsViewHolder, position: Int) {
         val training = trainings?.get(position) ?: return
-        Logger.d(LOG_TAG, "onBindViewHolder. training=$training")
+        Logger.v(LOG_TAG, "onBindViewHolder. training=$training")
         holder.date.text = AppUtils.formatDateWithWeekDay(training.date)
         holder.root.setOnClickListener { listener.accept(training) }
     }
@@ -31,9 +33,20 @@ class TrainingsAdapter(
     override fun getItemCount(): Int = trainings?.size ?: 0
 
 
-    fun setList(list: List<Training>?) {
-        this.trainings = list
-        notifyDataSetChanged()
+    fun setList(list: List<Training>?, listView: RecyclerView?) {
+        if (itemCount == 0) {
+            Threading.dispatchMainDelayed(Consumer {
+                listView?.visibility = View.INVISIBLE
+                this.trainings = list
+                notifyDataSetChanged()
+                val unbounded = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                listView?.measure(unbounded, unbounded)
+                Animator.animateDropdownSlide(listView, listView?.measuredHeight, Animator.ANIMATION_LENGTH_MED, true)
+            }, Animator.ANIMATION_LENGTH_MED)
+        } else {
+            this.trainings = list
+            notifyDataSetChanged()
+        }
     }
 
 

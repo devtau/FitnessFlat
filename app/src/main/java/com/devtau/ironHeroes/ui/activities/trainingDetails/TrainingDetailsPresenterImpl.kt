@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.content.Context
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
+import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.rest.NetworkLayer
@@ -39,10 +40,10 @@ class TrainingDetailsPresenterImpl(
                 view.showScreenTitle(training == null)
                 view.showDeleteTrainingBtn(training != null)
 
-                dataLayer.getExercisesAndClose(trainingId, Consumer { exercisesFromDB ->
+                dataLayer.getExercisesAndClose(Consumer { exercisesFromDB ->
 
                     //TODO: serialize exercisesInTraining
-                    dataLayer.getExercisesInTrainingAndClose(trainingId, Consumer {
+                    disposeOnStop(dataLayer.getExercisesInTraining(trainingId, Consumer {
                         if (it != null && exercisesFromDB != null)
                             for (next in it)
                                 for (nextExercise in exercisesFromDB)
@@ -50,7 +51,7 @@ class TrainingDetailsPresenterImpl(
                                         next.exercise = nextExercise
                         training?.exercises = it
                         view.showTrainingDetails(training)
-                    })
+                    }))
                 })
             })
         }
@@ -102,6 +103,9 @@ class TrainingDetailsPresenterImpl(
             view.closeScreen()
         })
     }
+
+    override fun provideExercises(): List<ExerciseInTraining>? = training?.exercises
+    override fun provideTrainingId() = training?.id
     //</editor-fold>
 
 

@@ -43,6 +43,7 @@ interface DataLayer {
     fun getHeroByIdAndClose(id: Long, listener: Consumer<Hero?>)
     fun getTrainingByIdAndClose(id: Long, listener: Consumer<Training?>)
     fun getExerciseAndClose(id: Long, listener: Consumer<Exercise?>)
-    fun getExercisesAndClose(id: Long, listener: Consumer<List<Exercise>?>)
+    fun getExercisesAndClose(listener: Consumer<List<Exercise>?>)
     fun getExercisesInTrainingAndClose(trainingId: Long, listener: Consumer<List<ExerciseInTraining>?>)
+    fun getExerciseInTrainingAndClose(id: Long, listener: Consumer<ExerciseInTraining?>)
 }
