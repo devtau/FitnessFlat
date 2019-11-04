@@ -12,7 +12,7 @@ class HeroesPresenterImpl(
     private val view: HeroesView,
     private val dataLayer: DataLayer,
     private val networkLayer: NetworkLayer,
-    private val prefs: PreferencesManager?,
+    private val prefs: PreferencesManager,
     private val humanType: HumanType
 ): DBSubscriber(), HeroesPresenter {
 

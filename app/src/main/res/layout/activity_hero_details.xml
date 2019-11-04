@@ -113,7 +113,7 @@
 						android:id="@+id/genderFemale"
 						android:layout_width="80dp"
 						android:layout_height="wrap_content"
-						android:drawableTop="@mipmap/ic_gender_female"
+						android:drawableTop="@drawable/ic_gender_female"
 						android:textOff=""
 						android:textOn=""
 						android:textSize="0sp"/>
@@ -122,7 +122,7 @@
 						android:id="@+id/genderMale"
 						android:layout_width="80dp"
 						android:layout_height="wrap_content"
-						android:drawableTop="@mipmap/ic_gender_male"
+						android:drawableTop="@drawable/ic_gender_male"
 						android:textOff=""
 						android:textOn=""
 						android:textSize="0sp"/>
@@ -232,5 +232,5 @@
 		android:layout_gravity="bottom|end"
 		android:layout_margin="@dimen/marginNormal"
 		android:visibility="invisible"
-		app:srcCompat="@mipmap/ic_delete"/>
+		app:srcCompat="@drawable/ic_delete"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

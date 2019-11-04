@@ -26,14 +26,14 @@ class DependencyRegistry {
     fun inject(activity: LauncherActivity) {
         val dataLayer = DataLayerImpl(activity)
         val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager.getInstance(activity)
+        val prefs = PreferencesManager(activity)
         activity.presenter = LauncherPresenterImpl(activity, dataLayer, networkLayer, prefs)
     }
 
     fun inject(activity: HeroesActivity) {
         val dataLayer = DataLayerImpl(activity)
         val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager.getInstance(activity)
+        val prefs = PreferencesManager(activity)
         val humanType = activity.intent?.extras?.getSerializable(HUMAN_TYPE) as HumanType? ?: return
         activity.presenter = HeroesPresenterImpl(activity, dataLayer, networkLayer, prefs, humanType)
     }
@@ -41,7 +41,7 @@ class DependencyRegistry {
     fun inject(activity: HeroDetailsActivity) {
         val dataLayer = DataLayerImpl(activity)
         val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager.getInstance(activity)
+        val prefs = PreferencesManager(activity)
         val heroId = if (activity.intent?.hasExtra(HERO_ID) == true) activity.intent?.extras?.getLong(HERO_ID) else null
         val humanType = activity.intent?.extras?.getSerializable(HUMAN_TYPE) as HumanType? ?: return
         activity.presenter = HeroDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, heroId, humanType)
@@ -50,14 +50,14 @@ class DependencyRegistry {
     fun inject(activity: TrainingsActivity) {
         val dataLayer = DataLayerImpl(activity)
         val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager.getInstance(activity)
+        val prefs = PreferencesManager(activity)
         activity.presenter = TrainingsPresenterImpl(activity, dataLayer, networkLayer, prefs)
     }
 
     fun inject(activity: TrainingDetailsActivity) {
         val dataLayer = DataLayerImpl(activity)
         val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager.getInstance(activity)
+        val prefs = PreferencesManager(activity)
         val trainingId = if (activity.intent?.hasExtra(TRAINING_ID) == true) activity.intent?.extras?.getLong(TRAINING_ID) else null
         activity.presenter = TrainingDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, trainingId)
     }
@@ -66,7 +66,7 @@ class DependencyRegistry {
         val context = dialog.context ?: return
         val dataLayer = DataLayerImpl(context)
         val networkLayer = NetworkLayerImpl(context)
-        val prefs = PreferencesManager.getInstance(context)
+        val prefs = PreferencesManager(context)
         val trainingId = if (dialog.arguments?.containsKey(TRAINING_ID) == true)
             dialog.arguments?.getLong(TRAINING_ID) else null
         val exerciseId = if (dialog.arguments?.containsKey(EXERCISE_IN_TRAINING_ID) == true)

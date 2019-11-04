@@ -42,6 +42,7 @@
 	<string name="error_formatter" formatted="false">Ошибка: %s</string>
     <string name="cancel">Отмена</string>
     <string name="save">Сохранить</string>
+    <string name="filters">Фильтры</string>
 	
 	<string name="check_internet_connection">Проверьте подключение к сети интернет</string>
     <string name="serializable_object_changed">Похоже, что изменился один из сериализуемых объектов, получаемых от сервера</string>

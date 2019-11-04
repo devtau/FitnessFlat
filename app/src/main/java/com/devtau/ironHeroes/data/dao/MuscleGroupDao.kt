@@ -15,7 +15,7 @@ interface MuscleGroupDao {
     fun getById(id: Long): Flowable<MuscleGroup>
 
     @Transaction
-    @Query("SELECT * FROM MuscleGroups")
+    @Query("SELECT * FROM MuscleGroups ORDER BY name")
     fun getList(): Flowable<List<MuscleGroup>>
 
     @Delete

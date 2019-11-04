@@ -1,9 +1,12 @@
 package com.devtau.ironHeroes.adapters
 
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.viewHolders.TrainingsViewHolder
 import com.devtau.ironHeroes.data.model.Training
@@ -26,7 +29,17 @@ class TrainingsAdapter(
     override fun onBindViewHolder(holder: TrainingsViewHolder, position: Int) {
         val training = trainings?.get(position) ?: return
         Logger.v(LOG_TAG, "onBindViewHolder. training=$training")
-        holder.date.text = AppUtils.formatDateWithWeekDay(training.date)
+        Glide.with(holder.context).load(
+            if (!TextUtils.isEmpty(training.champion?.avatarUrl)) training.champion?.avatarUrl
+            else if (training.champion?.avatarId != null) training.champion?.avatarId
+            else null)
+            .transition(DrawableTransitionOptions.withCrossFade()).into(holder.championImage)
+        holder.date.text = AppUtils.formatDateTimeWithWeekDay(training.date)
+        Glide.with(holder.context).load(
+            if (!TextUtils.isEmpty(training.hero?.avatarUrl)) training.hero?.avatarUrl
+            else if (training.hero?.avatarId != null) training.hero?.avatarId
+            else null)
+            .transition(DrawableTransitionOptions.withCrossFade()).into(holder.heroImage)
         holder.root.setOnClickListener { listener.accept(training) }
     }
 

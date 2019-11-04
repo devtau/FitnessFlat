@@ -5,16 +5,81 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context=".ui.activities.heroesList.HeroesActivity">
-
-	<include layout="@layout/toolbar"/>
-
-	<androidx.recyclerview.widget.RecyclerView
-		android:id="@+id/listView"
+	tools:context=".ui.activities.trainingsList.TrainingsActivity">
+	
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"/>
-
+		android:orientation="vertical">
+		
+		<include layout="@layout/toolbar"/>
+		
+		<LinearLayout
+			android:id="@+id/filters"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:paddingTop="@dimen/marginHalf"
+			android:paddingBottom="@dimen/marginHalf"
+			android:background="@color/colorWhite"
+			android:elevation="4dp"
+			android:visibility="gone"
+			android:orientation="horizontal">
+			
+			<LinearLayout
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:orientation="vertical">
+				
+				<TextView
+					android:text="@string/champion"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:paddingLeft="@dimen/marginNormal"
+					android:paddingRight="@dimen/marginNormal"
+					android:textColor="@color/secondaryTextColor"
+					android:textSize="@dimen/secondaryTextSize"/>
+				
+				<Spinner
+					android:id="@+id/champion"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="@dimen/marginHalf"
+					android:paddingLeft="@dimen/marginHalf"
+					android:paddingRight="@dimen/marginHalf"/>
+			</LinearLayout>
+			
+			<LinearLayout
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:orientation="vertical">
+				
+				<TextView
+					android:text="@string/hero"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:paddingLeft="@dimen/marginNormal"
+					android:paddingRight="@dimen/marginNormal"
+					android:textColor="@color/secondaryTextColor"
+					android:textSize="@dimen/secondaryTextSize"/>
+				
+				<Spinner
+					android:id="@+id/hero"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="@dimen/marginHalf"
+					android:paddingLeft="@dimen/marginHalf"
+					android:paddingRight="@dimen/marginHalf"/>
+			</LinearLayout>
+		</LinearLayout>
+		
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/listView"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"/>
+	</LinearLayout>
+	
 	<com.google.android.material.floatingactionbutton.FloatingActionButton
 		android:id="@+id/fab"
 		android:layout_width="wrap_content"
@@ -22,5 +87,5 @@
 		android:layout_gravity="bottom|end"
 		android:layout_margin="@dimen/marginNormal"
 		android:visibility="invisible"
-		app:srcCompat="@mipmap/ic_add"/>
+		app:srcCompat="@drawable/ic_add"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

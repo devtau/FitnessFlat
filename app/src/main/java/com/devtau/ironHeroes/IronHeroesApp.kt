@@ -16,7 +16,7 @@ class IronHeroesApp: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        prefs = PreferencesManager.getInstance(this)
+        prefs = PreferencesManager(this)
         //vk
         VKSdk.initialize(this)
         object: VKAccessTokenTracker() {

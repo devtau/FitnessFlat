@@ -10,7 +10,7 @@ class LauncherPresenterImpl(
     private val view: LauncherView,
     private val dataLayer: DataLayer,
     private val networkLayer: NetworkLayer,
-    private val prefs: PreferencesManager?
+    private val prefs: PreferencesManager
 ): DBSubscriber(), LauncherPresenter {
 
     init {

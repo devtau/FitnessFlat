@@ -68,7 +68,7 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        val authListener = IronHeroesApp.getVKAuthListener(this, PreferencesManager.getInstance(this))
+        val authListener = IronHeroesApp.getVKAuthListener(this, PreferencesManager(this))
         if (VKSdk.onActivityResult(requestCode, resultCode, intent, authListener)) {
             val params = VKParameters()
             params[VKApiConst.FIELDS] = "photo_max_orig"
@@ -106,24 +106,17 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     }
 
     override fun showHeroDetails(hero: Hero?) {
-        fun updateInputField(input: TextView?, value: String?) {
-            if (input != null && input.text?.toString() != value) {
-                input.setText(value)
-                if (input is EditText) input.setSelection(value?.length ?: 0)
-            }
-        }
-
         Logger.d(LOG_TAG, "showHeroDetails. hero=$hero")
-        updateInputField(firstNameInput, hero?.firstName)
-        updateInputField(secondNameInput, hero?.secondName)
-        updateInputField(phoneInput, hero?.phone)
+        AppUtils.updateInputField(firstNameInput, hero?.firstName)
+        AppUtils.updateInputField(secondNameInput, hero?.secondName)
+        AppUtils.updateInputField(phoneInput, hero?.phone)
 
         genderFemale?.isChecked = hero?.gender == Gender.FEMALE.code
         genderMale?.isChecked = hero?.gender == Gender.MALE.code
 
-        updateInputField(vkIdInput, hero?.vkId)
-        updateInputField(emailInput, hero?.email)
-        updateInputField(birthdayText, hero?.birthDay)
+        AppUtils.updateInputField(vkIdInput, hero?.vkId)
+        AppUtils.updateInputField(emailInput, hero?.email)
+        AppUtils.updateInputField(birthdayText, AppUtils.formatDate(hero?.birthDay))
         isChampion?.isChecked = hero?.humanType == HumanType.CHAMPION
     }
 

@@ -6,4 +6,5 @@ interface TrainingsPresenter {
     fun onStop()
     fun restartLoaders()
     fun provideTrainings(): List<Training>?
+    fun filterAndUpdateList(championIndex: Int, heroIndex: Int)
 }

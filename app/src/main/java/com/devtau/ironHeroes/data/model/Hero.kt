@@ -5,6 +5,7 @@ import androidx.room.Entity
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.enums.Gender
 import com.devtau.ironHeroes.enums.HumanType
+import com.devtau.ironHeroes.util.AppUtils
 
 @Entity(tableName = "Heroes")
 class Hero(
@@ -17,7 +18,7 @@ class Hero(
 
     var vkId: String?,
     var email: String?,
-    var birthDay: String?,
+    var birthDay: Long?,
     var avatarUrl: String?,
     var avatarId: Int?
 ): DataObject(id) {
@@ -41,7 +42,7 @@ class Hero(
     }
 
     fun someFieldsChanged(firstName: String?, secondName: String?, phone: String?, gender: String?,
-                          vkId: String?, email: String?, birthDay: String?,
+                          vkId: String?, email: String?, birthDay: Long?,
                           avatarUrl: String?, avatarId: Int?) =
         firstName != this.firstName
                 || secondName != this.secondName
@@ -63,17 +64,17 @@ class Hero(
 
         fun getMockChampions() = listOf(
             Hero(1, HumanType.CHAMPION, "Рома", "Богданов", "+79111718219", Gender.MALE.code, "romanyurievich93", "d29028@yandex.ru",
-                "20.07.1993", null, R.drawable.roma),
+                AppUtils.parseDate("20.07.1993").timeInMillis, null, R.drawable.roma),
             Hero(2, HumanType.CHAMPION, "Антон", "Щукин", "+79500400027", Gender.MALE.code, "shukin2007", "d29029@yandex.ru",
-                "28.02.1993", null, R.drawable.anton))
+                AppUtils.parseDate("28.02.1993").timeInMillis, null, R.drawable.anton))
 
         fun getMockHeroes() = listOf(
             Hero(3, HumanType.HERO, "Денис", "Русских", "+79219781372", Gender.MALE.code, "devtau", "d29025@yandex.ru",
-                "25.09.1983", null, R.drawable.denis),
+                AppUtils.parseDate("25.09.1983").timeInMillis, null, R.drawable.denis),
             Hero(4, HumanType.HERO, "Маша", "Черничкина", "+79219781373", Gender.FEMALE.code, "iiaquamarieii", "d29026@yandex.ru",
-                "26.05.1993", null, R.drawable.masha),
+                AppUtils.parseDate("26.05.1993").timeInMillis, null, R.drawable.masha),
             Hero(5, HumanType.HERO, "Евгений", "Стирманов", "+79210000000", Gender.MALE.code, "uginstarr", "d29027@yandex.ru",
-                "25.10.1993", null, R.drawable.evgen))
+                AppUtils.parseDate("25.10.1993").timeInMillis, null, R.drawable.evgen))
 
 //        "https://yadi.sk/i/hZhu1zg73GNum4"
 //        "https://drive.google.com/open?id=0BwZwHCn4b4EseUZKYVB6eW1acTQ"

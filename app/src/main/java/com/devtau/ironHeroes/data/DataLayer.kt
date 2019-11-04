@@ -9,6 +9,7 @@ interface DataLayer {
     fun deleteHeroes(list: List<Hero?>?)
 
     fun updateTrainings(list: List<Training?>?)
+    fun updateTraining(training: Training?): Long
     fun deleteTrainings(list: List<Training?>?)
 
     fun updateExercises(list: List<Exercise?>?)
@@ -28,7 +29,7 @@ interface DataLayer {
     fun getChampions(listener: Consumer<List<Hero>?>): Disposable
 
     fun getTraining(id: Long, listener: Consumer<Training?>): Disposable
-    fun getTrainings(listener: Consumer<List<Training>?>): Disposable
+    fun getTrainings(listener: Consumer<List<Training>>): Disposable
 
     fun getExercise(id: Long, listener: Consumer<Exercise?>): Disposable
     fun getExercises(listener: Consumer<List<Exercise>?>): Disposable

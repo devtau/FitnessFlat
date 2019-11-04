@@ -6,6 +6,7 @@ import com.devtau.ironHeroes.data.relations.ExerciseInTrainingRelation
 import com.devtau.ironHeroes.data.relations.ExerciseRelation
 import com.devtau.ironHeroes.data.relations.TrainingRelation
 import com.devtau.ironHeroes.enums.HumanType
+import com.devtau.ironHeroes.util.Constants.EMPTY_OBJECT_ID
 import com.devtau.ironHeroes.util.Logger
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -37,6 +38,14 @@ class DataLayerImpl(context: Context): DataLayer {
     } else {
         Logger.d(LOG_TAG, "updateTrainings. list=$list")
         db.trainingDao().insert(list).subscribeDefault("updateTrainings. inserted")
+    }
+
+    override fun updateTraining(training: Training?) = if (training == null) {
+        Logger.e(LOG_TAG, "updateTrainings. training is null. aborting")
+        EMPTY_OBJECT_ID
+    } else {
+        Logger.d(LOG_TAG, "updateTrainings. training=$training")
+        db.trainingDao().insert(training)
     }
 
     override fun deleteTrainings(list: List<Training?>?) = if (list == null) {
@@ -120,7 +129,7 @@ class DataLayerImpl(context: Context): DataLayer {
         .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
         { Logger.e(LOG_TAG, "Error in getTraining: ${it.message}") }
 
-    override fun getTrainings(listener: Consumer<List<Training>?>): Disposable = db.trainingDao().getList()
+    override fun getTrainings(listener: Consumer<List<Training>>): Disposable = db.trainingDao().getList()
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .map { TrainingRelation.convertList(it) }

@@ -3,7 +3,9 @@ package com.devtau.ironHeroes.ui.activities.trainingsList
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.TrainingsAdapter
 import com.devtau.ironHeroes.data.model.Training
@@ -15,8 +17,9 @@ import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_trainings.*
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
 
-class TrainingsActivity: AppCompatActivity(), TrainingsView {
+class TrainingsActivity: ViewSubscriberActivity(), TrainingsView {
 
     lateinit var presenter: TrainingsPresenter
     private var adapter: TrainingsAdapter? = null
@@ -35,11 +38,26 @@ class TrainingsActivity: AppCompatActivity(), TrainingsView {
     override fun onStart() {
         super.onStart()
         presenter.restartLoaders()
+        subscribeField(champion, Consumer { applyFilter() })
+        subscribeField(hero, Consumer { applyFilter() })
     }
 
     override fun onStop() {
         super.onStop()
         presenter.onStop()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_trainings, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.filter -> {
+            filters?.visibility = if (filters?.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
     //</editor-fold>
 
@@ -51,6 +69,12 @@ class TrainingsActivity: AppCompatActivity(), TrainingsView {
     override fun updateTrainings(list: List<Training>?) {
         adapter?.setList(list, listView)
     }
+
+    override fun showChampions(list: List<String>?, selectedIndex: Int) =
+        AppUtils.initSpinner(champion, list, selectedIndex, this)
+
+    override fun showHeroes(list: List<String>?, selectedIndex: Int) =
+        AppUtils.initSpinner(hero, list, selectedIndex, this)
     //</editor-fold>
 
 
@@ -67,6 +91,8 @@ class TrainingsActivity: AppCompatActivity(), TrainingsView {
         listView?.layoutManager = CustomLinearLayoutManager(this)
         listView?.adapter = adapter
     }
+
+    private fun applyFilter() = presenter.filterAndUpdateList(champion?.selectedItemPosition ?: 0, hero?.selectedItemPosition ?: 0)
     //</editor-fold>
 
 

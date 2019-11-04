@@ -37,7 +37,7 @@ abstract class ViewSubscriberActivity: AppCompatActivity() {
         spinner ?: return
         compositeUiDisposable.add(RxAdapterView.itemSelections(spinner)
             .subscribeOn(AndroidSchedulers.mainThread())
-            .skip(2)
+            .skip(1)
             .subscribe(onNext))
     }
 }

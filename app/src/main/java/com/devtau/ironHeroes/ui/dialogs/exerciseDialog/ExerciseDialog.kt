@@ -4,10 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.FragmentManager
 import android.view.*
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.dialogs.ViewSubscriberDialog
@@ -16,15 +13,13 @@ import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
 import com.devtau.ironHeroes.util.Constants.TRAINING_ID
 import com.devtau.ironHeroes.util.Logger
 import io.reactivex.functions.Action
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.dialog_exercise.*
-import java.util.ArrayList
 
 class ExerciseDialog: ViewSubscriberDialog(),
     ExerciseView {
 
     lateinit var presenter: ExercisePresenter
-    private var exercises: List<Exercise>? = null
-    private var exerciseInTraining: ExerciseInTraining? = null
     private var listener: Listener? = null
 
 
@@ -53,7 +48,8 @@ class ExerciseDialog: ViewSubscriberDialog(),
     override fun onStart() {
         super.onStart()
         presenter.restartLoaders()
-//        subscribeField(exercise, Consumer { presenter.updateExercise(exerciseInTraining) })
+        subscribeField(muscleGroup, Consumer { applyFilter() })
+        subscribeField(exercise, Consumer { updateExerciseData() })
     }
 
     override fun onResume() {
@@ -77,12 +73,15 @@ class ExerciseDialog: ViewSubscriberDialog(),
         if (context != null) AppUtils.alertD(LOG_TAG, msg, context!!, confirmedListener)
     }
 
-    override fun showExerciseDetails(exerciseInTraining: ExerciseInTraining?, exercises: List<Exercise>?) {
-        this.exercises = exercises
-        this.exerciseInTraining = exerciseInTraining
-        weightInput?.setText(exerciseInTraining?.weight?.toString())
-        countInput?.setText(exerciseInTraining?.count?.toString())
-        initSpinner(exercise, exercises, exerciseInTraining?.exerciseId)
+    override fun showMuscleGroups(list: List<String>?, selectedIndex: Int) =
+        AppUtils.initSpinner(muscleGroup, list, selectedIndex, context)
+
+    override fun showExercises(list: List<String>?, selectedIndex: Int) =
+        AppUtils.initSpinner(exercise, list, selectedIndex, context)
+
+    override fun showExerciseDetails(exercise: ExerciseInTraining?) {
+        AppUtils.updateInputField(weightInput, exercise?.weight?.toString())
+        AppUtils.updateInputField(countInput, exercise?.count?.toString() ?: ExerciseInTraining.DEFAULT_COUNT)
     }
     //</editor-fold>
 
@@ -92,33 +91,19 @@ class ExerciseDialog: ViewSubscriberDialog(),
         cancel.setOnClickListener { dialog?.dismiss() }
         save.setOnClickListener {
             dialog?.dismiss()
-            presenter.updateExercise(
-                exercises?.get(exercise.selectedItemPosition)?.id,
-                weightInput?.text?.toString(),
-                countInput?.text?.toString())
+            updateExerciseData()
         }
     }
 
-    private fun initSpinner(spinner: Spinner?, list: List<Exercise>?, selectedId: Long?) {
-        val context = context
-        if (context == null || spinner == null || list == null) {
-            Logger.e(LOG_TAG, "initSpinner. bad data. aborting")
-            return
-        }
-
-        val spinnerStrings = ArrayList<String>()
-        var selectedItemIndex = 0
-        for (i in list.indices) {
-            val next = list[i]
-            spinnerStrings.add(next.name)
-            if (next.id == selectedId) selectedItemIndex = i
-        }
-
-        val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, spinnerStrings)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-        spinner.setSelection(selectedItemIndex)
+    private fun updateExerciseData() {
+        val exerciseIndex = exercise?.selectedItemPosition
+        if (exerciseIndex != null) presenter.updateExerciseData(
+            exerciseIndex,
+            weightInput?.text?.toString(),
+            countInput?.text?.toString())
     }
+
+    private fun applyFilter() = presenter.filterAndUpdateList(muscleGroup?.selectedItemPosition ?: 0)
     //</editor-fold>
 
 

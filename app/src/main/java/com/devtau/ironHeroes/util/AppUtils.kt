@@ -5,16 +5,15 @@ import android.net.ConnectivityManager
 import android.telephony.PhoneNumberUtils
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
-import com.devtau.ironHeroes.util.Constants.DATE_WITH_WEEK_DAY_FORMATTER
+import com.devtau.ironHeroes.util.Constants.DATE_TIME_FORMATTER
+import com.devtau.ironHeroes.util.Constants.DATE_TIME_WITH_WEEK_DAY_FORMATTER
 import com.devtau.ironHeroes.util.Constants.PHONE_MASK
 import com.devtau.ironHeroes.util.Constants.STANDARD_DELAY_MS
 import com.redmadrobot.inputmask.MaskedTextChangedListener
@@ -55,27 +54,36 @@ object AppUtils {
 
     fun clearPhoneFromMask(savedPhone: String?): String = PhoneNumberUtils.normalizeNumber(savedPhone)
 
+    fun formatDate(timeInMillis: Long?): String {
+        val date = Calendar.getInstance()
+        if (timeInMillis != null) date.timeInMillis = timeInMillis
+        return formatDate(date)
+    }
     fun formatDate(cal: Calendar): String =
         SimpleDateFormat(DATE_FORMATTER, Locale.getDefault()).format(cal.time)
 
-    fun formatDate(cal: Long?): String {
+    fun formatDateTimeWithWeekDay(timeInMillis: Long?): String {
         val date = Calendar.getInstance()
-        if (cal != null) date.timeInMillis = cal
-        return SimpleDateFormat(DATE_FORMATTER, Locale.getDefault()).format(date.time)
+        if (timeInMillis != null) date.timeInMillis = timeInMillis
+        return formatDateTimeWithWeekDay(date)
     }
-
-    fun formatDateWithWeekDay(cal: Calendar): String =
-        SimpleDateFormat(DATE_WITH_WEEK_DAY_FORMATTER, Locale.getDefault()).format(cal.time)
-
-    fun formatDateWithWeekDay(cal: Long?): String {
-        val date = Calendar.getInstance()
-        if (cal != null) date.timeInMillis = cal
-        return SimpleDateFormat(DATE_WITH_WEEK_DAY_FORMATTER, Locale.getDefault()).format(date.time)
-    }
+    fun formatDateTimeWithWeekDay(cal: Calendar): String =
+        SimpleDateFormat(DATE_TIME_WITH_WEEK_DAY_FORMATTER, Locale.getDefault()).format(cal.time)
 
     fun parseDate(date: String?): Calendar {
         val calendar = Calendar.getInstance()
         val inputDf = SimpleDateFormat(DATE_FORMATTER, Locale.getDefault())
+        try {
+            calendar.timeInMillis = inputDf.parse(date).time
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return calendar
+    }
+
+    fun parseDateTime(date: String?): Calendar {
+        val calendar = Calendar.getInstance()
+        val inputDf = SimpleDateFormat(DATE_TIME_FORMATTER, Locale.getDefault())
         try {
             calendar.timeInMillis = inputDf.parse(date).time
         } catch (e: Exception) {
@@ -117,9 +125,9 @@ object AppUtils {
     fun alert(logTag: String?, msg: String, context: Context) {
         try {
             AlertDialog.Builder(context)
-                    .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
-                    .setMessage(msg)
-                    .show()
+                .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
+                .setMessage(msg)
+                .show()
             Logger.e(logTag ?: LOG_TAG, msg)
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
@@ -130,12 +138,12 @@ object AppUtils {
     fun alert(logTag: String?, msg: String, context: Context, confirmedListener: Action) {
         try {
             AlertDialog.Builder(context)
-                    .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                        confirmedListener.run()
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                    .setMessage(msg).show()
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    confirmedListener.run()
+                    dialog.dismiss()
+                }
+                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                .setMessage(msg).show()
             Logger.e(logTag ?: LOG_TAG, msg)
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
@@ -149,15 +157,33 @@ object AppUtils {
     fun alertD(logTag: String?, msg: String, context: Context, confirmedListener: Action? = null) {
         try {
             AlertDialog.Builder(context)
-                    .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                        confirmedListener?.run()
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                    .setMessage(msg).show()
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    confirmedListener?.run()
+                    dialog.dismiss()
+                }
+                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                .setMessage(msg).show()
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun initSpinner(spinner: Spinner?, spinnerStrings: List<String>?, selectedIndex: Int, context: Context?) {
+        if (spinner == null || spinnerStrings == null || context == null) {
+            Logger.e(LOG_TAG, "initSpinner. bad data. aborting")
+            return
+        }
+        val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, spinnerStrings)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+        spinner.setSelection(selectedIndex)
+    }
+
+    fun updateInputField(input: TextView?, value: String?) {
+        if (input != null && input.text?.toString() != value) {
+            input.setText(value)
+            if (input is EditText) input.setSelection(value?.length ?: 0)
         }
     }
 }

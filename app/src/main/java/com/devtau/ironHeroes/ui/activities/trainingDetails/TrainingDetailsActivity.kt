@@ -1,16 +1,16 @@
 package com.devtau.ironHeroes.ui.activities.trainingDetails
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.ExercisesInTrainingAdapter
-import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.data.model.Training
+import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
@@ -26,11 +26,10 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     TrainingDetailsView, ExerciseDialog.Listener {
 
     lateinit var presenter: TrainingDetailsPresenter
-    private var champions: List<Hero>? = null
-    private var heroes: List<Hero>? = null
     private var exercisesAdapter: ExercisesInTrainingAdapter? = null
     private var deleteTrainingBtn: MenuItem? = null
     private var deleteTrainingBtnVisibility: Boolean = false
+    private var trainingDate: Calendar? = null
 
 
     //<editor-fold desc="Framework overrides">
@@ -45,8 +44,8 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     override fun onStart() {
         super.onStart()
         presenter.restartLoaders()
-        subscribeField(champion, Consumer { updateTrainingData("champion", champion.selectedItem.toString()) })
-        subscribeField(hero, Consumer { updateTrainingData("hero", hero.selectedItem.toString()) })
+        subscribeField(champion, Consumer { updateTrainingData() })
+        subscribeField(hero, Consumer { updateTrainingData() })
     }
 
     override fun onStop() {
@@ -84,36 +83,22 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
         AppUtils.initToolbar(this, toolbarTitle, true)
     }
 
-    override fun showBirthdayNA() {
-        dateText?.text = AppUtils.formatDate(null)
+    override fun showTrainingDate(date: Calendar) {
+        trainingDate = date
+        dateText?.text = AppUtils.formatDateTimeWithWeekDay(date)
     }
+    override fun showExercises(list: List<ExerciseInTraining>?) = exercisesAdapter?.setList(list, listView)
+    override fun showChampions(list: List<String>?, selectedIndex: Int) = AppUtils.initSpinner(champion, list, selectedIndex, this)
+    override fun showHeroes(list: List<String>?, selectedIndex: Int) = AppUtils.initSpinner(hero, list, selectedIndex, this)
 
-    override fun showTrainingDetails(training: Training?) {
-        fun updateInputField(input: TextView?, value: String?) {
-            if (input != null && input.text?.toString() != value) {
-                input.setText(value)
-                if (input is EditText) input.setSelection(value?.length ?: 0)
-            }
-        }
-
-        Logger.d(LOG_TAG, "showTrainingDetails. training=$training")
-        updateInputField(dateText, AppUtils.formatDate(training?.date))
-        exercisesAdapter?.setList(training?.exercises, listView)
-    }
-
-    override fun showChampions(list: List<Hero>?, selectedChampionId: Long) {
-        champions = list
-        initSpinner(champion, list, selectedChampionId)
-    }
-
-    override fun showHeroes(list: List<Hero>?, selectedHeroId: Long) {
-        heroes = list
-        initSpinner(hero, list, selectedHeroId)
-    }
-
-    override fun onDateSet(date: Calendar) {
-        dateText?.text = AppUtils.formatDate(date)
-        updateTrainingData("dateText", dateText?.text?.toString())
+    override fun showDateDialog(date: Calendar, minDate: Calendar, maxDate: Calendar) {
+        trainingDate = date
+        val dialog = DatePickerDialog(this,
+            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(date, year, month, dayOfMonth) },
+            date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
+        dialog.datePicker.minDate = minDate.timeInMillis
+        dialog.datePicker.maxDate = maxDate.timeInMillis
+        dialog.show()
     }
 
     override fun showDeleteTrainingBtn(show: Boolean) {
@@ -127,37 +112,17 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     //<editor-fold desc="Private methods">
     private fun initUi() {
-        dateInput?.setOnClickListener {
-            presenter.showDateDialog(this, AppUtils.parseDate(dateText?.text?.toString()).timeInMillis)
-        }
+        dateInput?.setOnClickListener { presenter.dateDialogRequested(trainingDate) }
         addExercise?.setOnClickListener {
             ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTrainingId(), null, this)
         }
     }
 
-    private fun updateTrainingData(field: String, value: String?) {
-        Logger.d(LOG_TAG, "updateTrainingData. new data in $field detected. value=$value")
-        presenter.updateTrainingData(
-            champions?.get(champion.selectedItemPosition)?.id,
-            heroes?.get(hero.selectedItemPosition)?.id,
-            AppUtils.parseDate(dateText?.text?.toString()).timeInMillis)
-    }
-
-    private fun initSpinner(spinner: Spinner?, list: List<Hero>?, selectedId: Long) {
-        if (spinner == null || list == null) return
-
-        val spinnerStrings = ArrayList<String>()
-        var selectedItemIndex = 0
-        for (i in list.indices) {
-            val next = list[i]
-            spinnerStrings.add(next.getName())
-            if (next.id == selectedId) selectedItemIndex = i
-        }
-
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerStrings)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-        spinner.setSelection(selectedItemIndex)
+    private fun updateTrainingData() {
+        val championIndex = champion?.selectedItemPosition
+        val heroIndex = hero?.selectedItemPosition
+        if (championIndex == null || heroIndex == null || trainingDate == null) return
+        presenter.updateTrainingData(championIndex, heroIndex, trainingDate)
     }
 
     private fun initList() {
@@ -166,6 +131,27 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
         })
         listView?.layoutManager = CustomLinearLayoutManager(this)
         listView?.adapter = exercisesAdapter
+    }
+
+    private fun onDateSet(date: Calendar, year: Int, month: Int, dayOfMonth: Int) {
+        val dialog = TimePickerDialog(this,
+            TimePickerDialog.OnTimeSetListener { _, hour, minute -> onTimeSet(year, month, dayOfMonth, hour, minute) },
+            date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE), true)
+        dialog.show()
+    }
+
+    private fun onTimeSet(year: Int, month: Int, dayOfMonth: Int, hour: Int, minute: Int) {
+        Logger.d(LOG_TAG, "onTimeSet. year=$year, month=$month, dayOfMonth=$dayOfMonth, hour=$hour, minute=$minute")
+        val hourMinute = presenter.roundMinutesInHalfHourIntervals(hour, minute)
+        val date = Calendar.getInstance()
+        date.set(Calendar.YEAR, year)
+        date.set(Calendar.MONTH, month)
+        date.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        date.set(Calendar.HOUR_OF_DAY, hourMinute.hour)
+        date.set(Calendar.MINUTE, hourMinute.minute)
+        date.set(Calendar.SECOND, 0)
+        showTrainingDate(date)
+        updateTrainingData()
     }
     //</editor-fold>
 

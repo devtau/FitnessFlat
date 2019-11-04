@@ -5,7 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/marginNormal"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
+    
+    <Spinner
+        android:id="@+id/muscleGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/marginHalf"
+        android:paddingBottom="@dimen/marginHalf"
+        android:minHeight="48dp"/>
     
     <Spinner
         android:id="@+id/exercise"
@@ -34,7 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginLeft="@dimen/marginHalf"
-            android:inputType="numberDecimal"
+            android:inputType="number"
+            android:digits="0123456789"
             android:maxLines="1"/>
     </TableRow>
     
@@ -57,7 +68,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginLeft="@dimen/marginHalf"
-            android:inputType="numberDecimal"
+            android:inputType="number"
+            android:digits="0123456789"
             android:maxLines="1"/>
     </TableRow>
     

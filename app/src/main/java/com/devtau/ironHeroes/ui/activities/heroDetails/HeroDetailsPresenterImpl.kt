@@ -19,7 +19,7 @@ class HeroDetailsPresenterImpl(
     private val view: HeroDetailsView,
     private val dataLayer: DataLayer,
     private val networkLayer: NetworkLayer,
-    private val prefs: PreferencesManager?,
+    private val prefs: PreferencesManager,
     private val heroId: Long?,
     private val humanType: HumanType
 ): DBSubscriber(), HeroDetailsPresenter {
@@ -50,12 +50,12 @@ class HeroDetailsPresenterImpl(
                                 vkId: String?, email: String?, birthDay: String?,
                                 avatarUrl: String?, avatarId: Int?) {
         val allPartsPresent = Hero.allObligatoryPartsPresent(firstName, secondName, phone, gender)
-        val someFieldsChanged = hero?.someFieldsChanged(firstName, secondName, phone, gender, vkId, email, birthDay,
-            avatarUrl, avatarId) ?: true
+        val someFieldsChanged = hero?.someFieldsChanged(firstName, secondName, phone, gender, vkId, email,
+            AppUtils.parseDate(birthDay).timeInMillis, avatarUrl, avatarId) ?: true
         Logger.d(LOG_TAG, "updateHeroData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
         if (allPartsPresent && someFieldsChanged) {
-            hero = Hero(heroId, humanType, firstName!!, secondName!!, phone!!, gender!!, vkId, email, birthDay,
-                avatarUrl, avatarId ?: hero?.avatarId)
+            hero = Hero(heroId, humanType, firstName!!, secondName!!, phone!!, gender!!, vkId, email,
+                AppUtils.parseDate(birthDay).timeInMillis, avatarUrl, avatarId ?: hero?.avatarId)
             dataLayer.updateHeroes(listOf(hero))
         }
     }
@@ -63,7 +63,12 @@ class HeroDetailsPresenterImpl(
     override fun showBirthDayDialog(context: Context, selectedBirthday: String?) {
         val nowMinusCentury = Calendar.getInstance()
         nowMinusCentury.add(Calendar.YEAR, -100)
-        val birthDay = AppUtils.parseDate(hero?.birthDay ?: selectedBirthday)
+        val heroBirthDay = hero?.birthDay
+        val birthDay = if (heroBirthDay != null) {
+            val date = Calendar.getInstance()
+            date.timeInMillis = heroBirthDay
+            date
+        } else AppUtils.parseDate(selectedBirthday)
 
         val dialog = DatePickerDialog(context,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(year, month, dayOfMonth) },

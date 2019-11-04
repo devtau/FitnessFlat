@@ -1,92 +1,96 @@
 package com.devtau.ironHeroes.ui.activities.trainingDetails
 
-import android.app.DatePickerDialog
-import android.content.Context
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
-import com.devtau.ironHeroes.data.model.ExerciseInTraining
-import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.data.model.Training
+import com.devtau.ironHeroes.data.model.*
 import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
+import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
+import com.devtau.ironHeroes.util.Threading
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
+import java.util.concurrent.Callable
 
 class TrainingDetailsPresenterImpl(
     private val view: TrainingDetailsView,
     private val dataLayer: DataLayer,
     private val networkLayer: NetworkLayer,
-    private val prefs: PreferencesManager?,
-    private val trainingId: Long?
+    private val prefs: PreferencesManager,
+    private var trainingId: Long?
 ): DBSubscriber(), TrainingDetailsPresenter {
 
     private var training: Training? = null
     private var champions: List<Hero>? = null
     private var heroes: List<Hero>? = null
+    private var exercises: List<Exercise>? = null
+    private var exercisesInTraining: List<ExerciseInTraining>? = null
 
 
     //<editor-fold desc="Presenter overrides">
     override fun restartLoaders() {
-        if (trainingId == null) {
-            view.showScreenTitle(true)
-            view.showBirthdayNA()
-            view.showDeleteTrainingBtn(false)
-        } else {
-            dataLayer.getTrainingByIdAndClose(trainingId, Consumer { trainingFromDB ->
-                training = trainingFromDB
-                view.showScreenTitle(training == null)
-                view.showDeleteTrainingBtn(training != null)
-
-                dataLayer.getExercisesAndClose(Consumer { exercisesFromDB ->
-
-                    //TODO: serialize exercisesInTraining
-                    disposeOnStop(dataLayer.getExercisesInTraining(trainingId, Consumer {
-                        if (it != null && exercisesFromDB != null)
-                            for (next in it)
-                                for (nextExercise in exercisesFromDB)
-                                    if (next.exerciseId == nextExercise.id)
-                                        next.exercise = nextExercise
-                        training?.exercises = it
-                        view.showTrainingDetails(training)
-                    }))
-                })
-            })
-        }
+        disposeOnStop(dataLayer.getExercises(Consumer {
+            exercises = it
+            publishDataToView()
+        }))
         disposeOnStop(dataLayer.getChampions(Consumer {
             champions = it
-            view.showChampions(it, training?.championId ?: 0)
+            publishDataToView()
         }))
         disposeOnStop(dataLayer.getHeroes(Consumer {
             heroes = it
-            view.showHeroes(it, training?.heroId ?: 0)
+            publishDataToView()
         }))
-    }
 
-    override fun updateTrainingData(championId: Long?, heroId: Long?, date: Long?) {
-        val allPartsPresent = Training.allObligatoryPartsPresent(championId, heroId, date)
-        val someFieldsChanged = training?.someFieldsChanged(championId, heroId, date) ?: true
-        Logger.d(LOG_TAG, "updateTrainingData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
-        if (allPartsPresent && someFieldsChanged) {
-            training = Training(trainingId, championId!!, heroId!!, date!!)
-            dataLayer.updateTrainings(listOf(training))
+        val trainingId = trainingId
+        if (trainingId != null) {
+            disposeOnStop(dataLayer.getExercisesInTraining(trainingId, Consumer {
+                exercisesInTraining = it
+                publishDataToView()
+            }))
+            dataLayer.getTrainingByIdAndClose(trainingId, Consumer {
+                training = it
+                publishDataToView()
+            })
         }
     }
 
-    override fun showDateDialog(context: Context, selectedDate: Long?) {
+    override fun updateTrainingData(championIndex: Int, heroIndex: Int, date: Calendar?) {
+        val championId = champions?.get(championIndex)?.id
+        val heroId = heroes?.get(heroIndex)?.id
+        val trainingDate = date?.timeInMillis ?: Calendar.getInstance().timeInMillis
+        val allPartsPresent = Training.allObligatoryPartsPresent(championId, heroId, trainingDate)
+        val someFieldsChanged = training?.someFieldsChanged(championId, heroId, trainingDate) ?: true
+        Logger.d(LOG_TAG, "updateTrainingData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
+        if (allPartsPresent && someFieldsChanged) {
+            training = Training(trainingId, championId!!, heroId!!, trainingDate)
+            Threading.async(Callable {
+                trainingId = dataLayer.updateTraining(training)
+                if (training?.id == null) {
+                    training?.id = trainingId
+                    disposeOnStop(dataLayer.getExercisesInTraining(trainingId!!, Consumer {
+                        exercisesInTraining = it
+                        publishDataToView()
+                    }))
+                }
+            })
+        }
+    }
+
+    override fun dateDialogRequested(tempDate: Calendar?) {
+        val cal = tempDate?.timeInMillis ?: Calendar.getInstance().timeInMillis
         val nowMinusCentury = Calendar.getInstance()
         nowMinusCentury.add(Calendar.YEAR, -100)
-        val date = Calendar.getInstance()
-        if (selectedDate != null) date.timeInMillis = training?.date ?: selectedDate
 
-        val dialog = DatePickerDialog(context,
-            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(year, month, dayOfMonth) },
-            date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
-        dialog.datePicker.minDate = nowMinusCentury.timeInMillis
-        dialog.datePicker.maxDate = Calendar.getInstance().timeInMillis
-        dialog.show()
+        val nowPlusTwoDays = Calendar.getInstance()
+        nowPlusTwoDays.add(Calendar.DAY_OF_MONTH, 2)
+
+        val date = Calendar.getInstance()
+        if (tempDate != null) date.timeInMillis = training?.date ?: cal
+
+        view.showDateDialog(date, nowMinusCentury, nowPlusTwoDays)
     }
 
     override fun onBackPressed(action: Action) {
@@ -106,19 +110,66 @@ class TrainingDetailsPresenterImpl(
 
     override fun provideExercises(): List<ExerciseInTraining>? = training?.exercises
     override fun provideTrainingId() = training?.id
+
+    override fun roundMinutesInHalfHourIntervals(hour: Int, minute: Int): HourMinute =
+        if (hour == 23 && minute > 44) HourMinute(hour, 30)
+        else when (minute) {
+            in 1..14 -> HourMinute(hour, 0)
+            in 15..29 -> HourMinute(hour, 30)
+            in 31..44 -> HourMinute(hour, 30)
+            in 45..59 -> HourMinute(hour + 1, 0)
+            else -> HourMinute(hour, minute)
+        }
     //</editor-fold>
 
 
-    private fun onDateSet(year: Int, month: Int, dayOfMonth: Int) {
-        val date = Calendar.getInstance()
-        date.set(Calendar.YEAR, year)
-        date.set(Calendar.MONTH, month)
-        date.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-        date.set(Calendar.HOUR_OF_DAY, 0)
-        date.set(Calendar.MINUTE, 0)
-        date.set(Calendar.SECOND, 0)
+    private fun getSpinnerStrings(list: List<Hero>?): List<String> {
+        val spinnerStrings = ArrayList<String>()
+        if (list != null) for (next in list) spinnerStrings.add(next.getName())
+        return spinnerStrings
+    }
 
-        view.onDateSet(date)
+    private fun getSelectedItemIndex(list: List<Hero>?, selectedId: Long?): Int {
+        var index = 0
+        if (list != null) for (i in list.indices)
+            if (list[i].id == selectedId) index = i
+        return index
+    }
+
+    private fun publishDataToView() {
+        val training = training
+        if (AppUtils.isEmpty(exercises) || AppUtils.isEmpty(champions) || AppUtils.isEmpty(heroes)
+            || (trainingId != null && (training == null || exercisesInTraining == null))) return
+
+        val championId = training?.championId ?: prefs.favoriteChampionId
+        val heroId = training?.heroId ?: prefs.favoriteHeroId
+        view.showChampions(getSpinnerStrings(champions), getSelectedItemIndex(champions, championId))
+        view.showHeroes(getSpinnerStrings(heroes), getSelectedItemIndex(heroes, heroId))
+
+        if (trainingId == null) {
+            view.showScreenTitle(true)
+            view.showTrainingDate(Calendar.getInstance())
+            view.showDeleteTrainingBtn(false)
+        } else {
+            val exercises = exercises
+            val exercisesInTraining = exercisesInTraining
+            if (exercisesInTraining != null && exercises != null)
+                for (nextTraining in exercisesInTraining)
+                    for (nextExercise in exercises)
+                        if (nextTraining.exerciseId == nextExercise.id)
+                            nextTraining.exercise = nextExercise
+            training?.exercises = exercisesInTraining
+            view.showExercises(training!!.exercises)
+
+            view.showScreenTitle(false)
+            view.showTrainingDate(training.getDateCal())
+            view.showDeleteTrainingBtn(true)
+        }
+
+        Logger.d(LOG_TAG, "publishDataToView. " +
+                "training=$training, " +
+                "champions size=${champions?.size}, " +
+                "heroes size=${heroes?.size}")
     }
 
 
