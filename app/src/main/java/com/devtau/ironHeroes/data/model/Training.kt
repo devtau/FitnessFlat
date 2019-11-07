@@ -51,40 +51,40 @@ class Training(
 
             return listOf(
                 Training(1, anton.id ?: EMPTY_OBJECT_ID, anton, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("8.10 8:00").timeInMillis, null),
+                    AppUtils.parseDateTime("8.10.2019 8:00").timeInMillis, null),
                 Training(2, roma.id ?: EMPTY_OBJECT_ID, roma, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("9.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("9.10.2019 9:00").timeInMillis, null),
                 Training(3, roma.id ?: EMPTY_OBJECT_ID, roma, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("11.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("11.10.2019 9:00").timeInMillis, null),
 
                 Training(4, anton.id ?: EMPTY_OBJECT_ID, anton, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("14.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("14.10.2019 9:00").timeInMillis, null),
                 Training(5, anton.id ?: EMPTY_OBJECT_ID, anton, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("15.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("15.10.2019 9:00").timeInMillis, null),
                 Training(6, anton.id ?: EMPTY_OBJECT_ID, anton, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("17.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("17.10.2019 9:00").timeInMillis, null),
 
                 Training(7, roma.id ?: EMPTY_OBJECT_ID, roma, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("21.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("21.10.2019 9:00").timeInMillis, null),
                 Training(8, roma.id ?: EMPTY_OBJECT_ID, roma, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("22.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("22.10.2019 9:00").timeInMillis, null),
                 Training(9, anton.id ?: EMPTY_OBJECT_ID, anton, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("25.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("25.10.2019 9:00").timeInMillis, null),
 
                 Training(10, roma.id ?: EMPTY_OBJECT_ID, roma, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("28.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("28.10.2019 9:00").timeInMillis, null),
                 Training(11, roma.id ?: EMPTY_OBJECT_ID, roma, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("29.10 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("29.10.2019 9:00").timeInMillis, null),
                 Training(12, anton.id ?: EMPTY_OBJECT_ID, anton, denis.id ?: EMPTY_OBJECT_ID, denis,
-                    AppUtils.parseDateTime("01.11 9:00").timeInMillis, null),
+                    AppUtils.parseDateTime("01.11.2019 9:00").timeInMillis, null),
 
 
                 Training(13, roma.id ?: EMPTY_OBJECT_ID, roma,
                     Hero.getMockHeroes()[1].id ?: EMPTY_OBJECT_ID, Hero.getMockHeroes()[1],
-                    AppUtils.parseDateTime("21.10 9:30").timeInMillis, null),
+                    AppUtils.parseDateTime("21.10.2019 9:30").timeInMillis, null),
                 Training(14, roma.id ?: EMPTY_OBJECT_ID, roma,
                     Hero.getMockHeroes()[2].id ?: EMPTY_OBJECT_ID, Hero.getMockHeroes()[2],
-                    AppUtils.parseDateTime("21.10 10:00").timeInMillis, null)
+                    AppUtils.parseDateTime("21.10.2019 10:00").timeInMillis, null)
             )
         }
     }

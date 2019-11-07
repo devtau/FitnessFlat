@@ -19,6 +19,10 @@ interface ExerciseInTrainingDao {
     @Query("SELECT * FROM ExercisesInTraining WHERE trainingId = :trainingId")
     fun getList(trainingId: Long): Flowable<List<ExerciseInTrainingRelation>>
 
+    @Transaction
+    @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.id WHERE heroId = :heroId AND Trainings.date < :maxDate ORDER BY Trainings.date DESC")
+    fun getListForHero(heroId: Long, maxDate: Long): Flowable<List<ExerciseInTrainingRelation>>
+
     @Delete
     fun delete(list: List<ExerciseInTraining?>): Completable
 

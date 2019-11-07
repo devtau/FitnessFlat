@@ -4,16 +4,21 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
+import com.devtau.ironHeroes.data.model.Training
 
 class ExerciseInTrainingRelation {
 
     @Embedded
     lateinit var exerciseInTraining: ExerciseInTraining
 
+    @Relation(parentColumn = "trainingId", entityColumn = "id")
+    lateinit var training: Training
+
     @Relation(parentColumn = "exerciseId", entityColumn = "id")
     lateinit var exercise: Exercise
 
     fun convert(): ExerciseInTraining {
+        exerciseInTraining.training = training
         exerciseInTraining.exercise = exercise
         return exerciseInTraining
     }

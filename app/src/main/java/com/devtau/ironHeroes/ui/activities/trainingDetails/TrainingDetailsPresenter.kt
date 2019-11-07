@@ -2,6 +2,7 @@ package com.devtau.ironHeroes.ui.activities.trainingDetails
 
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.HourMinute
+import com.devtau.ironHeroes.data.model.Training
 import io.reactivex.functions.Action
 import java.util.*
 
@@ -13,6 +14,6 @@ interface TrainingDetailsPresenter {
     fun onBackPressed(action: Action)
     fun deleteTraining()
     fun provideExercises(): List<ExerciseInTraining>?
-    fun provideTrainingId(): Long?
+    fun provideTraining(): Training?
     fun roundMinutesInHalfHourIntervals(hour: Int, minute: Int): HourMinute
 }

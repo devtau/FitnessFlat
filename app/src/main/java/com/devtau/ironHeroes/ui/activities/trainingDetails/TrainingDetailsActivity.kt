@@ -114,7 +114,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     private fun initUi() {
         dateInput?.setOnClickListener { presenter.dateDialogRequested(trainingDate) }
         addExercise?.setOnClickListener {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTrainingId(), null, this)
+            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.id, null, this)
         }
     }
 
@@ -127,7 +127,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     private fun initList() {
         exercisesAdapter = ExercisesInTrainingAdapter(presenter.provideExercises(), Consumer {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTrainingId(), it.id, this)
+            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.id, it.id, this)
         })
         listView?.layoutManager = CustomLinearLayoutManager(this)
         listView?.adapter = exercisesAdapter

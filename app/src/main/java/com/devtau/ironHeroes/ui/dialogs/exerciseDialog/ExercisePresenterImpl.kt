@@ -26,6 +26,7 @@ class ExercisePresenterImpl(
     private var exercises: List<Exercise>? = null
     private var exercisesFiltered: List<Exercise>? = null
     private var exerciseInTraining: ExerciseInTraining? = null
+    private var exercisesInTrainings: List<ExerciseInTraining>? = null
 
 
     //<editor-fold desc="Presenter overrides">
@@ -41,6 +42,10 @@ class ExercisePresenterImpl(
         val exerciseInTrainingId = exerciseInTrainingId
         if (exerciseInTrainingId != null) dataLayer.getExerciseInTrainingAndClose(exerciseInTrainingId, Consumer {
             exerciseInTraining = it
+            prepareAndPublishDataToView()
+        })
+        dataLayer.getAllExercisesInTrainingsAndClose(3L, Consumer {
+            exercisesInTrainings = it
             prepareAndPublishDataToView()
         })
     }
@@ -83,6 +88,13 @@ class ExercisePresenterImpl(
         exercisesFiltered = filter(exercises, muscleGroupId)
         view.showExercises(getSpinnerStrings2(exercisesFiltered), 0)
     }
+
+    override fun updatePreviousExerciseData(exerciseIndex: Int) {
+        val selectedExerciseId = exercisesFiltered?.get(exerciseIndex)?.id
+        val previous = getPreviousExerciseData(selectedExerciseId)
+        view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
+        if (exerciseInTraining == null) view.showExerciseDetails(previous?.weight, previous?.count)
+    }
     //</editor-fold>
 
 
@@ -93,18 +105,20 @@ class ExercisePresenterImpl(
                     exerciseInTraining.exercise?.muscleGroup = next
         }
 
+        val exerciseInTraining = exerciseInTraining
         if (AppUtils.isEmpty(muscleGroups) || AppUtils.isEmpty(exercises) ||
             (exerciseInTrainingId != null && exerciseInTraining == null)) return
 
-        val exerciseInTraining = exerciseInTraining
         if (exerciseInTraining == null) {
-            view.showExerciseDetails(null)
             view.showMuscleGroups(getSpinnerStrings1(muscleGroups), 0)
             exercisesFiltered = filter(exercises, muscleGroups!![0].id)
             view.showExercises(getSpinnerStrings2(exercisesFiltered), 0)
+
+            val previous = getPreviousExerciseData(exercisesFiltered?.get(0)?.id)
+            view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
+            view.showExerciseDetails(previous?.weight, previous?.count)
         } else {
             applyMuscleGroupDetails(exerciseInTraining)
-            view.showExerciseDetails(exerciseInTraining)
 
             val selectedMuscleGroupId = exerciseInTraining.exercise?.muscleGroupId
             val selectedMuscleGroupIndex = getSelectedItemIndex(muscleGroups, selectedMuscleGroupId)
@@ -113,6 +127,10 @@ class ExercisePresenterImpl(
             exercisesFiltered = filter(exercises, selectedMuscleGroupId)
             val selectedExerciseIndex = getSelectedItemIndex(exercisesFiltered, exerciseInTraining.exerciseId)
             view.showExercises(getSpinnerStrings2(exercisesFiltered), selectedExerciseIndex)
+
+            val previous = getPreviousExerciseData(exerciseInTraining.exercise?.id)
+            view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
+            view.showExerciseDetails(exerciseInTraining.weight, exerciseInTraining.count)
         }
 
         Logger.d(LOG_TAG, "publishDataToView. " +
@@ -148,6 +166,21 @@ class ExercisePresenterImpl(
         Logger.d(LOG_TAG, "filter. list size=${list?.size}, muscleGroupId=$muscleGroupId, filtered size=${filtered.size}")
         return filtered
     }
+
+    private fun getPreviousExerciseData(exerciseId: Long?): ExerciseInTraining? {
+        when {
+            exerciseId == null -> return null
+            exercisesInTrainings != null -> {
+                for (next in exercisesInTrainings!!)
+                    if (exerciseId == next.exerciseId)
+                        return next
+                return null
+            }
+            else -> return null
+        }
+    }
+
+
 
 
     companion object {

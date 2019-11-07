@@ -10,9 +10,9 @@ object Constants {
     const val INTEGER_NOT_PARSED = -1
 
     const val DATE_FORMATTER = "dd.MM.yyyy"
-    const val DATE_TIME_FORMATTER = "dd.MM HH:mm"
-    const val DATE_WITH_WEEK_DAY_FORMATTER = "dd.MM, EE"
-    const val DATE_TIME_WITH_WEEK_DAY_FORMATTER = "dd.MM HH:mm, EE"
+    const val DATE_TIME_FORMATTER = "dd.MM.yyyy HH:mm"
+    const val DATE_WITH_WEEK_DAY_FORMATTER = "dd.MM (EE)"
+    const val DATE_TIME_WITH_WEEK_DAY_FORMATTER = "dd.MM HH:mm (EE)"
 
     const val INTERNAL_SERVER_ERROR = 500
     const val BAD_REQUEST = 400

@@ -9,4 +9,5 @@ interface ExercisePresenter {
     fun deleteExercise()
     fun provideExercises(): List<Exercise>?
     fun filterAndUpdateList(muscleGroupIndex: Int)
+    fun updatePreviousExerciseData(exerciseIndex: Int)
 }

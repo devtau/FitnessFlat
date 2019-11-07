@@ -14,6 +14,7 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_WITH_WEEK_DAY_FORMATTER
+import com.devtau.ironHeroes.util.Constants.DATE_WITH_WEEK_DAY_FORMATTER
 import com.devtau.ironHeroes.util.Constants.PHONE_MASK
 import com.devtau.ironHeroes.util.Constants.STANDARD_DELAY_MS
 import com.redmadrobot.inputmask.MaskedTextChangedListener
@@ -59,16 +60,24 @@ object AppUtils {
         if (timeInMillis != null) date.timeInMillis = timeInMillis
         return formatDate(date)
     }
-    fun formatDate(cal: Calendar): String =
-        SimpleDateFormat(DATE_FORMATTER, Locale.getDefault()).format(cal.time)
+    fun formatDate(cal: Calendar): String = formatAnyDate(cal, DATE_FORMATTER)
 
     fun formatDateTimeWithWeekDay(timeInMillis: Long?): String {
         val date = Calendar.getInstance()
         if (timeInMillis != null) date.timeInMillis = timeInMillis
         return formatDateTimeWithWeekDay(date)
     }
-    fun formatDateTimeWithWeekDay(cal: Calendar): String =
-        SimpleDateFormat(DATE_TIME_WITH_WEEK_DAY_FORMATTER, Locale.getDefault()).format(cal.time)
+    fun formatDateTimeWithWeekDay(cal: Calendar): String = formatAnyDate(cal, DATE_TIME_WITH_WEEK_DAY_FORMATTER)
+
+    fun formatDateWithWeekDay(timeInMillis: Long?): String {
+        val date = Calendar.getInstance()
+        if (timeInMillis != null) date.timeInMillis = timeInMillis
+        return formatDateWithWeekDay(date)
+    }
+    fun formatDateWithWeekDay(cal: Calendar): String = formatAnyDate(cal, DATE_WITH_WEEK_DAY_FORMATTER)
+
+    private fun formatAnyDate(cal: Calendar, formatter: String): String =
+        SimpleDateFormat(formatter, Locale.getDefault()).format(cal.time)
 
     fun parseDate(date: String?): Calendar {
         val calendar = Calendar.getInstance()

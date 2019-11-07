@@ -13,6 +13,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 class DataLayerImpl(context: Context): DataLayer {
 
@@ -247,6 +248,20 @@ class DataLayerImpl(context: Context): DataLayer {
                 listener.accept(it)
                 disposable?.dispose()
             }) { Logger.e(LOG_TAG, "Error in getExerciseInTrainingAndClose: ${it.message}") }
+    }
+
+    override fun getAllExercisesInTrainingsAndClose(heroId: Long, listener: Consumer<List<ExerciseInTraining>?>) {
+        var disposable: Disposable? = null
+        val maxDate = Calendar.getInstance()
+        maxDate.add(Calendar.DAY_OF_MONTH, -1)
+        disposable = db.exerciseInTrainingDao().getListForHero(heroId, maxDate.timeInMillis)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { ExerciseInTrainingRelation.convertList(it) }
+            .subscribe({
+                listener.accept(it)
+                disposable?.dispose()
+            }) { Logger.e(LOG_TAG, "Error in getAllExercisesInTrainingsAndClose: ${it.message}") }
     }
 
 

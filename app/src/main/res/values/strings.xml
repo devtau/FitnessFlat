@@ -59,6 +59,9 @@
     <string name="permission_explanation_storage">Разрешите приложению доступ к карте памяти для выбора изображения</string>
     <string name="permission_cancelled_msg_storage">Доступ к карте памяти отклонен</string>
     <string name="further">далее</string>
+    <string name="previous_exercise_data">Прошлый раз вы выполнили это упражнение:</string>
+    <string name="no_data">нет данных</string>
+    <string name="previous_training_data_formatter" formatted="false">%s %s x %s</string>
     
     <!--TODO: заполнить из профиля приложения-->
     <integer name="com_vk_sdk_AppId" translatable="false">7173607</integer>

@@ -49,6 +49,7 @@ class ExerciseDialog: ViewSubscriberDialog(),
         super.onStart()
         presenter.restartLoaders()
         subscribeField(muscleGroup, Consumer { applyFilter() })
+        subscribeField(exercise, Consumer { presenter.updatePreviousExerciseData(exercise?.selectedItemPosition ?: 0) })
     }
 
     override fun onResume() {
@@ -78,9 +79,13 @@ class ExerciseDialog: ViewSubscriberDialog(),
     override fun showExercises(list: List<String>?, selectedIndex: Int) =
         AppUtils.initSpinner(exercise, list, selectedIndex, context)
 
-    override fun showExerciseDetails(exercise: ExerciseInTraining?) {
-        AppUtils.updateInputField(weightInput, exercise?.weight?.toString())
-        AppUtils.updateInputField(countInput, exercise?.count?.toString() ?: ExerciseInTraining.DEFAULT_COUNT)
+    override fun showExerciseDetails(weight: Int?, count: Int?) {
+        AppUtils.updateInputField(weightInput, weight?.toString())
+        AppUtils.updateInputField(countInput, count?.toString() ?: ExerciseInTraining.DEFAULT_COUNT)
+    }
+
+    override fun showPreviousExerciseData(date: Long?, weight: Int?, count: Int?) {
+        AppUtils.updateInputField(previousExerciseData, composePreviousExerciseDataString(date, weight, count))
     }
     //</editor-fold>
 
@@ -107,6 +112,15 @@ class ExerciseDialog: ViewSubscriberDialog(),
     }
 
     private fun applyFilter() = presenter.filterAndUpdateList(muscleGroup?.selectedItemPosition ?: 0)
+
+    private fun composePreviousExerciseDataString(date: Long?, weight: Int?, count: Int?) =
+        if (date == null || weight == null || count == null) {
+            context?.getString(R.string.no_data)
+        } else {
+            val formatter = context?.getString(R.string.previous_training_data_formatter) ?: ""
+            val dateFormatted = AppUtils.formatDateWithWeekDay(date)
+            String.format(formatter, dateFormatted, weight.toString(), count.toString())
+        }
     //</editor-fold>
 
 

@@ -109,7 +109,7 @@ class TrainingDetailsPresenterImpl(
     }
 
     override fun provideExercises(): List<ExerciseInTraining>? = training?.exercises
-    override fun provideTrainingId() = training?.id
+    override fun provideTraining() = training
 
     override fun roundMinutesInHalfHourIntervals(hour: Int, minute: Int): HourMinute =
         if (hour == 23 && minute > 44) HourMinute(hour, 30)
