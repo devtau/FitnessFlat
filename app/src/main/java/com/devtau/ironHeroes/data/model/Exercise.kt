@@ -17,6 +17,8 @@ class Exercise(
 
     constructor(id: Long?, name: String, muscleGroupId: Long): this(id, name, muscleGroupId, null)
 
+    override fun toString(): String = "$name, muscleGroup=$muscleGroup"
+
     companion object {
         fun getMock() = listOf(
             //Грудные

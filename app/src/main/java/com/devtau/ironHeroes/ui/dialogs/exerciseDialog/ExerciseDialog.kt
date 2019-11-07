@@ -49,7 +49,6 @@ class ExerciseDialog: ViewSubscriberDialog(),
         super.onStart()
         presenter.restartLoaders()
         subscribeField(muscleGroup, Consumer { applyFilter() })
-        subscribeField(exercise, Consumer { updateExerciseData() })
     }
 
     override fun onResume() {
@@ -89,9 +88,13 @@ class ExerciseDialog: ViewSubscriberDialog(),
     //<editor-fold desc="Private methods">
     private fun initUi() {
         cancel.setOnClickListener { dialog?.dismiss() }
-        save.setOnClickListener {
+        delete.setOnClickListener {
+            presenter.deleteExercise()
             dialog?.dismiss()
+        }
+        save.setOnClickListener {
             updateExerciseData()
+            dialog?.dismiss()
         }
     }
 

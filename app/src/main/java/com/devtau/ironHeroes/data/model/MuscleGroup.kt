@@ -8,6 +8,7 @@ class MuscleGroup(
     var name: String
 ): DataObject(id) {
 
+    override fun toString(): String = name
 
     companion object {
         fun getMock() = listOf(

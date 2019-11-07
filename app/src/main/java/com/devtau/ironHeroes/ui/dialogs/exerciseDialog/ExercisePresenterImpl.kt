@@ -19,7 +19,7 @@ class ExercisePresenterImpl(
     private val networkLayer: NetworkLayer,
     private val prefs: PreferencesManager?,
     private val trainingId: Long?,
-    private var exerciseId: Long?
+    private var exerciseInTrainingId: Long?
 ): DBSubscriber(), ExercisePresenter {
 
     private var muscleGroups: List<MuscleGroup>? = null
@@ -32,25 +32,25 @@ class ExercisePresenterImpl(
     override fun restartLoaders() {
         disposeOnStop(dataLayer.getMuscleGroups(Consumer {
             muscleGroups = it
-            publishDataToView()
+            prepareAndPublishDataToView()
         }))
         disposeOnStop(dataLayer.getExercises(Consumer {
             exercises = it
-            publishDataToView()
+            prepareAndPublishDataToView()
         }))
-        val exerciseId = exerciseId
-        if (exerciseId != null) dataLayer.getExerciseInTrainingAndClose(exerciseId, Consumer {
+        val exerciseInTrainingId = exerciseInTrainingId
+        if (exerciseInTrainingId != null) dataLayer.getExerciseInTrainingAndClose(exerciseInTrainingId, Consumer {
             exerciseInTraining = it
-            publishDataToView()
+            prepareAndPublishDataToView()
         })
     }
 
     override fun updateExerciseData(exerciseIndex: Int, weight: String?, count: String?) {
-        exerciseId = exercisesFiltered?.get(exerciseIndex)?.id
+        exerciseInTrainingId = exercisesFiltered?.get(exerciseIndex)?.id
         val weightInt = try {
             weight?.toInt() ?: 0
         } catch (e: NumberFormatException) {
-            Logger.e(LOG_TAG, "bad data in weight field")
+            Logger.i(LOG_TAG, "bad data in weight field")
             0
         }
         val countInt = try {
@@ -60,17 +60,21 @@ class ExercisePresenterImpl(
             INTEGER_NOT_PARSED
         }
 
-        if (ExerciseInTraining.allObligatoryPartsPresent(trainingId, exerciseId, weightInt, countInt)) {
+        if (ExerciseInTraining.allObligatoryPartsPresent(trainingId, exerciseInTrainingId, weightInt, countInt)) {
             if (exerciseInTraining == null) {
-                exerciseInTraining = ExerciseInTraining(null, trainingId!!, exerciseId!!, weightInt, countInt)
-            } else if (exerciseInTraining?.someFieldsChanged(exerciseId, weightInt, countInt) == true) {
-                exerciseInTraining?.exerciseId = exerciseId
+                exerciseInTraining = ExerciseInTraining(null, trainingId!!, exerciseInTrainingId!!, weightInt, countInt)
+            } else if (exerciseInTraining?.someFieldsChanged(exerciseInTrainingId, weightInt, countInt) == true) {
+                exerciseInTraining?.exerciseId = exerciseInTrainingId
                 exerciseInTraining?.weight = weightInt
                 exerciseInTraining?.count = countInt
             }
 
             dataLayer.updateExercisesInTraining(listOf(exerciseInTraining))
         }
+    }
+
+    override fun deleteExercise() {
+        dataLayer.deleteExercisesInTraining(listOf(exerciseInTraining))
     }
 
     override fun provideExercises(): List<Exercise>? = exercises
@@ -82,18 +86,39 @@ class ExercisePresenterImpl(
     //</editor-fold>
 
 
-    private fun publishDataToView() {
-        if (AppUtils.isEmpty(muscleGroups) || AppUtils.isEmpty(exercises) || (exerciseId != null && exerciseInTraining == null)) return
-        val exerciseInTraining = if (exerciseId == null) null else exerciseInTraining
-        view.showMuscleGroups(getSpinnerStrings1(muscleGroups), 0)
-        exercisesFiltered = filter(exercises, muscleGroups!![0].id)
-        view.showExercises(getSpinnerStrings2(exercisesFiltered), 0)
-        view.showExerciseDetails(exerciseInTraining)
+    private fun prepareAndPublishDataToView() {
+        fun applyMuscleGroupDetails(exerciseInTraining: ExerciseInTraining) {
+            for (next in muscleGroups!!)
+                if (exerciseInTraining.exercise?.muscleGroupId == next.id)
+                    exerciseInTraining.exercise?.muscleGroup = next
+        }
+
+        if (AppUtils.isEmpty(muscleGroups) || AppUtils.isEmpty(exercises) ||
+            (exerciseInTrainingId != null && exerciseInTraining == null)) return
+
+        val exerciseInTraining = exerciseInTraining
+        if (exerciseInTraining == null) {
+            view.showExerciseDetails(null)
+            view.showMuscleGroups(getSpinnerStrings1(muscleGroups), 0)
+            exercisesFiltered = filter(exercises, muscleGroups!![0].id)
+            view.showExercises(getSpinnerStrings2(exercisesFiltered), 0)
+        } else {
+            applyMuscleGroupDetails(exerciseInTraining)
+            view.showExerciseDetails(exerciseInTraining)
+
+            val selectedMuscleGroupId = exerciseInTraining.exercise?.muscleGroupId
+            val selectedMuscleGroupIndex = getSelectedItemIndex(muscleGroups, selectedMuscleGroupId)
+            view.showMuscleGroups(getSpinnerStrings1(muscleGroups), selectedMuscleGroupIndex)
+
+            exercisesFiltered = filter(exercises, selectedMuscleGroupId)
+            val selectedExerciseIndex = getSelectedItemIndex(exercisesFiltered, exerciseInTraining.exerciseId)
+            view.showExercises(getSpinnerStrings2(exercisesFiltered), selectedExerciseIndex)
+        }
 
         Logger.d(LOG_TAG, "publishDataToView. " +
-                "muscleGroups=$muscleGroups, " +
+                "muscleGroups size=${muscleGroups?.size}, " +
                 "exercises size=${exercises?.size}, " +
-                "exerciseId=$exerciseId, " +
+                "exerciseInTrainingId=$exerciseInTrainingId, " +
                 "exerciseInTraining=$exerciseInTraining")
     }
 

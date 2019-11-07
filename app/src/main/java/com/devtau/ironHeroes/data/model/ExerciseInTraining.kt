@@ -21,6 +21,9 @@ class ExerciseInTraining(
     constructor(id: Long?, trainingId: Long, exerciseId: Long, weight: Int, count: Int):
             this(id, trainingId, exerciseId, null, weight, count)
 
+    override fun toString(): String = "trainingId=$trainingId, exerciseId=$exerciseId, " +
+            "exercise=$exercise, weight=$weight, count=$count"
+
     fun someFieldsChanged(exerciseId: Long?, weight: Int?, count: Int?) =
         exerciseId != this.exerciseId || weight != this.weight || count != this.count
 

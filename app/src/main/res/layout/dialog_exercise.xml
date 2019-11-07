@@ -88,12 +88,19 @@
             style="@style/Widget.AppCompat.Button.Borderless"/>
         
         <Button
+            android:id="@+id/delete"
+            android:text="@string/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+        
+        <Button
             android:id="@+id/save"
             android:text="@string/save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAllCaps="true"
-            android:layout_marginLeft="@dimen/marginHalf"
             style="@style/Widget.AppCompat.Button.Borderless"/>
     </LinearLayout>
 </TableLayout>
