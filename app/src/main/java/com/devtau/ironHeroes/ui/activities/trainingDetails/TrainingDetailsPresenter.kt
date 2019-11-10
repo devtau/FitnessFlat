@@ -15,5 +15,4 @@ interface TrainingDetailsPresenter {
     fun deleteTraining()
     fun provideExercises(): List<ExerciseInTraining>?
     fun provideTraining(): Training?
-    fun roundMinutesInHalfHourIntervals(hour: Int, minute: Int): HourMinute
 }

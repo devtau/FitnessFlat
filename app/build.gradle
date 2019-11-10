@@ -11,12 +11,20 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "DATABASE_NAME", "\"IronHeroesDB\""
         buildConfigField "Boolean", "WITH_LOGS", "true"
         buildConfigField "String", "SERVER", "\"https://yandex.ru\""
         resConfigs "ru"
+    }
+    signingConfigs {
+        release {
+            keyAlias 'key0'
+            keyPassword 'dXS4GFexEf'
+            storeFile file('../keystore.jks')
+            storePassword 'dXS4GFexEf'
+        }
     }
     buildTypes {
         def formattedDate = new Date().format('yyyy-MM-dd')

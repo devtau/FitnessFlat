@@ -12,6 +12,8 @@ import com.devtau.ironHeroes.util.Constants.INTEGER_NOT_PARSED
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
 import io.reactivex.functions.Consumer
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ExercisePresenterImpl(
     private val view: ExerciseView,
@@ -44,13 +46,29 @@ class ExercisePresenterImpl(
             exerciseInTraining = it
             prepareAndPublishDataToView()
         })
-        dataLayer.getAllExercisesInTrainingsAndClose(3L, Consumer {
-            exercisesInTrainings = it
-            prepareAndPublishDataToView()
-        })
+
+        val trainingId = trainingId
+        if (trainingId != null) {
+            dataLayer.getTrainingByIdAndClose(trainingId, Consumer { training ->
+                val maxDate = Calendar.getInstance()
+                if (training != null) maxDate.timeInMillis = training.date
+                maxDate.add(Calendar.HOUR_OF_DAY, -2)
+                dataLayer.getAllExercisesInTrainingsAndClose(3L, maxDate.timeInMillis, Consumer {
+                    exercisesInTrainings = it
+                    prepareAndPublishDataToView()
+                })
+            })
+        } else {
+            val maxDate = Calendar.getInstance()
+            maxDate.add(Calendar.HOUR_OF_DAY, -2)
+            dataLayer.getAllExercisesInTrainingsAndClose(3L, maxDate.timeInMillis, Consumer {
+                exercisesInTrainings = it
+                prepareAndPublishDataToView()
+            })
+        }
     }
 
-    override fun updateExerciseData(exerciseIndex: Int, weight: String?, count: String?) {
+    override fun updateExerciseData(exerciseIndex: Int, weight: String?, count: String?, comment: String?) {
         exerciseInTrainingId = exercisesFiltered?.get(exerciseIndex)?.id
         val weightInt = try {
             weight?.toInt() ?: 0
@@ -68,10 +86,11 @@ class ExercisePresenterImpl(
         if (ExerciseInTraining.allObligatoryPartsPresent(trainingId, exerciseInTrainingId, weightInt, countInt)) {
             if (exerciseInTraining == null) {
                 exerciseInTraining = ExerciseInTraining(null, trainingId!!, exerciseInTrainingId!!, weightInt, countInt)
-            } else if (exerciseInTraining?.someFieldsChanged(exerciseInTrainingId, weightInt, countInt) == true) {
+            } else if (exerciseInTraining?.someFieldsChanged(exerciseInTrainingId, weightInt, countInt, comment) == true) {
                 exerciseInTraining?.exerciseId = exerciseInTrainingId
                 exerciseInTraining?.weight = weightInt
                 exerciseInTraining?.count = countInt
+                exerciseInTraining?.comment = comment
             }
 
             dataLayer.updateExercisesInTraining(listOf(exerciseInTraining))
@@ -86,14 +105,16 @@ class ExercisePresenterImpl(
     override fun filterAndUpdateList(muscleGroupIndex: Int) {
         val muscleGroupId = muscleGroups?.get(muscleGroupIndex)?.id
         exercisesFiltered = filter(exercises, muscleGroupId)
-        view.showExercises(getSpinnerStrings2(exercisesFiltered), 0)
+        val selectedExerciseIndex = if (exerciseInTraining == null) 0
+        else getSelectedItemIndex(exercisesFiltered, exerciseInTraining?.exerciseId)
+        view.showExercises(getSpinnerStrings2(exercisesFiltered), selectedExerciseIndex)
     }
 
     override fun updatePreviousExerciseData(exerciseIndex: Int) {
         val selectedExerciseId = exercisesFiltered?.get(exerciseIndex)?.id
         val previous = getPreviousExerciseData(selectedExerciseId)
         view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
-        if (exerciseInTraining == null) view.showExerciseDetails(previous?.weight, previous?.count)
+        if (exerciseInTraining == null) view.showExerciseDetails(previous?.weight, previous?.count, previous?.comment)
     }
     //</editor-fold>
 
@@ -116,7 +137,7 @@ class ExercisePresenterImpl(
 
             val previous = getPreviousExerciseData(exercisesFiltered?.get(0)?.id)
             view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
-            view.showExerciseDetails(previous?.weight, previous?.count)
+            view.showExerciseDetails(previous?.weight, previous?.count, previous?.comment)
         } else {
             applyMuscleGroupDetails(exerciseInTraining)
 
@@ -130,7 +151,7 @@ class ExercisePresenterImpl(
 
             val previous = getPreviousExerciseData(exerciseInTraining.exercise?.id)
             view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
-            view.showExerciseDetails(exerciseInTraining.weight, exerciseInTraining.count)
+            view.showExerciseDetails(exerciseInTraining.weight, exerciseInTraining.count, exerciseInTraining?.comment)
         }
 
         Logger.d(LOG_TAG, "publishDataToView. " +

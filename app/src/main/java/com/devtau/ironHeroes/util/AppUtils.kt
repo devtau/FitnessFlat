@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.data.model.HourMinute
 import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_WITH_WEEK_DAY_FORMATTER
@@ -194,5 +195,31 @@ object AppUtils {
             input.setText(value)
             if (input is EditText) input.setSelection(value?.length ?: 0)
         }
+    }
+
+    fun roundMinutesInHalfHourIntervals(hour: Int, minute: Int): HourMinute =
+        if (hour == 23 && minute > 44) HourMinute(hour, 30)
+        else when (minute) {
+            in 1..14 -> HourMinute(hour, 0)
+            in 15..29 -> HourMinute(hour, 30)
+            in 31..44 -> HourMinute(hour, 30)
+            in 45..59 -> HourMinute(hour + 1, 0)
+            else -> HourMinute(hour, minute)
+        }
+
+    fun getRoundDate() = getRoundDate(null, null, null, null, null)
+    fun getRoundDate(year: Int?, month: Int?, dayOfMonth: Int?, hour: Int?, minute: Int?): Calendar {
+        val date = Calendar.getInstance()
+        if (year != null) date.set(Calendar.YEAR, year)
+        if (month != null) date.set(Calendar.MONTH, month)
+        if (dayOfMonth != null) date.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+        val hourLoc = hour ?: date.get(Calendar.HOUR_OF_DAY)
+        val minuteLoc = minute ?: date.get(Calendar.MINUTE)
+        val hourMinute = roundMinutesInHalfHourIntervals(hourLoc, minuteLoc)
+        date.set(Calendar.HOUR_OF_DAY, hourMinute.hour)
+        date.set(Calendar.MINUTE, hourMinute.minute)
+        date.set(Calendar.SECOND, 0)
+        return date
     }
 }

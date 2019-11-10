@@ -110,16 +110,6 @@ class TrainingDetailsPresenterImpl(
 
     override fun provideExercises(): List<ExerciseInTraining>? = training?.exercises
     override fun provideTraining() = training
-
-    override fun roundMinutesInHalfHourIntervals(hour: Int, minute: Int): HourMinute =
-        if (hour == 23 && minute > 44) HourMinute(hour, 30)
-        else when (minute) {
-            in 1..14 -> HourMinute(hour, 0)
-            in 15..29 -> HourMinute(hour, 30)
-            in 31..44 -> HourMinute(hour, 30)
-            in 45..59 -> HourMinute(hour + 1, 0)
-            else -> HourMinute(hour, minute)
-        }
     //</editor-fold>
 
 
@@ -148,7 +138,7 @@ class TrainingDetailsPresenterImpl(
 
         if (trainingId == null) {
             view.showScreenTitle(true)
-            view.showTrainingDate(Calendar.getInstance())
+            view.showTrainingDate(AppUtils.getRoundDate())
             view.showDeleteTrainingBtn(false)
         } else {
             val exercises = exercises

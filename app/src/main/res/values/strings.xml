@@ -50,6 +50,7 @@
     <string name="not_ready">Повторите запрос позже</string>
     <string name="device_offline">Нет интернета</string>
     <string name="too_many_requests">Слишком много попыток. Повторите запрос позже</string>
+    <string name="comment">Заметки</string>
     
     <string name="permission_needed">Требуется разрешение</string>
     <string name="permission_cancelled_msg_gps">Доступ к GPS-датчику отклонен</string>

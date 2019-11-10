@@ -142,15 +142,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     private fun onTimeSet(year: Int, month: Int, dayOfMonth: Int, hour: Int, minute: Int) {
         Logger.d(LOG_TAG, "onTimeSet. year=$year, month=$month, dayOfMonth=$dayOfMonth, hour=$hour, minute=$minute")
-        val hourMinute = presenter.roundMinutesInHalfHourIntervals(hour, minute)
-        val date = Calendar.getInstance()
-        date.set(Calendar.YEAR, year)
-        date.set(Calendar.MONTH, month)
-        date.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-        date.set(Calendar.HOUR_OF_DAY, hourMinute.hour)
-        date.set(Calendar.MINUTE, hourMinute.minute)
-        date.set(Calendar.SECOND, 0)
-        showTrainingDate(date)
+        showTrainingDate(AppUtils.getRoundDate(year, month, dayOfMonth, hour, minute))
         updateTrainingData()
     }
     //</editor-fold>

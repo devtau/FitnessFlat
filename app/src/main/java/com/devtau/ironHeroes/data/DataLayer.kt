@@ -47,5 +47,5 @@ interface DataLayer {
     fun getExercisesAndClose(listener: Consumer<List<Exercise>?>)
     fun getExercisesInTrainingAndClose(trainingId: Long, listener: Consumer<List<ExerciseInTraining>?>)
     fun getExerciseInTrainingAndClose(id: Long, listener: Consumer<ExerciseInTraining?>)
-    fun getAllExercisesInTrainingsAndClose(heroId: Long, listener: Consumer<List<ExerciseInTraining>?>)
+    fun getAllExercisesInTrainingsAndClose(heroId: Long, maxRelevantDate: Long, listener: Consumer<List<ExerciseInTraining>?>)
 }

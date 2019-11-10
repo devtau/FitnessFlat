@@ -79,9 +79,10 @@ class ExerciseDialog: ViewSubscriberDialog(),
     override fun showExercises(list: List<String>?, selectedIndex: Int) =
         AppUtils.initSpinner(exercise, list, selectedIndex, context)
 
-    override fun showExerciseDetails(weight: Int?, count: Int?) {
+    override fun showExerciseDetails(weight: Int?, count: Int?, comment: String?) {
         AppUtils.updateInputField(weightInput, weight?.toString())
         AppUtils.updateInputField(countInput, count?.toString() ?: ExerciseInTraining.DEFAULT_COUNT)
+        AppUtils.updateInputField(commentInput, comment)
     }
 
     override fun showPreviousExerciseData(date: Long?, weight: Int?, count: Int?) {
@@ -108,7 +109,8 @@ class ExerciseDialog: ViewSubscriberDialog(),
         if (exerciseIndex != null) presenter.updateExerciseData(
             exerciseIndex,
             weightInput?.text?.toString(),
-            countInput?.text?.toString())
+            countInput?.text?.toString(),
+            commentInput?.text?.toString())
     }
 
     private fun applyFilter() = presenter.filterAndUpdateList(muscleGroup?.selectedItemPosition ?: 0)
