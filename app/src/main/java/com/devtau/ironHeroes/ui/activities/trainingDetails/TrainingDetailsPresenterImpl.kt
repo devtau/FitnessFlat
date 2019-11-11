@@ -60,7 +60,7 @@ class TrainingDetailsPresenterImpl(
     override fun updateTrainingData(championIndex: Int, heroIndex: Int, date: Calendar?) {
         val championId = champions?.get(championIndex)?.id
         val heroId = heroes?.get(heroIndex)?.id
-        val trainingDate = date?.timeInMillis ?: Calendar.getInstance().timeInMillis
+        val trainingDate = date?.timeInMillis ?: AppUtils.getRoundDate().timeInMillis
         val allPartsPresent = Training.allObligatoryPartsPresent(championId, heroId, trainingDate)
         val someFieldsChanged = training?.someFieldsChanged(championId, heroId, trainingDate) ?: true
         Logger.d(LOG_TAG, "updateTrainingData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
@@ -133,13 +133,16 @@ class TrainingDetailsPresenterImpl(
 
         val championId = training?.championId ?: prefs.favoriteChampionId
         val heroId = training?.heroId ?: prefs.favoriteHeroId
-        view.showChampions(getSpinnerStrings(champions), getSelectedItemIndex(champions, championId))
-        view.showHeroes(getSpinnerStrings(heroes), getSelectedItemIndex(heroes, heroId))
+        val championIndex = getSelectedItemIndex(champions, championId)
+        val heroIndex = getSelectedItemIndex(heroes, heroId)
+        view.showChampions(getSpinnerStrings(champions), championIndex)
+        view.showHeroes(getSpinnerStrings(heroes), heroIndex)
 
         if (trainingId == null) {
             view.showScreenTitle(true)
             view.showTrainingDate(AppUtils.getRoundDate())
             view.showDeleteTrainingBtn(false)
+            updateTrainingData(championIndex, heroIndex, null)
         } else {
             val exercises = exercises
             val exercisesInTraining = exercisesInTraining
