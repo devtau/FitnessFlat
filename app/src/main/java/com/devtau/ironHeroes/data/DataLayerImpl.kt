@@ -250,11 +250,17 @@ class DataLayerImpl(context: Context): DataLayer {
             }) { Logger.e(LOG_TAG, "Error in getExerciseInTrainingAndClose: ${it.message}") }
     }
 
-    override fun getAllExercisesInTrainingsAndClose(heroId: Long, maxRelevantDate: Long, listener: Consumer<List<ExerciseInTraining>?>) {
+    override fun getAllExercisesInTrainingsAndClose(heroId: Long, maxRelevantDate: Long, sortAscending: Boolean,
+                                                    listener: Consumer<List<ExerciseInTraining>?>) {
         var disposable: Disposable? = null
         val maxDate = Calendar.getInstance()
         maxDate.add(Calendar.DAY_OF_MONTH, -1)
-        disposable = db.exerciseInTrainingDao().getListForHero(heroId, maxRelevantDate)
+        val flowable = if (sortAscending) {
+            db.exerciseInTrainingDao().getListForHeroAsc(heroId, maxRelevantDate)
+        } else {
+            db.exerciseInTrainingDao().getListForHeroDesc(heroId, maxRelevantDate)
+        }
+        disposable = flowable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map { ExerciseInTrainingRelation.convertList(it) }

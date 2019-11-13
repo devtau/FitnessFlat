@@ -13,7 +13,6 @@ import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsActivity
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants
-import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_trainings.*
 import com.devtau.ironHeroes.R
@@ -63,9 +62,7 @@ class TrainingsActivity: ViewSubscriberActivity(), TrainingsView {
 
 
     //<editor-fold desc="View overrides">
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId, confirmedListener))
-    override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(LOG_TAG, msg, this, confirmedListener)
-
+    override fun getLogTag() = LOG_TAG
     override fun updateTrainings(list: List<Training>?) {
         adapter?.setList(list, listView)
     }

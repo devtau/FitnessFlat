@@ -75,9 +75,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
 
     //<editor-fold desc="View overrides">
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
-    override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(LOG_TAG, msg, this, confirmedListener)
-
+    override fun getLogTag() = LOG_TAG
     override fun showScreenTitle(newTraining: Boolean) {
         val toolbarTitle = if (newTraining) R.string.training_add else R.string.training_edit
         AppUtils.initToolbar(this, toolbarTitle, true)
@@ -114,7 +112,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     private fun initUi() {
         dateInput?.setOnClickListener { presenter.dateDialogRequested(trainingDate) }
         addExercise?.setOnClickListener {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.id, null, this)
+            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId, presenter.provideTraining()?.id, null, this)
         }
     }
 
@@ -127,7 +125,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     private fun initList() {
         exercisesAdapter = ExercisesInTrainingAdapter(presenter.provideExercises(), Consumer {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.id, it.id, this)
+            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId, presenter.provideTraining()?.id, it.id, this)
         })
         listView?.layoutManager = CustomLinearLayoutManager(this)
         listView?.adapter = exercisesAdapter

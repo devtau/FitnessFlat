@@ -5,6 +5,7 @@
     <string name="champions">Чемпионы</string>
     <string name="champion">Чемпион</string>
     <string name="trainings">Тренировки</string>
+    <string name="statistics">Статистика</string>
     <string name="choose_action">Выберите действие</string>
     <string name="hero_edit">Редактировать героя</string>
     <string name="hero_add">Добавить героя</string>
@@ -63,6 +64,9 @@
     <string name="previous_exercise_data">Прошлый раз вы выполнили это упражнение:</string>
     <string name="no_data">нет данных</string>
     <string name="previous_training_data_formatter" formatted="false">%s %s x %s</string>
+    
+    <string name="day_formatter" formatted="false" translatable="false">%d\n%s</string>
+    <string name="hour_formatter" formatted="false" translatable="false">%d:00</string>
     
     <!--TODO: заполнить из профиля приложения-->
     <integer name="com_vk_sdk_AppId" translatable="false">7173607</integer>

@@ -33,6 +33,7 @@
         <activity android:name=".ui.activities.heroDetails.HeroDetailsActivity"/>
         <activity android:name=".ui.activities.trainingsList.TrainingsActivity"/>
         <activity android:name=".ui.activities.trainingDetails.TrainingDetailsActivity"/>
+        <activity android:name=".ui.activities.statistics.StatisticsActivity"/>
     
         <activity
             android:name="com.vk.sdk.VKServiceActivity"

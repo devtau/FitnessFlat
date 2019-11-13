@@ -29,6 +29,9 @@ class ExerciseInTraining(
     fun someFieldsChanged(exerciseId: Long?, weight: Int?, count: Int?, comment: String?) =
         exerciseId != this.exerciseId || weight != this.weight || count != this.count || !TextUtils.equals(comment, this.comment)
 
+    fun calculateWork(): Int = weight * count
+
+
     companion object {
         const val DEFAULT_COUNT = 80.toString()
 

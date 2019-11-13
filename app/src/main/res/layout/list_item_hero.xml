@@ -27,7 +27,7 @@
         tools:text="Денис Русских"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="@dimen/marginHalf"
         android:gravity="center_vertical"
         android:drawableEnd="@drawable/ic_edit"/>
 </LinearLayout>

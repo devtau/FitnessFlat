@@ -3,22 +3,21 @@ package com.devtau.ironHeroes.ui.activities.heroesList
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.HeroesAdapter
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
+import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
 import com.devtau.ironHeroes.ui.activities.heroDetails.HeroDetailsActivity
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.Constants.HUMAN_TYPE
-import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_heroes.*
 
-class HeroesActivity: AppCompatActivity(), HeroesView {
+class HeroesActivity: ViewSubscriberActivity(), HeroesView {
 
     lateinit var presenter: HeroesPresenter
     private var adapter: HeroesAdapter? = null
@@ -51,9 +50,7 @@ class HeroesActivity: AppCompatActivity(), HeroesView {
 
 
     //<editor-fold desc="View overrides">
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId, confirmedListener))
-    override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(LOG_TAG, msg, this, confirmedListener)
-
+    override fun getLogTag() = LOG_TAG
     override fun updateHeroes(list: List<Hero>?) = adapter?.setList(list)
     //</editor-fold>
 

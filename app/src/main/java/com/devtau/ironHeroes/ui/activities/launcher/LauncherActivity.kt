@@ -3,18 +3,19 @@ package com.devtau.ironHeroes.ui.activities.launcher
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.DBViewerActivity
+import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
 import com.devtau.ironHeroes.ui.activities.heroesList.HeroesActivity
+import com.devtau.ironHeroes.ui.activities.statistics.StatisticsActivity
 import com.devtau.ironHeroes.ui.activities.trainingsList.TrainingsActivity
 import com.devtau.ironHeroes.util.AppUtils
-import io.reactivex.functions.Action
 import kotlinx.android.synthetic.main.activity_launcher.*
 
-class LauncherActivity: AppCompatActivity(), LauncherView {
+class LauncherActivity: ViewSubscriberActivity(), LauncherView {
 
     lateinit var presenter: LauncherPresenter
 
@@ -54,8 +55,7 @@ class LauncherActivity: AppCompatActivity(), LauncherView {
 
 
     //<editor-fold desc="View overrides">
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId, confirmedListener))
-    override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(LOG_TAG, msg, this, confirmedListener)
+    override fun getLogTag() = LOG_TAG
     //</editor-fold>
 
 
@@ -64,6 +64,7 @@ class LauncherActivity: AppCompatActivity(), LauncherView {
         heroes.setOnClickListener { HeroesActivity.newInstance(this, HumanType.HERO) }
         champions.setOnClickListener { HeroesActivity.newInstance(this, HumanType.CHAMPION) }
         trainings.setOnClickListener { TrainingsActivity.newInstance(this) }
+        statistics.setOnClickListener { StatisticsActivity.newInstance(this, Hero.getMockHeroes()[0].id!!) }
     }
     //</editor-fold>
 

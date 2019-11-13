@@ -6,8 +6,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
-import android.widget.EditText
-import android.widget.TextView
 import com.devtau.ironHeroes.IronHeroesApp
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.enums.Gender
@@ -89,9 +87,7 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
 
 
     //<editor-fold desc="View overrides">
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
-    override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(LOG_TAG, msg, this, confirmedListener)
-
+    override fun getLogTag() = LOG_TAG
     override fun showScreenTitle(newHero: Boolean, humanType: HumanType) {
         this.newHero = newHero
         val toolbarTitle = when (humanType) {

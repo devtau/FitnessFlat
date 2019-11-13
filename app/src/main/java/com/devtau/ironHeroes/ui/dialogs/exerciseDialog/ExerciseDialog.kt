@@ -10,9 +10,9 @@ import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.dialogs.ViewSubscriberDialog
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
+import com.devtau.ironHeroes.util.Constants.HERO_ID
 import com.devtau.ironHeroes.util.Constants.TRAINING_ID
 import com.devtau.ironHeroes.util.Logger
-import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.dialog_exercise.*
 
@@ -68,11 +68,7 @@ class ExerciseDialog: ViewSubscriberDialog(),
 
 
     //<editor-fold desc="View overrides">
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
-    override fun showMsg(msg: String, confirmedListener: Action?){
-        if (context != null) AppUtils.alertD(LOG_TAG, msg, context!!, confirmedListener)
-    }
-
+    override fun getLogTag() = LOG_TAG
     override fun showMuscleGroups(list: List<String>?, selectedIndex: Int) =
         AppUtils.initSpinner(muscleGroup, list, selectedIndex, context)
 
@@ -134,8 +130,8 @@ class ExerciseDialog: ViewSubscriberDialog(),
         private const val LOG_TAG = "ExerciseDialog"
         private const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog"
 
-        fun showDialog(fragmentManager: FragmentManager?, trainingId: Long?, exerciseInTrainingId: Long?, listener: Listener) {
-            if (fragmentManager == null || trainingId == null) {
+        fun showDialog(fragmentManager: FragmentManager?, heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?, listener: Listener) {
+            if (fragmentManager == null || heroId == null || trainingId == null) {
                 Logger.e(LOG_TAG, "showDialog. bad data. aborting")
                 return
             }
@@ -143,13 +139,14 @@ class ExerciseDialog: ViewSubscriberDialog(),
             val prev = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
             if (prev != null) ft.remove(prev)
             ft.addToBackStack(null)
-            val newFragment = newInstance(trainingId, exerciseInTrainingId)
+            val newFragment = newInstance(heroId, trainingId, exerciseInTrainingId)
             newFragment.show(ft, FRAGMENT_TAG)
         }
 
-        private fun newInstance(trainingId: Long?, exerciseInTrainingId: Long?): ExerciseDialog {
+        private fun newInstance(heroId: Long, trainingId: Long?, exerciseInTrainingId: Long?): ExerciseDialog {
             val fragment = ExerciseDialog()
             val args = Bundle()
+            args.putLong(HERO_ID, heroId)
             if (trainingId != null) args.putLong(TRAINING_ID, trainingId)
             if (exerciseInTrainingId != null) args.putLong(EXERCISE_IN_TRAINING_ID, exerciseInTrainingId)
             fragment.arguments = args

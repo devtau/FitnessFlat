@@ -11,7 +11,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.data.model.DataObject
+import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.HourMinute
+import com.devtau.ironHeroes.data.model.MuscleGroup
 import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_WITH_WEEK_DAY_FORMATTER
@@ -145,16 +148,18 @@ object AppUtils {
         }
     }
 
-    fun alert(logTag: String?, msg: String, context: Context, confirmedListener: Action) {
+    fun alert(logTag: String?, msg: String, context: Context, confirmedListener: Action? = null) {
+        Logger.e(logTag ?: LOG_TAG, msg)
         try {
-            AlertDialog.Builder(context)
+            val builder = AlertDialog.Builder(context)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    confirmedListener.run()
+                    confirmedListener?.run()
                     dialog.dismiss()
                 }
-                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                .setMessage(msg).show()
-            Logger.e(logTag ?: LOG_TAG, msg)
+            if (confirmedListener != null)
+                builder.setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+
+            builder.setMessage(msg).show()
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -165,16 +170,19 @@ object AppUtils {
             = alertD(logTag, context.getString(msgId), context, confirmedListener)
 
     fun alertD(logTag: String?, msg: String, context: Context, confirmedListener: Action? = null) {
+        Logger.d(logTag ?: LOG_TAG, msg)
         try {
-            AlertDialog.Builder(context)
+            val builder = AlertDialog.Builder(context)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     confirmedListener?.run()
                     dialog.dismiss()
                 }
-                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                .setMessage(msg).show()
+            if (confirmedListener != null)
+                builder.setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+
+            builder.setMessage(msg).show()
         } catch (e: WindowManager.BadTokenException) {
-            Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
+            Logger.e(logTag ?: LOG_TAG, "in alertD. cannot show dialog")
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
@@ -221,5 +229,24 @@ object AppUtils {
         date.set(Calendar.MINUTE, hourMinute.minute)
         date.set(Calendar.SECOND, 0)
         return date
+    }
+
+    fun getMuscleGroupsSpinnerStrings(list: List<MuscleGroup>?): List<String> {
+        val spinnerStrings = ArrayList<String>()
+        if (list != null) for (next in list) spinnerStrings.add(next.name)
+        return spinnerStrings
+    }
+
+    fun getExercisesSpinnerStrings(list: List<Exercise>?): List<String> {
+        val spinnerStrings = ArrayList<String>()
+        if (list != null) for (next in list) spinnerStrings.add(next.name)
+        return spinnerStrings
+    }
+
+    fun getSelectedItemIndex(list: List<DataObject>?, selectedId: Long?): Int {
+        var index = 0
+        if (list != null) for (i in list.indices)
+            if (list[i].id == selectedId) index = i
+        return index
     }
 }

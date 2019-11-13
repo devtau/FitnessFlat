@@ -2,23 +2,41 @@ package com.devtau.ironHeroes.ui.dialogs
 
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import com.devtau.ironHeroes.ui.StandardView
+import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.CLICKS_DEBOUNCE_RATE_MS
 import com.jakewharton.rxbinding2.widget.RxAdapterView
 import com.jakewharton.rxbinding2.widget.RxTextView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.concurrent.TimeUnit
 
-abstract class ViewSubscriberDialog: DialogFragment() {
+abstract class ViewSubscriberDialog: DialogFragment(), StandardView {
 
     private val compositeUiDisposable = CompositeDisposable()
 
+    abstract fun getLogTag(): String
 
     override fun onStop() {
         compositeUiDisposable.clear()
         super.onStop()
+    }
+
+    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
+    override fun showMsg(msg: String, confirmedListener: Action?) {
+        val context = context ?: return
+        AppUtils.alertD(getLogTag(), msg, context, confirmedListener)
+    }
+    override fun resolveString(@StringRes stringId: Int): String = getString(stringId)
+    override fun resolveColor(@ColorRes colorId: Int): Int {
+        val context = context ?: return -1
+        return ContextCompat.getColor(context, colorId)
     }
 
 
