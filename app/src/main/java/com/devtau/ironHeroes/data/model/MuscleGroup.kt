@@ -1,12 +1,15 @@
 package com.devtau.ironHeroes.data.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "MuscleGroups")
 class MuscleGroup(
-    id: Long?,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "muscleGroupId")
+    var id: Long?,
     var name: String
-): DataObject(id) {
+) {
 
     override fun toString(): String = name
 

@@ -11,7 +11,7 @@ interface MuscleGroupDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(list: List<MuscleGroup?>): Completable
 
-    @Query("SELECT * FROM MuscleGroups WHERE id = :id")
+    @Query("SELECT * FROM MuscleGroups WHERE muscleGroupId = :id")
     fun getById(id: Long): Flowable<MuscleGroup>
 
     @Transaction

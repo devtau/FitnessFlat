@@ -8,14 +8,18 @@
     tools:background="@color/colorAccent"
     android:orientation="vertical"
     android:id="@+id/container"
-    android:background="@drawable/marker_background">
+    android:background="@drawable/rounded_rect">
 
     <!--библиотека не работает, если использовать tools:text-->
     <TextView
         android:id="@+id/content"
-        android:text="123"
+        android:text="1234567890\n1234567890\n1234567890123\n1234567890"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorWhite"
-        android:gravity="center_horizontal"/>
+        android:gravity="center"
+        android:paddingTop="1dp"
+        android:paddingBottom="6dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"/>
 </LinearLayout>

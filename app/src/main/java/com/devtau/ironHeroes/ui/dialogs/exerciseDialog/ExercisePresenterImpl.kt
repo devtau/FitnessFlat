@@ -68,12 +68,18 @@ class ExercisePresenterImpl(
         }
     }
 
-    override fun updateExerciseData(exerciseIndex: Int, weight: String?, count: String?, comment: String?) {
+    override fun updateExerciseData(exerciseIndex: Int, weight: String?, repeats: String?, count: String?, comment: String?) {
         exerciseInTrainingId = exercisesFiltered?.get(exerciseIndex)?.id
         val weightInt = try {
             weight?.toInt() ?: 0
         } catch (e: NumberFormatException) {
             Logger.i(LOG_TAG, "bad data in weight field")
+            0
+        }
+        val repeatsInt = try {
+            repeats?.toInt() ?: 0
+        } catch (e: NumberFormatException) {
+            Logger.i(LOG_TAG, "bad data in repeats field")
             0
         }
         val countInt = try {
@@ -83,12 +89,13 @@ class ExercisePresenterImpl(
             INTEGER_NOT_PARSED
         }
 
-        if (ExerciseInTraining.allObligatoryPartsPresent(trainingId, exerciseInTrainingId, weightInt, countInt)) {
+        if (ExerciseInTraining.allObligatoryPartsPresent(trainingId, exerciseInTrainingId, weightInt, repeatsInt, countInt)) {
             if (exerciseInTraining == null) {
-                exerciseInTraining = ExerciseInTraining(null, trainingId!!, exerciseInTrainingId!!, weightInt, countInt)
-            } else if (exerciseInTraining?.someFieldsChanged(exerciseInTrainingId, weightInt, countInt, comment) == true) {
+                exerciseInTraining = ExerciseInTraining(null, trainingId!!, exerciseInTrainingId!!, weightInt, repeatsInt, countInt)
+            } else if (exerciseInTraining?.someFieldsChanged(exerciseInTrainingId, weightInt, countInt, repeatsInt, comment) == true) {
                 exerciseInTraining?.exerciseId = exerciseInTrainingId
                 exerciseInTraining?.weight = weightInt
+                exerciseInTraining?.repeats = repeatsInt
                 exerciseInTraining?.count = countInt
                 exerciseInTraining?.comment = comment
             }
@@ -106,15 +113,15 @@ class ExercisePresenterImpl(
         val muscleGroupId = muscleGroups?.get(muscleGroupIndex)?.id
         exercisesFiltered = filter(exercises, muscleGroupId)
         val selectedExerciseIndex = if (exerciseInTraining == null) 0
-        else AppUtils.getSelectedItemIndex(exercisesFiltered, exerciseInTraining?.exerciseId)
+        else AppUtils.getSelectedExerciseIndex(exercisesFiltered, exerciseInTraining?.exerciseId)
         view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered), selectedExerciseIndex)
     }
 
     override fun updatePreviousExerciseData(exerciseIndex: Int) {
         val selectedExerciseId = exercisesFiltered?.get(exerciseIndex)?.id
         val previous = getPreviousExerciseData(selectedExerciseId)
-        view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
-        if (exerciseInTraining == null) view.showExerciseDetails(previous?.weight, previous?.count, previous?.comment)
+        view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.repeats, previous?.count)
+        if (exerciseInTraining == null) view.showExerciseDetails(previous?.weight, previous?.repeats, previous?.count, previous?.comment)
     }
     //</editor-fold>
 
@@ -136,22 +143,22 @@ class ExercisePresenterImpl(
             view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered), 0)
 
             val previous = getPreviousExerciseData(exercisesFiltered?.get(0)?.id)
-            view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
-            view.showExerciseDetails(previous?.weight, previous?.count, previous?.comment)
+            view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.repeats, previous?.count)
+            view.showExerciseDetails(previous?.weight, previous?.repeats, previous?.count, previous?.comment)
         } else {
             applyMuscleGroupDetails(exerciseInTraining)
 
             val selectedMuscleGroupId = exerciseInTraining.exercise?.muscleGroupId
-            val selectedMuscleGroupIndex = AppUtils.getSelectedItemIndex(muscleGroups, selectedMuscleGroupId)
+            val selectedMuscleGroupIndex = AppUtils.getSelectedMuscleGroupIndex(muscleGroups, selectedMuscleGroupId)
             view.showMuscleGroups(AppUtils.getMuscleGroupsSpinnerStrings(muscleGroups), selectedMuscleGroupIndex)
 
             exercisesFiltered = filter(exercises, selectedMuscleGroupId)
-            val selectedExerciseIndex = AppUtils.getSelectedItemIndex(exercisesFiltered, exerciseInTraining.exerciseId)
+            val selectedExerciseIndex = AppUtils.getSelectedExerciseIndex(exercisesFiltered, exerciseInTraining.exerciseId)
             view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered), selectedExerciseIndex)
 
             val previous = getPreviousExerciseData(exerciseInTraining.exercise?.id)
-            view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.count)
-            view.showExerciseDetails(exerciseInTraining.weight, exerciseInTraining.count, exerciseInTraining.comment)
+            view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.repeats, previous?.count)
+            view.showExerciseDetails(exerciseInTraining.weight, exerciseInTraining.repeats, exerciseInTraining.count, exerciseInTraining.comment)
         }
 
         Logger.d(LOG_TAG, "publishDataToView. " +

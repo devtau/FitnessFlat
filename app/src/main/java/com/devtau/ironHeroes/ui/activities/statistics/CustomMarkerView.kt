@@ -28,10 +28,11 @@ class CustomMarkerView(context: Context, layoutResource: Int) :
     override fun refreshContent(entry: Entry, highlight: Highlight?) {
         val msg = "Entry should contain Object tag of type Integer with background color"
         if (entry.data == null) throw NullPointerException(msg)
-        if (entry.data !is Int) throw ClassCastException(msg)
+        if (entry.data !is Tag) throw ClassCastException(msg)
 
-        content.text = entry.y.toInt().toString()
-        val lineColor = ContextCompat.getColor(context, entry.data as Int)
-        container.background.mutate().setColorFilter(lineColor, PorterDuff.Mode.SRC_ATOP)
+        val tag = entry.data as Tag
+        content.text = tag.title
+        val markerColor = ContextCompat.getColor(context, tag.markerColorId)
+        container.background.mutate().setColorFilter(markerColor, PorterDuff.Mode.SRC_ATOP)
     }
 }

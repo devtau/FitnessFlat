@@ -12,7 +12,7 @@ interface ExerciseInTrainingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(list: List<ExerciseInTraining?>): Completable
 
-    @Query("SELECT * FROM ExercisesInTraining WHERE id = :id")
+    @Query("SELECT * FROM ExercisesInTraining WHERE exerciseInTrainingId = :id")
     fun getById(id: Long): Flowable<ExerciseInTrainingRelation>
 
     @Transaction
@@ -20,11 +20,11 @@ interface ExerciseInTrainingDao {
     fun getList(trainingId: Long): Flowable<List<ExerciseInTrainingRelation>>
 
     @Transaction
-    @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.id WHERE heroId = :heroId AND Trainings.date < :maxDate ORDER BY Trainings.date DESC")
+    @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.trainingId WHERE heroId = :heroId AND Trainings.date < :maxDate ORDER BY Trainings.date DESC")
     fun getListForHeroDesc(heroId: Long, maxDate: Long): Flowable<List<ExerciseInTrainingRelation>>
 
     @Transaction
-    @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.id WHERE heroId = :heroId AND Trainings.date < :maxDate ORDER BY Trainings.date ASC")
+    @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.trainingId WHERE heroId = :heroId AND Trainings.date < :maxDate ORDER BY Trainings.date ASC")
     fun getListForHeroAsc(heroId: Long, maxDate: Long): Flowable<List<ExerciseInTrainingRelation>>
 
     @Delete

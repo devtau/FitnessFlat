@@ -31,7 +31,8 @@
             android:layout_weight="1"
             android:paddingTop="@dimen/marginHalf"
             android:paddingBottom="@dimen/marginHalf"
-            android:minHeight="48dp"/>
+            android:minHeight="48dp"
+            android:visibility="gone"/>
     </LinearLayout>
     
     <com.github.mikephil.charting.charts.LineChart

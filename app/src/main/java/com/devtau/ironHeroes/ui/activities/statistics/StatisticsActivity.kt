@@ -7,17 +7,21 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.enums.StatisticsType
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
+import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.HERO_ID
 import com.devtau.ironHeroes.util.Logger
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_statistics.*
 
 class StatisticsActivity: ViewSubscriberActivity(),
-    StatisticsView {
+    StatisticsView, ExerciseDialog.Listener {
 
     lateinit var presenter: StatisticsPresenter
     private var statisticsType: StatisticsType? = null
@@ -56,6 +60,11 @@ class StatisticsActivity: ViewSubscriberActivity(),
         Logger.d(LOG_TAG, "showStatisticsData. lineData=$lineData")
         initChart(lineData)
     }
+
+    override fun showExerciseDetails(heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?) {
+        Logger.d(LOG_TAG, "showExerciseDetails. heroId=$heroId, trainingId=$trainingId, exerciseInTrainingId=$exerciseInTrainingId")
+        ExerciseDialog.showDialog(supportFragmentManager, heroId, trainingId, exerciseInTrainingId, this@StatisticsActivity)
+    }
     //</editor-fold>
 
 
@@ -70,9 +79,19 @@ class StatisticsActivity: ViewSubscriberActivity(),
         chart.setPinchZoom(false)// if disabled, scaling can be done on x- and y-axis separately
         chart.setDrawGridBackground(false)
         chart.maxHighlightDistance = 300f
-        chart.legend.isEnabled = true
-        chart.legend.textColor = R.color.colorBlack
+        chart.legend.isEnabled = false
         chart.marker = CustomMarkerView(this, R.layout.custom_marker_view)
+        chart.highlightValues(null)
+        chart.setOnChartValueSelectedListener(object: OnChartValueSelectedListener {
+            var trainingId: Long? = null
+            var exerciseId: Long? = null
+            override fun onValueSelected(e: Entry?, h: Highlight?) {
+                trainingId = (e?.data as Tag?)?.trainingId
+                exerciseId = (e?.data as Tag?)?.exerciseInTrainingId
+                Logger.d(LOG_TAG, "onValueSelected. trainingId=$trainingId, exerciseId=$exerciseId")
+            }
+            override fun onNothingSelected() = presenter.onBalloonClicked(trainingId, exerciseId)
+        })
 
         tuneXAxis(X_LABELS_COUNT, resolveColor(R.color.colorBlack))
         tuneYAxis(resolveColor(R.color.colorBlack), Y_AXIS_MINIMUM)
@@ -135,7 +154,7 @@ class StatisticsActivity: ViewSubscriberActivity(),
         private const val LOG_TAG = "StatisticsActivity"
         private const val X_LABELS_COUNT = 10
         private const val Y_LABELS_COUNT = 5
-        private const val Y_AXIS_MINIMUM = 50
+        private const val Y_AXIS_MINIMUM = 0
 
         fun newInstance(context: Context, heroId: Long) {
             val intent = Intent(context, StatisticsActivity::class.java)

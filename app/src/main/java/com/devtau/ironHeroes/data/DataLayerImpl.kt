@@ -8,16 +8,19 @@ import com.devtau.ironHeroes.data.relations.TrainingRelation
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.util.Constants.EMPTY_OBJECT_ID
 import com.devtau.ironHeroes.util.Logger
+import com.devtau.ironHeroes.util.Threading
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import java.util.concurrent.Callable
 
-class DataLayerImpl(context: Context): DataLayer {
-
-    private var db = DB.getInstance(context)
+class DataLayerImpl(
+    val context: Context,
+    val db: DB
+): DataLayer {
 
 
     override fun updateHeroes(list: List<Hero?>?) = if (list == null) {
@@ -41,12 +44,14 @@ class DataLayerImpl(context: Context): DataLayer {
         db.trainingDao().insert(list).subscribeDefault("updateTrainings. inserted")
     }
 
-    override fun updateTraining(training: Training?) = if (training == null) {
-        Logger.e(LOG_TAG, "updateTrainings. training is null. aborting")
-        EMPTY_OBJECT_ID
-    } else {
-        Logger.d(LOG_TAG, "updateTrainings. training=$training")
-        db.trainingDao().insert(training)
+    override fun updateTraining(training: Training?, listener: Consumer<Long>?) {
+        if (training == null) {
+            Logger.e(LOG_TAG, "updateTrainings. training is null. aborting")
+            listener?.accept(EMPTY_OBJECT_ID)
+        } else {
+            Logger.d(LOG_TAG, "updateTrainings. training=$training")
+            Threading.async(Callable { listener?.accept(db.trainingDao().insert(training)) })
+        }
     }
 
     override fun deleteTrainings(list: List<Training?>?) = if (list == null) {
@@ -61,6 +66,16 @@ class DataLayerImpl(context: Context): DataLayer {
     } else {
         Logger.d(LOG_TAG, "updateExercises. list=$list")
         db.exerciseDao().insert(list).subscribeDefault("updateExercises. inserted")
+    }
+
+    override fun updateExercise(exercise: Exercise?, listener: Consumer<Long>?) {
+        if (exercise == null) {
+            Logger.e(LOG_TAG, "updateExercise. exercise is null. aborting")
+            listener?.accept(EMPTY_OBJECT_ID)
+        } else {
+            Logger.d(LOG_TAG, "updateExercise. exercise=$exercise")
+            Threading.async(Callable { listener?.accept(db.exerciseDao().insert(exercise)) })
+        }
     }
 
     override fun deleteExercises(list: List<Exercise?>?) = if (list == null) {
@@ -106,7 +121,7 @@ class DataLayerImpl(context: Context): DataLayer {
     override fun getHero(id: Long, listener: Consumer<Hero?>): Disposable = db.heroDao().getById(id)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
+        .subscribe({ listener.accept(it) })
         { Logger.e(LOG_TAG, "Error in getHero: ${it.message}") }
 
     override fun getHeroes(listener: Consumer<List<Hero>?>): Disposable = db.heroDao()
@@ -121,13 +136,13 @@ class DataLayerImpl(context: Context): DataLayer {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe({ listener.accept(it) })
-        { Logger.e(LOG_TAG, "Error in getHeroes: ${it.message}") }
+        { Logger.e(LOG_TAG, "Error in getChampions: ${it.message}") }
 
     override fun getTraining(id: Long, listener: Consumer<Training?>): Disposable = db.trainingDao().getById(id)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .map(TrainingRelation::convert)
-        .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
+        .subscribe({ listener.accept(it) })
         { Logger.e(LOG_TAG, "Error in getTraining: ${it.message}") }
 
     override fun getTrainings(listener: Consumer<List<Training>>): Disposable = db.trainingDao().getList()
@@ -141,7 +156,7 @@ class DataLayerImpl(context: Context): DataLayer {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .map(ExerciseRelation::convert)
-        .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
+        .subscribe({ listener.accept(it) })
         { Logger.e(LOG_TAG, "Error in getExercise: ${it.message}") }
 
     override fun getExercises(listener: Consumer<List<Exercise>?>): Disposable = db.exerciseDao().getList()
@@ -156,8 +171,8 @@ class DataLayerImpl(context: Context): DataLayer {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .map(ExerciseInTrainingRelation::convert)
-        .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
-        { Logger.e(LOG_TAG, "Error in getExercise: ${it.message}") }
+        .subscribe({ listener.accept(it) })
+        { Logger.e(LOG_TAG, "Error in getExerciseInTraining: ${it.message}") }
 
     override fun getExercisesInTraining(trainingId: Long, listener: Consumer<List<ExerciseInTraining>?>): Disposable
             = db.exerciseInTrainingDao().getList(trainingId)
@@ -165,12 +180,12 @@ class DataLayerImpl(context: Context): DataLayer {
         .observeOn(AndroidSchedulers.mainThread())
         .map { ExerciseInTrainingRelation.convertList(it) }
         .subscribe({ listener.accept(it) })
-        { Logger.e(LOG_TAG, "Error in getExercises: ${it.message}") }
+        { Logger.e(LOG_TAG, "Error in getExercisesInTraining: ${it.message}") }
 
     override fun getMuscleGroup(id: Long, listener: Consumer<MuscleGroup?>): Disposable = db.muscleGroupDao().getById(id)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({ listener.accept(if (it.isEmpty()) null else it) })
+        .subscribe({ listener.accept(it) })
         { Logger.e(LOG_TAG, "Error in getMuscleGroup: ${it.message}") }
 
     override fun getMuscleGroups(listener: Consumer<List<MuscleGroup>?>): Disposable = db.muscleGroupDao().getList()
@@ -185,7 +200,7 @@ class DataLayerImpl(context: Context): DataLayer {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                listener.accept(if (it.isEmpty()) null else it)
+                listener.accept(it)
                 disposable?.dispose()
             }) { Logger.e(LOG_TAG, "Error in getHeroByIdAndClose: ${it.message}") }
     }
@@ -197,7 +212,7 @@ class DataLayerImpl(context: Context): DataLayer {
             .observeOn(AndroidSchedulers.mainThread())
             .map(TrainingRelation::convert)
             .subscribe({
-                listener.accept(if (it.isEmpty()) null else it)
+                listener.accept(it)
                 disposable?.dispose()
             }) { Logger.e(LOG_TAG, "Error in getTrainingByIdAndClose: ${it.message}") }
     }
@@ -209,7 +224,7 @@ class DataLayerImpl(context: Context): DataLayer {
             .observeOn(AndroidSchedulers.mainThread())
             .map(ExerciseRelation::convert)
             .subscribe({
-                listener.accept(if (it.isEmpty()) null else it)
+                listener.accept(it)
                 disposable?.dispose()
             }) { Logger.e(LOG_TAG, "Error in getExerciseAndClose: ${it.message}") }
     }

@@ -56,6 +56,9 @@ class StatisticsPresenterImpl(
         view.showStatisticsData(convertToDataSets(exercisesFiltered, parseTrainingDates(exercisesFiltered), R.color.colorAccent))
 //        view.showStatisticsData(generateMockDataSets(20, 50, 150))
     }
+
+    override fun onBalloonClicked(trainingId: Long?, exerciseInTrainingId: Long?) =
+        view.showExerciseDetails(heroId, trainingId, exerciseInTrainingId)
     //</editor-fold>
 
 
@@ -87,7 +90,8 @@ class StatisticsPresenterImpl(
                         view.showMsg("parseLine. bad data. aborting")
                         return values
                     }
-                    values.add(Entry(dateIndex.toFloat(), next.calculateWork().toFloat(), markerColorId))
+                    val tag = Tag(markerColorId, Tag.getTitle(next), next.trainingId, next.id)
+                    values.add(Entry(dateIndex.toFloat(), next.calculateWork().toFloat(), tag))
                 }
             }
         }
@@ -169,7 +173,7 @@ class StatisticsPresenterImpl(
         val dataSets = ArrayList<ILineDataSet>()
 
         for (i in 0 until valuesMap.size()) {
-            val line = parseLine(valuesMap.keyAt(i), exercises, dates, markerColorId)
+            val line = parseLine(valuesMap.keyAt(i), exercises, dates, getLineColor(i))
             val lineColor = view.resolveColor(getLineColor(i))
             dataSets.add(formatLine(LineDataSet(line, ""), lineColor))
         }

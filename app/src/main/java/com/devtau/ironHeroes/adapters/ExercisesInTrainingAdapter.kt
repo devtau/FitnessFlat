@@ -10,7 +10,6 @@ import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.util.Animator
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.Threading
-import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 
 class ExercisesInTrainingAdapter(
@@ -28,6 +27,7 @@ class ExercisesInTrainingAdapter(
         Logger.v(LOG_TAG, "onBindViewHolder. exercise=$exercise")
         holder.exercise.text = exercise.exercise?.name
         holder.weight.text = exercise.weight.toString()
+        holder.repeats.text = exercise.repeats.toString()
         holder.count.text = exercise.count.toString()
         holder.root.setOnClickListener { listener.accept(exercise) }
     }

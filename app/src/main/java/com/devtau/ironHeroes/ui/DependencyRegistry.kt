@@ -1,5 +1,6 @@
 package com.devtau.ironHeroes.ui
 
+import com.devtau.ironHeroes.data.DB
 import com.devtau.ironHeroes.data.DataLayerImpl
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.rest.NetworkLayerImpl
@@ -27,14 +28,14 @@ import com.devtau.ironHeroes.util.PreferencesManager
 class DependencyRegistry {
 
     fun inject(activity: LauncherActivity) {
-        val dataLayer = DataLayerImpl(activity)
+        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
         val networkLayer = NetworkLayerImpl(activity)
         val prefs = PreferencesManager(activity)
         activity.presenter = LauncherPresenterImpl(activity, dataLayer, networkLayer, prefs)
     }
 
     fun inject(activity: HeroesActivity) {
-        val dataLayer = DataLayerImpl(activity)
+        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
         val networkLayer = NetworkLayerImpl(activity)
         val prefs = PreferencesManager(activity)
         val humanType = activity.intent?.extras?.getSerializable(HUMAN_TYPE) as HumanType? ?: return
@@ -42,7 +43,7 @@ class DependencyRegistry {
     }
 
     fun inject(activity: HeroDetailsActivity) {
-        val dataLayer = DataLayerImpl(activity)
+        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
         val networkLayer = NetworkLayerImpl(activity)
         val prefs = PreferencesManager(activity)
         val heroId = if (activity.intent?.hasExtra(HERO_ID) == true) activity.intent?.extras?.getLong(HERO_ID) else null
@@ -51,14 +52,14 @@ class DependencyRegistry {
     }
 
     fun inject(activity: TrainingsActivity) {
-        val dataLayer = DataLayerImpl(activity)
+        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
         val networkLayer = NetworkLayerImpl(activity)
         val prefs = PreferencesManager(activity)
         activity.presenter = TrainingsPresenterImpl(activity, dataLayer, networkLayer, prefs)
     }
 
     fun inject(activity: TrainingDetailsActivity) {
-        val dataLayer = DataLayerImpl(activity)
+        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
         val networkLayer = NetworkLayerImpl(activity)
         val prefs = PreferencesManager(activity)
         val trainingId = if (activity.intent?.hasExtra(TRAINING_ID) == true) activity.intent?.extras?.getLong(TRAINING_ID) else null
@@ -67,7 +68,7 @@ class DependencyRegistry {
 
     fun inject(dialog: ExerciseDialog) {
         val context = dialog.context ?: return
-        val dataLayer = DataLayerImpl(context)
+        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
         val networkLayer = NetworkLayerImpl(context)
         val prefs = PreferencesManager(context)
         val heroId = if (dialog.arguments?.containsKey(HERO_ID) == true)
@@ -92,7 +93,7 @@ class DependencyRegistry {
     }
 
     fun inject(activity: StatisticsActivity) {
-        val dataLayer = DataLayerImpl(activity)
+        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
         val networkLayer = NetworkLayerImpl(activity)
         val prefs = PreferencesManager(activity)
         val heroId = if (activity.intent?.hasExtra(HERO_ID) == true) activity.intent?.extras?.getLong(HERO_ID) else null

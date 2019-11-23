@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.model.DataObject
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.HourMinute
 import com.devtau.ironHeroes.data.model.MuscleGroup
@@ -243,7 +242,14 @@ object AppUtils {
         return spinnerStrings
     }
 
-    fun getSelectedItemIndex(list: List<DataObject>?, selectedId: Long?): Int {
+    fun getSelectedExerciseIndex(list: List<Exercise>?, selectedId: Long?): Int {
+        var index = 0
+        if (list != null) for (i in list.indices)
+            if (list[i].id == selectedId) index = i
+        return index
+    }
+
+    fun getSelectedMuscleGroupIndex(list: List<MuscleGroup>?, selectedId: Long?): Int {
         var index = 0
         if (list != null) for (i in list.indices)
             if (list[i].id == selectedId) index = i

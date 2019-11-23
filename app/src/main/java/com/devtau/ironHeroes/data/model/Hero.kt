@@ -1,7 +1,9 @@
 package com.devtau.ironHeroes.data.model
 
 import android.text.TextUtils
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.enums.Gender
@@ -10,7 +12,8 @@ import com.devtau.ironHeroes.util.AppUtils
 
 @Entity(tableName = "Heroes")
 class Hero(
-    id: Long?,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "heroId")
+    var id: Long?,
     var humanType: HumanType,
     var firstName: String,
     var secondName: String,
@@ -22,7 +25,7 @@ class Hero(
     var birthDay: Long?,
     var avatarUrl: String?,
     var avatarId: Int?
-): DataObject(id) {
+) {
     fun deepEquals(other: Hero?) =
         id == other?.id
                 && humanType == other?.humanType

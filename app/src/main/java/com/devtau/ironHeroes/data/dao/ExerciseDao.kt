@@ -12,7 +12,10 @@ interface ExerciseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(list: List<Exercise?>): Completable
 
-    @Query("SELECT * FROM Exercises WHERE id = :id")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(exercise: Exercise?): Long
+
+    @Query("SELECT * FROM Exercises WHERE exerciseId = :id")
     fun getById(id: Long): Flowable<ExerciseRelation>
 
     @Transaction

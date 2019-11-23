@@ -8,11 +8,9 @@ import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
-import com.devtau.ironHeroes.util.Threading
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
-import java.util.concurrent.Callable
 
 class TrainingDetailsPresenterImpl(
     private val view: TrainingDetailsView,
@@ -66,12 +64,12 @@ class TrainingDetailsPresenterImpl(
         Logger.d(LOG_TAG, "updateTrainingData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
         if (allPartsPresent && someFieldsChanged) {
             training = Training(trainingId, championId!!, heroId!!, trainingDate)
-            Threading.async(Callable {
-                trainingId = dataLayer.updateTraining(training)
+            dataLayer.updateTraining(training, Consumer {
+                trainingId = it
                 if (training?.id == null) {
                     training?.id = trainingId
-                    disposeOnStop(dataLayer.getExercisesInTraining(trainingId!!, Consumer {
-                        exercisesInTraining = it
+                    disposeOnStop(dataLayer.getExercisesInTraining(trainingId!!, Consumer { exercises ->
+                        exercisesInTraining = exercises
                         publishDataToView()
                     }))
                 }

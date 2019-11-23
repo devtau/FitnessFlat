@@ -9,10 +9,11 @@ interface DataLayer {
     fun deleteHeroes(list: List<Hero?>?)
 
     fun updateTrainings(list: List<Training?>?)
-    fun updateTraining(training: Training?): Long
+    fun updateTraining(training: Training?, listener: Consumer<Long>? = null)
     fun deleteTrainings(list: List<Training?>?)
 
     fun updateExercises(list: List<Exercise?>?)
+    fun updateExercise(exercise: Exercise?, listener: Consumer<Long>? = null)
     fun deleteExercises(list: List<Exercise?>?)
 
     fun updateExercisesInTraining(list: List<ExerciseInTraining?>?)

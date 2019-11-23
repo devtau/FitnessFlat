@@ -1,7 +1,9 @@
 package com.devtau.ironHeroes.data.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
+import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "Exercises",
@@ -9,11 +11,12 @@ import androidx.room.Index
     ignoredColumns = ["muscleGroup"]
 )
 class Exercise(
-    id: Long?,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "exerciseId")
+    var id: Long?,
     var name: String,
     var muscleGroupId: Long,
     var muscleGroup: MuscleGroup?
-): DataObject(id) {
+) {
 
     constructor(id: Long?, name: String, muscleGroupId: Long): this(id, name, muscleGroupId, null)
 
@@ -41,6 +44,7 @@ class Exercise(
 
             //Бицепс
             Exercise(15, "Подъем гантелей сидя", 2),
+            Exercise(55, "Подъем гантелей сидя (скотт)", 2),
             Exercise(16, "Подъем гантелей стоя", 2),
             Exercise(17, "Подъем штанги стоя", 2),
             Exercise(48, "Подъем штанги стоя обратным", 2),
@@ -63,6 +67,7 @@ class Exercise(
             Exercise(29, "Тяга верхнего блока", 5),
             Exercise(30, "Тяга нижнего блока", 5),
             Exercise(31, "Тяга гантели к поясу", 5),
+            Exercise(54, "Тяга гантелей к поясу на скамье", 5),
             Exercise(47, "Пуловер", 5),
             Exercise(50, "Подтягивания", 5),
             Exercise(52, "Гиперэкстензия", 5),
@@ -83,6 +88,8 @@ class Exercise(
             Exercise(44, "Румынская тяга", 8),
             Exercise(45, "Присед со штангой", 8),
             Exercise(46, "Выпады с гантелями на месте", 8),
+            Exercise(53, "Ягодичный мостик", 8),
+            Exercise(56, "Становая тяга", 8),
 
             //Пресс
             Exercise(32, "Пресс в TRX горизонтально", 6),

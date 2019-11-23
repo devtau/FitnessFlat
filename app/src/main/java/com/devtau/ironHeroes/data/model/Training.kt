@@ -1,7 +1,9 @@
 package com.devtau.ironHeroes.data.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.devtau.ironHeroes.util.AppUtils
 import java.util.*
 
@@ -11,14 +13,15 @@ import java.util.*
     ignoredColumns = ["champion", "hero", "exercises"]
 )
 class Training(
-    id: Long?,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "trainingId")
+    var id: Long?,
     var championId: Long?,
     var champion: Hero?,
     var heroId: Long?,
     var hero: Hero?,
     var date: Long,
     var exercises: List<ExerciseInTraining>? = null
-): DataObject(id) {
+) {
 
     constructor(id: Long?, championId: Long?, heroId: Long?, date: Long):
             this(id, championId, null, heroId, null, date, null)
@@ -68,6 +71,14 @@ class Training(
                 Training(13, anton.id, denis.id, AppUtils.parseDateTime("04.11.2019 10:00").timeInMillis),
                 Training(14, anton.id, denis.id, AppUtils.parseDateTime("05.11.2019 9:00").timeInMillis),
                 Training(15, roma.id, denis.id, AppUtils.parseDateTime("08.11.2019 9:00").timeInMillis),
+
+                Training(16, anton.id, denis.id, AppUtils.parseDateTime("11.11.2019 10:00").timeInMillis),
+                Training(17, roma.id, denis.id, AppUtils.parseDateTime("14.11.2019 9:00").timeInMillis),
+                Training(18, roma.id, denis.id, AppUtils.parseDateTime("15.11.2019 9:00").timeInMillis),
+
+                Training(19, anton.id, denis.id, AppUtils.parseDateTime("18.11.2019 9:00").timeInMillis),
+                Training(20, roma.id, denis.id, AppUtils.parseDateTime("21.11.2019 9:00").timeInMillis),
+                Training(21, anton.id, denis.id, AppUtils.parseDateTime("22.11.2019 9:00").timeInMillis),
 
 
                 Training(101, roma.id, Hero.getMockHeroes()[1].id, AppUtils.parseDateTime("21.10.2019 9:30").timeInMillis),

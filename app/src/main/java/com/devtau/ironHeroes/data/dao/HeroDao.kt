@@ -11,7 +11,7 @@ interface HeroDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(list: List<Hero?>?): Completable
 
-    @Query("SELECT * FROM Heroes WHERE id = :id")
+    @Query("SELECT * FROM Heroes WHERE heroId = :id")
     fun getById(id: Long): Flowable<Hero>
 
     @Query("SELECT * FROM Heroes WHERE humanType = :humanTypeCode ORDER BY firstName")

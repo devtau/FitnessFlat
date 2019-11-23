@@ -7,4 +7,5 @@ interface StatisticsView: StandardView {
     fun showMuscleGroups(list: List<String>?, selectedIndex: Int)
     fun showExercises(list: List<String>?, selectedIndex: Int)
     fun showStatisticsData(lineData: LineData?)
+    fun showExerciseDetails(heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?)
 }

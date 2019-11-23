@@ -11,10 +11,10 @@ class ExerciseInTrainingRelation {
     @Embedded
     lateinit var exerciseInTraining: ExerciseInTraining
 
-    @Relation(parentColumn = "trainingId", entityColumn = "id")
+    @Relation(parentColumn = "trainingId", entityColumn = "trainingId")
     lateinit var training: Training
 
-    @Relation(parentColumn = "exerciseId", entityColumn = "id")
+    @Relation(parentColumn = "exerciseId", entityColumn = "exerciseId")
     lateinit var exercise: Exercise
 
     fun convert(): ExerciseInTraining {
