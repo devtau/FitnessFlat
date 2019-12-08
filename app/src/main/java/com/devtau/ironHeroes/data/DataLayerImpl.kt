@@ -285,6 +285,18 @@ class DataLayerImpl(
             }) { Logger.e(LOG_TAG, "Error in getAllExercisesInTrainingsAndClose: ${it.message}") }
     }
 
+    override fun getAllTrainingsAndClose(listener: Consumer<List<Training>?>) {
+        var disposable: Disposable? = null
+        disposable = db.trainingDao().getList()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { TrainingRelation.convertList(it) }
+            .subscribe({
+                listener.accept(it)
+                disposable?.dispose()
+            }) { Logger.e(LOG_TAG, "Error in getAllTrainingsAndClose: ${it.message}") }
+    }
+
 
     private fun Completable.subscribeDefault(msg: String?) {
         var disposable: Disposable? = null

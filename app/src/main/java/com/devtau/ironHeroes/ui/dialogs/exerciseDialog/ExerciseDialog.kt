@@ -11,6 +11,7 @@ import com.devtau.ironHeroes.ui.dialogs.ViewSubscriberDialog
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
 import com.devtau.ironHeroes.util.Constants.HERO_ID
+import com.devtau.ironHeroes.util.Constants.POSITION
 import com.devtau.ironHeroes.util.Constants.TRAINING_ID
 import com.devtau.ironHeroes.util.Logger
 import io.reactivex.functions.Consumer
@@ -132,7 +133,8 @@ class ExerciseDialog: ViewSubscriberDialog(),
         private const val LOG_TAG = "ExerciseDialog"
         private const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog"
 
-        fun showDialog(fragmentManager: FragmentManager?, heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?, listener: Listener) {
+        fun showDialog(fragmentManager: FragmentManager?, heroId: Long?, trainingId: Long?,
+                       exerciseInTrainingId: Long?, position: Int?, listener: Listener) {
             if (fragmentManager == null || heroId == null || trainingId == null) {
                 Logger.e(LOG_TAG, "showDialog. bad data. aborting")
                 return
@@ -141,16 +143,17 @@ class ExerciseDialog: ViewSubscriberDialog(),
             val prev = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
             if (prev != null) ft.remove(prev)
             ft.addToBackStack(null)
-            val newFragment = newInstance(heroId, trainingId, exerciseInTrainingId)
+            val newFragment = newInstance(heroId, trainingId, exerciseInTrainingId, position)
             newFragment.show(ft, FRAGMENT_TAG)
         }
 
-        private fun newInstance(heroId: Long, trainingId: Long?, exerciseInTrainingId: Long?): ExerciseDialog {
+        private fun newInstance(heroId: Long, trainingId: Long?, exerciseInTrainingId: Long?, position: Int?): ExerciseDialog {
             val fragment = ExerciseDialog()
             val args = Bundle()
             args.putLong(HERO_ID, heroId)
             if (trainingId != null) args.putLong(TRAINING_ID, trainingId)
             if (exerciseInTrainingId != null) args.putLong(EXERCISE_IN_TRAINING_ID, exerciseInTrainingId)
+            if (position != null) args.putInt(POSITION, position)
             fragment.arguments = args
             return fragment
         }

@@ -15,4 +15,6 @@ interface TrainingDetailsPresenter {
     fun deleteTraining()
     fun provideExercises(): List<ExerciseInTraining>?
     fun provideTraining(): Training?
+    fun onExerciseMoved(fromPosition: Int, toPosition: Int)
+    fun addExerciseClicked()
 }

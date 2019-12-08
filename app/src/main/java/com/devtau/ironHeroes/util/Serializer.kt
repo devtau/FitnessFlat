@@ -1,6 +1,8 @@
 package com.devtau.ironHeroes.util
 
 import android.text.TextUtils
+import com.devtau.ironHeroes.data.model.ExerciseInTraining
+import com.devtau.ironHeroes.data.model.Training
 import java.util.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -25,4 +27,18 @@ object Serializer {
                 val listType = object: TypeToken<ArrayList<Int>>() {}.type
                 Gson().fromJson<ArrayList<Int>>(string, listType)
             }
+
+    fun deserializeListOfTrainings(string: String?): ArrayList<Training>? =
+        if (TextUtils.isEmpty(string)) null
+        else {
+            val listType = object: TypeToken<ArrayList<Training>>() {}.type
+            Gson().fromJson<ArrayList<Training>>(string, listType)
+        }
+
+    fun deserializeListOfExercisesInTrainings(string: String?): ArrayList<ExerciseInTraining>? =
+        if (TextUtils.isEmpty(string)) null
+        else {
+            val listType = object: TypeToken<ArrayList<ExerciseInTraining>>() {}.type
+            Gson().fromJson<ArrayList<ExerciseInTraining>>(string, listType)
+        }
 }

@@ -2,6 +2,7 @@ package com.devtau.ironHeroes.util
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.os.Looper
 import android.telephony.PhoneNumberUtils
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -254,5 +255,10 @@ object AppUtils {
         if (list != null) for (i in list.indices)
             if (list[i].id == selectedId) index = i
         return index
+    }
+
+    fun checkNotMainThread() {
+        if (Looper.getMainLooper().thread == Thread.currentThread())
+            throw RuntimeException("method should not be called from UI thread")
     }
 }

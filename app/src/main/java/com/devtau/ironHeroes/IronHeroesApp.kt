@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
+import com.google.firebase.FirebaseApp
+import com.google.firebase.iid.FirebaseInstanceId
 import com.vk.sdk.*
 import com.vk.sdk.api.VKError
 
@@ -17,6 +19,17 @@ class IronHeroesApp: Application() {
     override fun onCreate() {
         super.onCreate()
         prefs = PreferencesManager(this)
+
+        FirebaseApp.initializeApp(this)
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener {
+                if (!it.isSuccessful) {
+                    Logger.w(LOG_TAG, "getInstanceId. failed ${it.exception}")
+                } else {
+                    Logger.d(LOG_TAG, "getInstanceId. firebase token=${it.result?.token}")
+                }
+            }
+
         //vk
         VKSdk.initialize(this)
         object: VKAccessTokenTracker() {

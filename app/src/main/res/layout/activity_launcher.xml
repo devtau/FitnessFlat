@@ -42,4 +42,31 @@
 		android:layout_marginLeft="@dimen/marginNormal"
 		android:layout_marginRight="@dimen/marginNormal"
 		android:layout_marginBottom="@dimen/marginHalf"/>
+	
+	<Button
+		android:id="@+id/database"
+		android:text="@string/database"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/marginNormal"
+		android:layout_marginRight="@dimen/marginNormal"
+		android:layout_marginBottom="@dimen/marginHalf"/>
+	
+	<Button
+		android:id="@+id/exportToFile"
+		android:text="@string/export_to_file"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/marginNormal"
+		android:layout_marginRight="@dimen/marginNormal"
+		android:layout_marginBottom="@dimen/marginHalf"/>
+	
+	<Button
+		android:id="@+id/importFromFile"
+		android:text="@string/import_from_file"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/marginNormal"
+		android:layout_marginRight="@dimen/marginNormal"
+		android:layout_marginBottom="@dimen/marginHalf"/>
 </LinearLayout>

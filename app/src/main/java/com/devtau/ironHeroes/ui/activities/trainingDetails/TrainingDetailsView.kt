@@ -13,4 +13,5 @@ interface TrainingDetailsView: StandardView {
     fun showDateDialog(date: Calendar, minDate: Calendar, maxDate: Calendar)
     fun showDeleteTrainingBtn(show: Boolean)
     fun closeScreen()
+    fun showNewExerciseDialog(position: Int)
 }

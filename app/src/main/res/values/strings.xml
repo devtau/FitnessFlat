@@ -6,6 +6,12 @@
     <string name="champion">Чемпион</string>
     <string name="trainings">Тренировки</string>
     <string name="statistics">Статистика</string>
+    <string name="database">База данных</string>
+    <string name="export_to_file">Экспортировать в файл</string>
+    <string name="import_from_file">Импортировать из файла</string>
+    <string name="export_error">Ошибка при сохранении в файл</string>
+    <string name="exported_formatter" formatted="false">%s и %s\nсохранено в файл</string>
+    <string name="imported_formatter" formatted="false">%s и %s\nпрочитано из файла</string>
     <string name="choose_action">Выберите действие</string>
     <string name="hero_edit">Редактировать героя</string>
     <string name="hero_add">Добавить героя</string>
@@ -58,7 +64,7 @@
     <string name="permission_explanation_gps">Приложению необходим доступ к GPS-датчику. Если вы не хотите видеть этот вопрос, нажмите далее</string>
     <string name="permission_cancelled_msg_call">Доступ к звонкам отклонен</string>
     <string name="permission_explanation_call">Разрешите приложению совершать звонки для связи с героями. Если вы не хотите видеть этот вопрос, нажмите далее</string>
-    <string name="permission_explanation_storage">Разрешите приложению доступ к карте памяти для выбора изображения</string>
+    <string name="permission_explanation_storage">Разрешите приложению доступ к карте памяти для экспорта/импорта файла</string>
     <string name="permission_cancelled_msg_storage">Доступ к карте памяти отклонен</string>
     <string name="further">далее</string>
     <string name="previous_exercise_data">Прошлый раз вы выполнили это упражнение:</string>
@@ -70,4 +76,16 @@
     
     <!--TODO: заполнить из профиля приложения-->
     <integer name="com_vk_sdk_AppId" translatable="false">7173607</integer>
+    
+    <plurals name="trainings">
+        <item quantity="one">%d тренировка</item>
+        <item quantity="few">%d тренировки</item>
+        <item quantity="other">%d тренировок</item>
+    </plurals>
+    
+    <plurals name="exercises">
+        <item quantity="one">%d упражнение</item>
+        <item quantity="few">%d упражнения</item>
+        <item quantity="other">%d упражнений</item>
+    </plurals>
 </resources>

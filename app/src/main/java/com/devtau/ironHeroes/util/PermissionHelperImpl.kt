@@ -14,7 +14,7 @@ import android.widget.Toast
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.Manifest.permission.CALL_PHONE
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import com.devtau.ironHeroes.R
 
 class PermissionHelperImpl: PermissionHelper {
@@ -72,27 +72,27 @@ class PermissionHelperImpl: PermissionHelper {
 
 
     override fun checkStoragePermission(context: Context): Boolean =
-            if (!isPermissionDynamic()) true else isPermissionGranted(context, READ_EXTERNAL_STORAGE)
+            if (!isPermissionDynamic()) true else isPermissionGranted(context, WRITE_EXTERNAL_STORAGE)
 
     @TargetApi(23)
     override fun requestStoragePermission(fragment: Fragment) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(fragment.activity!!, READ_EXTERNAL_STORAGE)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(fragment.activity!!, WRITE_EXTERNAL_STORAGE)) {
             val explanationText = fragment.getString(R.string.permission_explanation_storage)
             val declinedText = fragment.getString(R.string.permission_cancelled_msg_storage)
-            showExplanationDialog(fragment, explanationText, declinedText, READ_EXTERNAL_STORAGE, STORAGE_REQUEST_CODE)
+            showExplanationDialog(fragment, explanationText, declinedText, WRITE_EXTERNAL_STORAGE, STORAGE_REQUEST_CODE)
         } else {
-            fragment.requestPermissions(arrayOf(READ_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
+            fragment.requestPermissions(arrayOf(WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
         }
     }
 
     @TargetApi(23)
     override fun requestStoragePermission(activity: Activity) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, READ_EXTERNAL_STORAGE)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, WRITE_EXTERNAL_STORAGE)) {
             val explanationText = activity.getString(R.string.permission_explanation_storage)
             val declinedText = activity.getString(R.string.permission_cancelled_msg_storage)
-            showExplanationDialog(activity, explanationText, declinedText, READ_EXTERNAL_STORAGE, STORAGE_REQUEST_CODE)
+            showExplanationDialog(activity, explanationText, declinedText, WRITE_EXTERNAL_STORAGE, STORAGE_REQUEST_CODE)
         } else {
-            activity.requestPermissions(arrayOf(READ_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
+            activity.requestPermissions(arrayOf(WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
         }
     }
 
@@ -166,7 +166,7 @@ class PermissionHelperImpl: PermissionHelper {
     companion object {
         const val GPS_REQUEST_CODE = 5748
         const val CALL_REQUEST_CODE = 5749
-        private const val STORAGE_REQUEST_CODE = 5751
+        const val STORAGE_REQUEST_CODE = 5751
         private const val LOG_TAG = "PermissionHelper"
     }
 }

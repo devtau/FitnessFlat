@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.ExercisesInTrainingAdapter
@@ -105,15 +107,17 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     }
 
     override fun closeScreen() = finish()
+
+    override fun showNewExerciseDialog(position: Int) =
+        ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
+            presenter.provideTraining()?.id, null, position, this)
     //</editor-fold>
 
 
     //<editor-fold desc="Private methods">
     private fun initUi() {
         dateInput?.setOnClickListener { presenter.dateDialogRequested(trainingDate) }
-        addExercise?.setOnClickListener {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId, presenter.provideTraining()?.id, null, this)
-        }
+        addExercise?.setOnClickListener { presenter.addExerciseClicked() }
     }
 
     private fun updateTrainingData() {
@@ -125,10 +129,38 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     private fun initList() {
         exercisesAdapter = ExercisesInTrainingAdapter(presenter.provideExercises(), Consumer {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId, presenter.provideTraining()?.id, it.id, this)
+            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
+                presenter.provideTraining()?.id, it.id, it.position, this)
         })
         listView?.layoutManager = CustomLinearLayoutManager(this)
         listView?.adapter = exercisesAdapter
+
+        val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {
+            override fun isLongPressDragEnabled() = true
+            override fun isItemViewSwipeEnabled() = false
+
+            override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+                val swipeFlags = if (isItemViewSwipeEnabled) ItemTouchHelper.START or ItemTouchHelper.END else 0
+                return makeMovementFlags(dragFlags, swipeFlags)
+            }
+
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                if (viewHolder.itemViewType != target.itemViewType) return false
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+                presenter.onExerciseMoved(fromPosition, toPosition)
+                recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//                val position = viewHolder.adapterPosition
+//                items.remove(position)
+//                listView.adapter?.notifyItemRemoved(position)
+            }
+        })
+        itemTouchHelper.attachToRecyclerView(listView)
     }
 
     private fun onDateSet(date: Calendar, year: Int, month: Int, dayOfMonth: Int) {

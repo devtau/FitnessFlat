@@ -1,7 +1,6 @@
 package com.devtau.ironHeroes
 
 import org.junit.Test
-
 import org.junit.Assert.*
 
 /**

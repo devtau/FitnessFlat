@@ -22,6 +22,7 @@ import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
 import com.devtau.ironHeroes.util.Constants.HERO_ID
 import com.devtau.ironHeroes.util.Constants.HUMAN_TYPE
+import com.devtau.ironHeroes.util.Constants.POSITION
 import com.devtau.ironHeroes.util.Constants.TRAINING_ID
 import com.devtau.ironHeroes.util.PreferencesManager
 
@@ -77,6 +78,8 @@ class DependencyRegistry {
             dialog.arguments?.getLong(TRAINING_ID) else null
         val exerciseId = if (dialog.arguments?.containsKey(EXERCISE_IN_TRAINING_ID) == true)
             dialog.arguments?.getLong(EXERCISE_IN_TRAINING_ID) else null
+        val position = if (dialog.arguments?.containsKey(POSITION) == true)
+            dialog.arguments?.getInt(POSITION) else null
         if (heroId == null) {
             AppUtils.alert(LOG_TAG, "$dialog misses necessary heroId", context)
             return
@@ -88,7 +91,8 @@ class DependencyRegistry {
             prefs,
             heroId,
             trainingId,
-            exerciseId
+            exerciseId,
+            position
         )
     }
 

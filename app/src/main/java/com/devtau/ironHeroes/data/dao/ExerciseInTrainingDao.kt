@@ -16,7 +16,7 @@ interface ExerciseInTrainingDao {
     fun getById(id: Long): Flowable<ExerciseInTrainingRelation>
 
     @Transaction
-    @Query("SELECT * FROM ExercisesInTraining WHERE trainingId = :trainingId")
+    @Query("SELECT * FROM ExercisesInTraining WHERE trainingId = :trainingId ORDER BY position ASC")
     fun getList(trainingId: Long): Flowable<List<ExerciseInTrainingRelation>>
 
     @Transaction

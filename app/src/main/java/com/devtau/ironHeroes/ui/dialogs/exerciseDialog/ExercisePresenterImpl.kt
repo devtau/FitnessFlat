@@ -21,7 +21,8 @@ class ExercisePresenterImpl(
     private val prefs: PreferencesManager?,
     private val heroId: Long,
     private val trainingId: Long?,
-    private var exerciseInTrainingId: Long?
+    private var exerciseInTrainingId: Long?,
+    private var position: Int?
 ): DBSubscriber(), ExercisePresenter {
 
     private var muscleGroups: List<MuscleGroup>? = null
@@ -90,8 +91,9 @@ class ExercisePresenterImpl(
         }
 
         if (ExerciseInTraining.allObligatoryPartsPresent(trainingId, exerciseInTrainingId, weightInt, repeatsInt, countInt)) {
-            if (exerciseInTraining == null) {
-                exerciseInTraining = ExerciseInTraining(null, trainingId!!, exerciseInTrainingId!!, weightInt, repeatsInt, countInt)
+            if (exerciseInTraining == null && position != null) {
+                exerciseInTraining = ExerciseInTraining(null, trainingId!!, exerciseInTrainingId!!,
+                    weightInt, repeatsInt, countInt, position!!, comment)
             } else if (exerciseInTraining?.someFieldsChanged(exerciseInTrainingId, weightInt, countInt, repeatsInt, comment) == true) {
                 exerciseInTraining?.exerciseId = exerciseInTrainingId
                 exerciseInTraining?.weight = weightInt
@@ -126,6 +128,7 @@ class ExercisePresenterImpl(
     //</editor-fold>
 
 
+    //<editor-fold desc="Private methods">
     private fun prepareAndPublishDataToView() {
         fun applyMuscleGroupDetails(exerciseInTraining: ExerciseInTraining) {
             for (next in muscleGroups!!)
@@ -188,8 +191,7 @@ class ExercisePresenterImpl(
             else -> return null
         }
     }
-
-
+    //</editor-fold>
 
 
     companion object {

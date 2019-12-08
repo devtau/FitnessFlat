@@ -63,7 +63,7 @@ class StatisticsActivity: ViewSubscriberActivity(),
 
     override fun showExerciseDetails(heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?) {
         Logger.d(LOG_TAG, "showExerciseDetails. heroId=$heroId, trainingId=$trainingId, exerciseInTrainingId=$exerciseInTrainingId")
-        ExerciseDialog.showDialog(supportFragmentManager, heroId, trainingId, exerciseInTrainingId, this@StatisticsActivity)
+        ExerciseDialog.showDialog(supportFragmentManager, heroId, trainingId, exerciseInTrainingId, null, this@StatisticsActivity)
     }
     //</editor-fold>
 
