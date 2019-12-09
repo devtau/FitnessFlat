@@ -10,11 +10,27 @@
 	<include layout="@layout/toolbar"/>
 	
 	<Button
+		android:id="@+id/trainings"
+		android:text="@string/trainings"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="@dimen/marginHalf"
+		android:layout_marginLeft="@dimen/marginNormal"
+		android:layout_marginRight="@dimen/marginNormal"/>
+	
+	<Button
+		android:id="@+id/statistics"
+		android:text="@string/statistics"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="@dimen/marginNormal"
+		android:layout_marginRight="@dimen/marginNormal"/>
+	
+	<Button
 		android:id="@+id/heroes"
 		android:text="@string/heroes"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="@dimen/marginHalf"
 		android:layout_marginLeft="@dimen/marginNormal"
 		android:layout_marginRight="@dimen/marginNormal"/>
 	
@@ -27,30 +43,12 @@
 		android:layout_marginRight="@dimen/marginNormal"/>
 	
 	<Button
-		android:id="@+id/trainings"
-		android:text="@string/trainings"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginLeft="@dimen/marginNormal"
-		android:layout_marginRight="@dimen/marginNormal"/>
-	
-	<Button
-		android:id="@+id/statistics"
-		android:text="@string/statistics"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginLeft="@dimen/marginNormal"
-		android:layout_marginRight="@dimen/marginNormal"
-		android:layout_marginBottom="@dimen/marginHalf"/>
-	
-	<Button
 		android:id="@+id/database"
 		android:text="@string/database"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="@dimen/marginNormal"
-		android:layout_marginRight="@dimen/marginNormal"
-		android:layout_marginBottom="@dimen/marginHalf"/>
+		android:layout_marginRight="@dimen/marginNormal"/>
 	
 	<Button
 		android:id="@+id/exportToFile"
@@ -58,8 +56,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="@dimen/marginNormal"
-		android:layout_marginRight="@dimen/marginNormal"
-		android:layout_marginBottom="@dimen/marginHalf"/>
+		android:layout_marginRight="@dimen/marginNormal"/>
 	
 	<Button
 		android:id="@+id/importFromFile"

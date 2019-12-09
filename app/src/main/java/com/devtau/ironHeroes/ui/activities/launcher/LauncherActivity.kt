@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.Hero
+import com.devtau.ironHeroes.data.model.MuscleGroup
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.DBViewerActivity
@@ -82,6 +84,9 @@ class LauncherActivity: ViewSubscriberActivity(), LauncherView {
         val exercises = resources.getQuantityString(R.plurals.exercises, exercisesCount, exercisesCount)
         showMsg(String.format(getString(R.string.imported_formatter), trainings, exercises))
     }
+
+    override fun provideMockExercises() = Exercise.getMock(this)
+    override fun provideMockMuscleGroups() = MuscleGroup.getMock(this)
     //</editor-fold>
 
 

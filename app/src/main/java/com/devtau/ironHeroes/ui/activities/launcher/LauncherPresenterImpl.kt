@@ -26,8 +26,8 @@ class LauncherPresenterImpl(
     init {
         disposeOnStop(dataLayer.getHeroes(Consumer { heroes ->
             if (heroes == null || heroes.isEmpty()) {
-                dataLayer.updateMuscleGroups(MuscleGroup.getMock())
-                dataLayer.updateExercises(Exercise.getMock())
+                dataLayer.updateMuscleGroups(view.provideMockMuscleGroups())
+                dataLayer.updateExercises(view.provideMockExercises())
 
                 if (BuildConfig.DEBUG) {
                     dataLayer.updateHeroes(Hero.getMockChampions())
@@ -53,7 +53,7 @@ class LauncherPresenterImpl(
             if (trainingsCount > 0 && exercisesCount > 0) view.showExported(trainingsCount, exercisesCount)
         }
 
-        dataLayer.getAllExercisesInTrainingsAndClose(heroId, Calendar.getInstance().timeInMillis, false, Consumer {
+        dataLayer.getAllTrainingsAndClose(Consumer {
             FileUtils.exportToJSON(it, exchangeDirName, Constants.TRAININGS_FILE_NAME, Consumer { count ->
                 Threading.dispatchMain(Action {
                     if (count == null) {
@@ -65,7 +65,7 @@ class LauncherPresenterImpl(
                 })
             })
         })
-        dataLayer.getAllTrainingsAndClose(Consumer {
+        dataLayer.getAllExercisesInTrainingsAndClose(heroId, Calendar.getInstance().timeInMillis, false, Consumer {
             FileUtils.exportToJSON(it, exchangeDirName, Constants.EXERCISES_FILE_NAME, Consumer { count ->
                 Threading.dispatchMain(Action {
                     if (count == null) {

@@ -1,8 +1,10 @@
 package com.devtau.ironHeroes.data.model
 
+import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.devtau.ironHeroes.R
 
 @Entity(tableName = "MuscleGroups")
 class MuscleGroup(
@@ -14,15 +16,15 @@ class MuscleGroup(
     override fun toString(): String = name
 
     companion object {
-        fun getMock() = listOf(
-            MuscleGroup(1, "Грудные"),
-            MuscleGroup(2, "Бицепс"),
-            MuscleGroup(3, "Трицепс"),
-            MuscleGroup(4, "Дельта"),
-            MuscleGroup(5, "Спина"),
-            MuscleGroup(6, "Пресс"),
-            MuscleGroup(7, "Трапеции (шраги)"),
-            MuscleGroup(8, "Ноги")
+        fun getMock(c: Context) = listOf(
+            MuscleGroup(1, c.getString(R.string.chest)),
+            MuscleGroup(2, c.getString(R.string.biceps)),
+            MuscleGroup(3, c.getString(R.string.triceps)),
+            MuscleGroup(4, c.getString(R.string.delta)),
+            MuscleGroup(5, c.getString(R.string.back)),
+            MuscleGroup(6, c.getString(R.string.press)),
+            MuscleGroup(7, c.getString(R.string.shrugs)),
+            MuscleGroup(8, c.getString(R.string.legs))
         )
     }
 }

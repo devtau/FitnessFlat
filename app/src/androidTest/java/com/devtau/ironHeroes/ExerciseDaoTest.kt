@@ -64,7 +64,8 @@ class ExerciseDaoTest {
         })
         lock?.await(2000, TimeUnit.MILLISECONDS)
         assertNotNull(exercises)
-        assertEquals(exercises?.size, Exercise.getMock().size)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        assertEquals(exercises?.size, Exercise.getMock(context).size)
 
         // Ensure list is sorted by name
         assertEquals(exercises?.get(0)?.id, exerciseA.id)
