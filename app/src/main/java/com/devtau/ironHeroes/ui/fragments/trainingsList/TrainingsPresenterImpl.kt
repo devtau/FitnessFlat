@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.trainingsList
+package com.devtau.ironHeroes.ui.fragments.trainingsList
 
 import com.devtau.ironHeroes.data.DataLayer
 import com.devtau.ironHeroes.data.model.Hero
@@ -48,6 +48,9 @@ class TrainingsPresenterImpl(
         prefs.favoriteHeroId = heroId
         view.updateTrainings(filter(trainings, championId, heroId))
     }
+
+    override fun isChampionFilterNeeded() = prefs.showChampionFilter
+    override fun isHeroFilterNeeded() = prefs.showHeroFilter
     //</editor-fold>
 
     private fun getSpinnerStrings(list: List<Hero>?): List<String> {

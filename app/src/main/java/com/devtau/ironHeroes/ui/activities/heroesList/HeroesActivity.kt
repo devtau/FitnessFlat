@@ -74,10 +74,10 @@ class HeroesActivity: ViewSubscriberActivity(), HeroesView {
     companion object {
         private const val LOG_TAG = "HeroesActivity"
 
-        fun newInstance(context: Context, humanType: HumanType) {
+        fun newInstance(context: Context?, humanType: HumanType) {
             val intent = Intent(context, HeroesActivity::class.java)
             intent.putExtra(HUMAN_TYPE, humanType)
-            context.startActivity(intent)
+            context?.startActivity(intent)
         }
     }
 }

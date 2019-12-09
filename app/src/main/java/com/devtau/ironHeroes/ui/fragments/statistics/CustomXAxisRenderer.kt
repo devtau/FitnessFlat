@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.statistics
+package com.devtau.ironHeroes.ui.fragments.statistics
 
 import android.graphics.Canvas
 import com.github.mikephil.charting.components.XAxis

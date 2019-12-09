@@ -169,7 +169,8 @@ object AppUtils {
     fun alertD(logTag: String?, @StringRes msgId: Int, context: Context, confirmedListener: Action? = null)
             = alertD(logTag, context.getString(msgId), context, confirmedListener)
 
-    fun alertD(logTag: String?, msg: String, context: Context, confirmedListener: Action? = null) {
+    fun alertD(logTag: String?, msg: String, context: Context?, confirmedListener: Action? = null) {
+        context ?: return
         Logger.d(logTag ?: LOG_TAG, msg)
         try {
             val builder = AlertDialog.Builder(context)

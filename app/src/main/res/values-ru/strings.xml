@@ -68,6 +68,10 @@
 	<string name="previous_exercise_data">Прошлый раз вы выполнили это упражнение:</string>
 	<string name="no_data">нет данных</string>
 	<string name="previous_training_data_formatter" formatted="false">%s %s x %s x %s</string>
+	<string name="settings">Настройки</string>
+	<string name="other">Прочее</string>
+	<string name="show_champion_filter">Показывать фильтр по чемпиону</string>
+	<string name="show_hero_filter">Показывать фильтр по герою</string>
 	
 	
 	//Грудь

@@ -4,20 +4,24 @@ import com.devtau.ironHeroes.data.DB
 import com.devtau.ironHeroes.data.DataLayerImpl
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.rest.NetworkLayerImpl
+import com.devtau.ironHeroes.ui.activities.functions.FunctionsActivity
+import com.devtau.ironHeroes.ui.activities.functions.FunctionsPresenterImpl
 import com.devtau.ironHeroes.ui.activities.heroDetails.HeroDetailsActivity
 import com.devtau.ironHeroes.ui.activities.heroDetails.HeroDetailsPresenterImpl
 import com.devtau.ironHeroes.ui.activities.heroesList.HeroesActivity
 import com.devtau.ironHeroes.ui.activities.heroesList.HeroesPresenterImpl
-import com.devtau.ironHeroes.ui.activities.statistics.StatisticsActivity
-import com.devtau.ironHeroes.ui.activities.statistics.StatisticsPresenterImpl
+import com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment
+import com.devtau.ironHeroes.ui.fragments.statistics.StatisticsPresenterImpl
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExercisePresenterImpl
-import com.devtau.ironHeroes.ui.activities.launcher.LauncherActivity
-import com.devtau.ironHeroes.ui.activities.launcher.LauncherPresenterImpl
 import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsActivity
 import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsPresenterImpl
-import com.devtau.ironHeroes.ui.activities.trainingsList.TrainingsActivity
-import com.devtau.ironHeroes.ui.activities.trainingsList.TrainingsPresenterImpl
+import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment
+import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsPresenterImpl
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
+import com.devtau.ironHeroes.ui.fragments.other.OtherFragment
+import com.devtau.ironHeroes.ui.fragments.other.OtherPresenterImpl
+import com.devtau.ironHeroes.ui.fragments.settings.SettingsFragment
+import com.devtau.ironHeroes.ui.fragments.settings.SettingsPresenterImpl
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
 import com.devtau.ironHeroes.util.Constants.HERO_ID
@@ -28,11 +32,11 @@ import com.devtau.ironHeroes.util.PreferencesManager
 
 class DependencyRegistry {
 
-    fun inject(activity: LauncherActivity) {
+    fun inject(activity: FunctionsActivity) {
         val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
         val networkLayer = NetworkLayerImpl(activity)
         val prefs = PreferencesManager(activity)
-        activity.presenter = LauncherPresenterImpl(activity, dataLayer, networkLayer, prefs)
+        activity.presenter = FunctionsPresenterImpl(activity, dataLayer, networkLayer, prefs)
     }
 
     fun inject(activity: HeroesActivity) {
@@ -52,11 +56,12 @@ class DependencyRegistry {
         activity.presenter = HeroDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, heroId, humanType)
     }
 
-    fun inject(activity: TrainingsActivity) {
-        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
-        val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager(activity)
-        activity.presenter = TrainingsPresenterImpl(activity, dataLayer, networkLayer, prefs)
+    fun inject(fragment: TrainingsFragment) {
+        val context = fragment.context ?: return
+        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
+        val networkLayer = NetworkLayerImpl(context)
+        val prefs = PreferencesManager(context)
+        fragment.presenter = TrainingsPresenterImpl(fragment, dataLayer, networkLayer, prefs)
     }
 
     fun inject(activity: TrainingDetailsActivity) {
@@ -96,16 +101,33 @@ class DependencyRegistry {
         )
     }
 
-    fun inject(activity: StatisticsActivity) {
-        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
-        val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager(activity)
-        val heroId = if (activity.intent?.hasExtra(HERO_ID) == true) activity.intent?.extras?.getLong(HERO_ID) else null
+    fun inject(fragment: StatisticsFragment) {
+        val context = fragment.context ?: return
+        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
+        val networkLayer = NetworkLayerImpl(context)
+        val prefs = PreferencesManager(context)
+        val heroId = if (fragment.arguments?.containsKey(HERO_ID) == true) fragment.arguments?.getLong(HERO_ID) else null
         if (heroId == null) {
-            AppUtils.alert(LOG_TAG, "$activity misses necessary heroId", activity)
+            AppUtils.alert(LOG_TAG, "$fragment misses necessary heroId", context)
             return
         }
-        activity.presenter = StatisticsPresenterImpl(activity, dataLayer, networkLayer, prefs, heroId)
+        fragment.presenter = StatisticsPresenterImpl(fragment, dataLayer, networkLayer, prefs, heroId)
+    }
+
+    fun inject(fragment: SettingsFragment) {
+        val context = fragment.context ?: return
+        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
+        val networkLayer = NetworkLayerImpl(context)
+        val prefs = PreferencesManager(context)
+        fragment.presenter = SettingsPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+    }
+
+    fun inject(fragment: OtherFragment) {
+        val context = fragment.context ?: return
+        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
+        val networkLayer = NetworkLayerImpl(context)
+        val prefs = PreferencesManager(context)
+        fragment.presenter = OtherPresenterImpl(fragment, dataLayer, networkLayer, prefs)
     }
 
     companion object {

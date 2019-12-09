@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.statistics
+package com.devtau.ironHeroes.ui.fragments.statistics
 
 import com.devtau.ironHeroes.ui.StandardView
 import com.github.mikephil.charting.data.LineData

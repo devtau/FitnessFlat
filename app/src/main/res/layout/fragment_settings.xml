@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.fragments.settings.SettingsFragment">
+    
+    <CheckBox
+        android:id="@+id/showChampionFilter"
+        android:text="@string/show_champion_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/marginHalf"
+        android:paddingBottom="@dimen/marginHalf"
+        android:layout_marginLeft="@dimen/marginNormal"
+        android:layout_marginRight="@dimen/marginNormal"/>
+    
+    <CheckBox
+        android:id="@+id/showHeroFilter"
+        android:text="@string/show_hero_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/marginHalf"
+        android:paddingBottom="@dimen/marginHalf"
+        android:layout_marginLeft="@dimen/marginNormal"
+        android:layout_marginRight="@dimen/marginNormal"/>
+</LinearLayout>

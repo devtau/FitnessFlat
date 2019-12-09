@@ -1,4 +1,11 @@
 <resources>
+    <integer name="com_vk_sdk_AppId" translatable="false">7173607</integer>
+    
+    <string name="day_formatter" formatted="false" translatable="false">%d\n%s</string>
+    <string name="hour_formatter" formatted="false" translatable="false">%d:00</string>
+    <string name="vk_id_base" translatable="false">https://vk.com/</string>
+    <string name="vk_id_formatter" formatted="false" translatable="false">https://vk.com/%s</string>
+    
     <string name="app_name">Iron Heroes</string>
     <string name="heroes">Heroes</string>
     <string name="hero">Hero</string>
@@ -31,8 +38,6 @@
     <string name="is_champion">Is champion</string>
     <string name="use_vk_avatar">Use avatar Vkontakte</string>
     <string name="vk_id">ID Vkontakte</string>
-    <string name="vk_id_base" translatable="false">https://vk.com/</string>
-    <string name="vk_id_formatter" formatted="false" translatable="false">https://vk.com/%s</string>
     <string name="phone_empty">Fill in the phone</string>
     <string name="email_empty">Fill in email</string>
     <string name="vk_id_empty">Fill in hero nickname or id</string>
@@ -70,11 +75,10 @@
     <string name="previous_exercise_data">Last time you completed this exercise:</string>
     <string name="no_data">there is no data</string>
     <string name="previous_training_data_formatter" formatted="false">%s %s x %s x %s</string>
-    
-    <string name="day_formatter" formatted="false" translatable="false">%d\n%s</string>
-    <string name="hour_formatter" formatted="false" translatable="false">%d:00</string>
-    
-    <integer name="com_vk_sdk_AppId" translatable="false">7173607</integer>
+    <string name="settings">Settings</string>
+    <string name="other">Other</string>
+    <string name="show_champion_filter">Show champion filter</string>
+    <string name="show_hero_filter">Show hero filter</string>
     
     //Chest
     <string name="barbell_bench_press_top">Barbell bench press (top)</string>

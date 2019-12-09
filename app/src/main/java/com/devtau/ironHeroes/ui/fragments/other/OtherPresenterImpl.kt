@@ -1,9 +1,8 @@
-package com.devtau.ironHeroes.ui.activities.launcher
+package com.devtau.ironHeroes.ui.fragments.other
 
-import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
-import com.devtau.ironHeroes.data.model.*
+import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.Constants
@@ -14,31 +13,14 @@ import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
 
-class LauncherPresenterImpl(
-    private val view: LauncherView,
+class OtherPresenterImpl(
+    private val view: OtherView,
     private val dataLayer: DataLayer,
     private val networkLayer: NetworkLayer,
     private val prefs: PreferencesManager
-): DBSubscriber(), LauncherPresenter {
+): DBSubscriber(), OtherPresenter {
 
     private val exchangeDirName = view.resolveString(R.string.app_name)
-
-    init {
-        disposeOnStop(dataLayer.getHeroes(Consumer { heroes ->
-            if (heroes == null || heroes.isEmpty()) {
-                dataLayer.updateMuscleGroups(view.provideMockMuscleGroups())
-                dataLayer.updateExercises(view.provideMockExercises())
-                dataLayer.updateHeroes(Hero.getMockChampions())
-                dataLayer.updateHeroes(Hero.getMockHeroes())
-
-                if (BuildConfig.DEBUG) {
-                    dataLayer.updateTrainings(Training.getMock())
-                    dataLayer.updateExercisesInTraining(ExerciseInTraining.getMock())
-                }
-            }
-        }))
-    }
-
 
     //<editor-fold desc="Presenter overrides">
     override fun restartLoaders() {
@@ -103,8 +85,12 @@ class LauncherPresenterImpl(
     }
     //</editor-fold>
 
+    //<editor-fold desc="Private methods">
+
+    //</editor-fold>
+
 
     companion object {
-        private const val LOG_TAG = "LauncherPresenter"
+        private const val LOG_TAG = "OtherPresenter"
     }
 }

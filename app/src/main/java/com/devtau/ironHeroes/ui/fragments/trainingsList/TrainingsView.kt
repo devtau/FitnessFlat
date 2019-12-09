@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.trainingsList
+package com.devtau.ironHeroes.ui.fragments.trainingsList
 
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.ui.StandardView

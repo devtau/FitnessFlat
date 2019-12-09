@@ -5,30 +5,28 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context=".ui.activities.trainingsList.TrainingsActivity">
+	tools:context=".ui.fragments.trainingsList.TrainingsFragment">
 	
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:orientation="vertical">
 		
-		<include layout="@layout/toolbar"/>
-		
 		<LinearLayout
 			android:id="@+id/filters"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:paddingTop="@dimen/marginHalf"
-			android:paddingBottom="@dimen/marginHalf"
 			android:background="@color/colorWhite"
 			android:elevation="4dp"
-			android:visibility="gone"
 			android:orientation="horizontal">
 			
 			<LinearLayout
+				android:id="@+id/championContainer"
 				android:layout_width="0dp"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingBottom="@dimen/marginHalf"
 				android:orientation="vertical">
 				
 				<TextView
@@ -50,9 +48,12 @@
 			</LinearLayout>
 			
 			<LinearLayout
+				android:id="@+id/heroContainer"
 				android:layout_width="0dp"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingBottom="@dimen/marginHalf"
 				android:orientation="vertical">
 				
 				<TextView

@@ -1,6 +1,5 @@
 package com.devtau.ironHeroes.ui.dialogs.exerciseDialog
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.FragmentManager
 import android.view.*
@@ -21,16 +20,9 @@ class ExerciseDialog: ViewSubscriberDialog(),
     ExerciseView {
 
     lateinit var presenter: ExercisePresenter
-    private var listener: Listener? = null
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is Listener) listener = context
-        else throw RuntimeException("$context must implement $LOG_TAG Listener")
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DependencyRegistry().inject(this)
@@ -125,16 +117,12 @@ class ExerciseDialog: ViewSubscriberDialog(),
     //</editor-fold>
 
 
-    interface Listener {
-    }
-
-
     companion object {
         private const val LOG_TAG = "ExerciseDialog"
         private const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog"
 
         fun showDialog(fragmentManager: FragmentManager?, heroId: Long?, trainingId: Long?,
-                       exerciseInTrainingId: Long?, position: Int?, listener: Listener) {
+                       exerciseInTrainingId: Long?, position: Int? = null) {
             if (fragmentManager == null || heroId == null || trainingId == null) {
                 Logger.e(LOG_TAG, "showDialog. bad data. aborting")
                 return

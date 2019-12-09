@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         
-        <activity android:name=".ui.activities.launcher.LauncherActivity">
+        <activity android:name=".ui.activities.functions.FunctionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -33,9 +33,9 @@
         <activity android:name=".ui.activities.DBViewerActivity"/>
         <activity android:name=".ui.activities.heroesList.HeroesActivity"/>
         <activity android:name=".ui.activities.heroDetails.HeroDetailsActivity"/>
-        <activity android:name=".ui.activities.trainingsList.TrainingsActivity"/>
+        <activity android:name="com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment"/>
         <activity android:name=".ui.activities.trainingDetails.TrainingDetailsActivity"/>
-        <activity android:name=".ui.activities.statistics.StatisticsActivity"/>
+        <activity android:name="com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment"/>
     
         <activity
             android:name="com.vk.sdk.VKServiceActivity"

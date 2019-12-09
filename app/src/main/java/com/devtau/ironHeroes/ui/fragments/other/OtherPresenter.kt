@@ -1,6 +1,6 @@
-package com.devtau.ironHeroes.ui.activities.launcher
+package com.devtau.ironHeroes.ui.fragments.other
 
-interface LauncherPresenter {
+interface OtherPresenter {
     fun onStop()
     fun restartLoaders()
     fun exportToFile()

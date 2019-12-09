@@ -25,12 +25,12 @@ import kotlinx.android.synthetic.main.activity_training_details.*
 import java.util.*
 
 class TrainingDetailsActivity: ViewSubscriberActivity(),
-    TrainingDetailsView, ExerciseDialog.Listener {
+    TrainingDetailsView {
 
     lateinit var presenter: TrainingDetailsPresenter
     private var exercisesAdapter: ExercisesInTrainingAdapter? = null
     private var deleteTrainingBtn: MenuItem? = null
-    private var deleteTrainingBtnVisibility: Boolean = false
+    private var deleteTrainingBtnVisibility: Boolean = true
     private var trainingDate: Calendar? = null
 
 
@@ -110,7 +110,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     override fun showNewExerciseDialog(position: Int) =
         ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
-            presenter.provideTraining()?.id, null, position, this)
+            presenter.provideTraining()?.id, null, position)
     //</editor-fold>
 
 
@@ -130,7 +130,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     private fun initList() {
         exercisesAdapter = ExercisesInTrainingAdapter(presenter.provideExercises(), Consumer {
             ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
-                presenter.provideTraining()?.id, it.id, it.position, this)
+                presenter.provideTraining()?.id, it.id, it.position)
         })
         listView?.layoutManager = CustomLinearLayoutManager(this)
         listView?.adapter = exercisesAdapter
@@ -181,10 +181,10 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     companion object {
         private const val LOG_TAG = "TrainingDetailsActivity"
 
-        fun newInstance(context: Context, trainingId: Long?) {
+        fun newInstance(context: Context?, trainingId: Long?) {
             val intent = Intent(context, TrainingDetailsActivity::class.java)
             if (trainingId != null) intent.putExtra(TRAINING_ID, trainingId)
-            context.startActivity(intent)
+            context?.startActivity(intent)
         }
     }
 }

@@ -1,16 +1,19 @@
-package com.devtau.ironHeroes.ui.activities.statistics
+package com.devtau.ironHeroes.ui.fragments.statistics
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Spinner
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.enums.StatisticsType
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
+import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.HERO_ID
 import com.devtau.ironHeroes.util.Logger
+import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
@@ -18,21 +21,27 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.activity_statistics.*
 
-class StatisticsActivity: ViewSubscriberActivity(),
-    StatisticsView, ExerciseDialog.Listener {
+class StatisticsFragment: ViewSubscriberFragment(),
+    StatisticsView {
 
     lateinit var presenter: StatisticsPresenter
     private var statisticsType: StatisticsType? = null
+    private var muscleGroup: Spinner? = null
+    private var exercise: Spinner? = null
+    private var chart: LineChart? = null
 
 
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_statistics)
         DependencyRegistry().inject(this)
-        AppUtils.initToolbar(this, R.string.statistics, true)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val root = inflater.inflate(R.layout.fragment_statistics, container, false)
+        initUI(root)
+        return root
     }
 
     override fun onStart() {
@@ -52,9 +61,9 @@ class StatisticsActivity: ViewSubscriberActivity(),
     //<editor-fold desc="View overrides">
     override fun getLogTag() = LOG_TAG
     override fun showMuscleGroups(list: List<String>?, selectedIndex: Int) =
-        AppUtils.initSpinner(muscleGroup, list, selectedIndex, this)
+        AppUtils.initSpinner(muscleGroup, list, selectedIndex, context)
     override fun showExercises(list: List<String>?, selectedIndex: Int) =
-        AppUtils.initSpinner(exercise, list, selectedIndex, this)
+        AppUtils.initSpinner(exercise, list, selectedIndex, context)
 
     override fun showStatisticsData(lineData: LineData?) {
         Logger.d(LOG_TAG, "showStatisticsData. lineData=$lineData")
@@ -63,13 +72,22 @@ class StatisticsActivity: ViewSubscriberActivity(),
 
     override fun showExerciseDetails(heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?) {
         Logger.d(LOG_TAG, "showExerciseDetails. heroId=$heroId, trainingId=$trainingId, exerciseInTrainingId=$exerciseInTrainingId")
-        ExerciseDialog.showDialog(supportFragmentManager, heroId, trainingId, exerciseInTrainingId, null, this@StatisticsActivity)
+        ExerciseDialog.showDialog(childFragmentManager, heroId, trainingId, exerciseInTrainingId)
     }
     //</editor-fold>
 
 
     //<editor-fold desc="Private methods">
+
+    private fun initUI(root: View?) {
+        muscleGroup = root?.findViewById(R.id.muscleGroup)
+        exercise = root?.findViewById(R.id.exercise)
+        chart = root?.findViewById(R.id.chart)
+    }
+
     private fun initChart(lineData: LineData?) {
+        val context = context ?: return
+        val chart = chart ?: return
 //        chart.setViewPortOffsets(0f, 0f, 0f, 0f)
 //        chart.setBackgroundColor(Color.rgb(104, 241, 175))
         chart.description.isEnabled = false
@@ -80,7 +98,7 @@ class StatisticsActivity: ViewSubscriberActivity(),
         chart.setDrawGridBackground(false)
         chart.maxHighlightDistance = 300f
         chart.legend.isEnabled = false
-        chart.marker = CustomMarkerView(this, R.layout.custom_marker_view)
+        chart.marker = CustomMarkerView(context, R.layout.custom_marker_view)
         chart.highlightValues(null)
         chart.setOnChartValueSelectedListener(object: OnChartValueSelectedListener {
             var trainingId: Long? = null
@@ -93,23 +111,24 @@ class StatisticsActivity: ViewSubscriberActivity(),
             override fun onNothingSelected() = presenter.onBalloonClicked(trainingId, exerciseId)
         })
 
-        tuneXAxis(X_LABELS_COUNT, resolveColor(R.color.colorBlack))
-        tuneYAxis(resolveColor(R.color.colorBlack), Y_AXIS_MINIMUM)
+        tuneXAxis(chart, X_LABELS_COUNT, resolveColor(R.color.colorBlack))
+        tuneYAxis(chart, resolveColor(R.color.colorBlack), Y_AXIS_MINIMUM)
         chart.extraBottomOffset = chart.rendererXAxis.paintAxisLabels.textSize
-        chart.axisRight.isEnabled = false
+        chart.axisRight?.isEnabled = false
         chart.data = lineData
 //        chart.animateXY(400, 400)
         chart.invalidate()
     }
 
     private fun tuneAxes(xLabelsCount: Int, axisTextColor: Int, yAxisMinimum: Int) {
-        tuneXAxis(xLabelsCount, axisTextColor)
-        tuneYAxis(axisTextColor, yAxisMinimum)
+        val chart = chart ?: return
+        tuneXAxis(chart, xLabelsCount, axisTextColor)
+        tuneYAxis(chart, axisTextColor, yAxisMinimum)
         chart.extraBottomOffset = chart.rendererXAxis.paintAxisLabels.textSize
-        chart.axisRight.isEnabled = false
+        chart.axisRight?.isEnabled = false
     }
 
-    private fun tuneXAxis(labelsCount: Int, axisTextColor: Int) {
+    private fun tuneXAxis(chart: LineChart, labelsCount: Int, axisTextColor: Int) {
         val xAxis = chart.xAxis
         xAxis.isEnabled = true
         xAxis.labelCount = labelsCount
@@ -129,7 +148,7 @@ class StatisticsActivity: ViewSubscriberActivity(),
 //        }
     }
 
-    private fun tuneYAxis(axisTextColor: Int, axisMinimum: Int) {
+    private fun tuneYAxis(chart: LineChart, axisTextColor: Int, axisMinimum: Int) {
         val yAxis = chart.axisLeft
         yAxis.labelCount = Y_LABELS_COUNT
         yAxis.textColor = axisTextColor
@@ -151,15 +170,18 @@ class StatisticsActivity: ViewSubscriberActivity(),
 
 
     companion object {
-        private const val LOG_TAG = "StatisticsActivity"
+        const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment"
+        private const val LOG_TAG = "StatisticsFragment"
         private const val X_LABELS_COUNT = 10
         private const val Y_LABELS_COUNT = 5
         private const val Y_AXIS_MINIMUM = 0
 
-        fun newInstance(context: Context, heroId: Long) {
-            val intent = Intent(context, StatisticsActivity::class.java)
-            intent.putExtra(HERO_ID, heroId)
-            context.startActivity(intent)
+        fun newInstance(heroId: Long): StatisticsFragment {
+            val fragment = StatisticsFragment()
+            val args = Bundle()
+            args.putLong(HERO_ID, heroId)
+            fragment.arguments = args
+            return fragment
         }
     }
 }

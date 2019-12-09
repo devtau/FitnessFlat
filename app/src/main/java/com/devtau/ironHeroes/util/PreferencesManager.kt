@@ -40,6 +40,22 @@ class PreferencesManager constructor(context: Context) {
             editor?.apply()
         }
 
+    var showChampionFilter: Boolean
+        get() = prefs.getBoolean(SHOW_CHAMPION_FILTER, true)
+        set(value) {
+            val editor = prefs.edit()
+            editor?.putBoolean(SHOW_CHAMPION_FILTER, value)
+            editor?.apply()
+        }
+
+    var showHeroFilter: Boolean
+        get() = prefs.getBoolean(SHOW_HERO_FILTER, true)
+        set(value) {
+            val editor = prefs.edit()
+            editor?.putBoolean(SHOW_HERO_FILTER, value)
+            editor?.apply()
+        }
+
     fun clear() = prefs.edit()?.clear()?.apply()
 
 
@@ -47,5 +63,7 @@ class PreferencesManager constructor(context: Context) {
         private const val VK_TOKEN = "vkToken"
         private const val FAVORITE_CHAMPION_ID = "favoriteChampionId"
         private const val FAVORITE_HERO_ID = "favoriteHeroId"
+        private const val SHOW_CHAMPION_FILTER = "showChampionFilter"
+        private const val SHOW_HERO_FILTER = "showHeroFilter"
     }
 }

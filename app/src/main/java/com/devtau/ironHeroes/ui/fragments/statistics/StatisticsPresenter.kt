@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.statistics
+package com.devtau.ironHeroes.ui.fragments.statistics
 
 interface StatisticsPresenter {
     fun onStop()

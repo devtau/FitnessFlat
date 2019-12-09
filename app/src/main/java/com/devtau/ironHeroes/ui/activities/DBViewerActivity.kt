@@ -956,9 +956,9 @@ class DBViewerActivity: AppCompatActivity() {
     companion object {
         private const val ROWS_PER_PAGE = 50
 
-        fun newInstance(context: Context) {
+        fun newInstance(context: Context?) {
             val intent = Intent(context, DBViewerActivity::class.java)
-            context.startActivity(intent)
+            context?.startActivity(intent)
         }
     }
 }
