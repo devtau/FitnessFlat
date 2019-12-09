@@ -28,10 +28,10 @@ class LauncherPresenterImpl(
             if (heroes == null || heroes.isEmpty()) {
                 dataLayer.updateMuscleGroups(view.provideMockMuscleGroups())
                 dataLayer.updateExercises(view.provideMockExercises())
+                dataLayer.updateHeroes(Hero.getMockChampions())
+                dataLayer.updateHeroes(Hero.getMockHeroes())
 
                 if (BuildConfig.DEBUG) {
-                    dataLayer.updateHeroes(Hero.getMockChampions())
-                    dataLayer.updateHeroes(Hero.getMockHeroes())
                     dataLayer.updateTrainings(Training.getMock())
                     dataLayer.updateExercisesInTraining(ExerciseInTraining.getMock())
                 }
