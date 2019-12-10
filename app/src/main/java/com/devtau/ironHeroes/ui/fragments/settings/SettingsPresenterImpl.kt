@@ -20,12 +20,10 @@ class SettingsPresenterImpl(
 
     override fun showChampionFilterClicked(checked: Boolean) {
         prefs.showChampionFilter = checked
-        if (!checked) prefs.favoriteChampionId = null
     }
 
     override fun showHeroFilterClicked(checked: Boolean) {
         prefs.showHeroFilter = checked
-        if (!checked) prefs.favoriteHeroId = null
     }
 
     override fun isChampionFilterNeeded() = prefs.showChampionFilter

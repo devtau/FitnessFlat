@@ -59,6 +59,7 @@ class Exercise(
             Exercise(26, c.getString(R.string.mid_muscle_bundle_swings), 4),
             Exercise(27, c.getString(R.string.rear_muscle_bundle_swings), 4),
             Exercise(28, c.getString(R.string.front_plate_raise), 4),
+            Exercise(58, c.getString(R.string.dumbbell_press_above_head), 4),
 
             //Трапеции (шраги)
             Exercise(35, c.getString(R.string.upright_barbell_rows), 7),

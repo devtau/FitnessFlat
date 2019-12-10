@@ -114,9 +114,10 @@ class StatisticsPresenterImpl(
 
     private fun parseTrainingDates(list: List<ExerciseInTraining>?): List<Calendar> {
         val dates = ArrayList<Calendar>()
-        if (list != null && list.size > 1 && checkSortOrder(list)) {
+        if (list != null && list.isNotEmpty() && checkSortOrder(list)) {
+            if (list.size > 1 && !checkSortOrder(list)) return dates
             val firstDateStart = list[0].training?.getDateCal()
-            val lastDateEnd = list[list.size - 1].training?.getDateCal()
+            val lastDateEnd = (list[if (list.size == 1) 0 else list.size - 1]).training?.getDateCal()
             if (firstDateStart == null || lastDateEnd == null) {
                 view.showMsg("parseDates. bad data. aborting")
                 return dates

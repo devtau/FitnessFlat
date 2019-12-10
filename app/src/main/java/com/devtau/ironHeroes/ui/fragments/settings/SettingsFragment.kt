@@ -1,5 +1,6 @@
 package com.devtau.ironHeroes.ui.fragments.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 class SettingsFragment: ViewSubscriberFragment(), SettingsView {
 
     lateinit var presenter: SettingsPresenter
+    private var listener: Listener? = null
 
 
     //<editor-fold desc="Framework overrides">
@@ -24,6 +26,17 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsView {
         val root = inflater.inflate(R.layout.fragment_settings, container, false)
         initUi(root)
         return root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is Listener) listener = context
+        else throw RuntimeException("$context must implement $LOG_TAG Listener")
+    }
+
+    override fun onDetach() {
+        listener = null
+        super.onDetach()
     }
 
     override fun onStop() {
@@ -44,14 +57,21 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsView {
         showChampionFilter?.isChecked = presenter.isChampionFilterNeeded()
         showChampionFilter?.setOnCheckedChangeListener { _, isChecked ->
             presenter.showChampionFilterClicked(isChecked)
+            listener?.updateSpinnersVisibility()
         }
         val showHeroFilter = root.findViewById<CheckBox>(R.id.showHeroFilter)
         showHeroFilter?.isChecked = presenter.isHeroFilterNeeded()
         showHeroFilter?.setOnCheckedChangeListener { _, isChecked ->
             presenter.showHeroFilterClicked(isChecked)
+            listener?.updateSpinnersVisibility()
         }
     }
     //</editor-fold>
+
+
+    interface Listener {
+        fun updateSpinnersVisibility()
+    }
 
 
     companion object {

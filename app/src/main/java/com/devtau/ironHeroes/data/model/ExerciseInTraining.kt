@@ -97,7 +97,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 36, 27, 4, 15, 1),
                 ExerciseInTraining(null, trainingId, 21, 10, 4, 15, 2),
                 ExerciseInTraining(null, trainingId, 31, 12, 4, 15, 3),
-                ExerciseInTraining(null, trainingId, 36, 7, 4, 15, 4),
+                ExerciseInTraining(null, trainingId, 58, 7, 4, 15, 4),
                 ExerciseInTraining(null, trainingId, 22, 2, 4, 15, 5),
                 ExerciseInTraining(null, trainingId, 30, 6, 3, 15, 6),
                 ExerciseInTraining(null, trainingId, 47, 4, 3, 15, 7)))

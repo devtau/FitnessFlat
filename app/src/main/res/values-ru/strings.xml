@@ -10,7 +10,7 @@
 	<string name="export_to_file">Экспортировать в файл</string>
 	<string name="import_from_file">Импортировать из файла</string>
 	<string name="export_error">Ошибка при сохранении в файл</string>
-	<string name="exported_formatter" formatted="false">%s и %s\nсохранено в файл</string>
+	<string name="exported_formatter" formatted="false">%s и %s\nсохранено в файл в папку \"Загрузки\"</string>
 	<string name="imported_formatter" formatted="false">%s и %s\nпрочитано из файла</string>
 	<string name="choose_action">Выберите действие</string>
 	<string name="hero_edit">Редактировать героя</string>
@@ -59,12 +59,13 @@
 	
 	<string name="permission_needed">Требуется разрешение</string>
 	<string name="permission_cancelled_msg_gps">Доступ к GPS-датчику отклонен</string>
-	<string name="permission_explanation_gps">Приложению необходим доступ к GPS-датчику. Если вы не хотите видеть этот вопрос, нажмите далее</string>
+	<string name="permission_explanation_gps">Приложению необходим доступ к GPS-датчику</string>
 	<string name="permission_cancelled_msg_call">Доступ к звонкам отклонен</string>
-	<string name="permission_explanation_call">Разрешите приложению совершать звонки для связи с героями. Если вы не хотите видеть этот вопрос, нажмите далее</string>
+	<string name="permission_explanation_call">Разрешите приложению совершать звонки для связи с героями</string>
 	<string name="permission_explanation_storage">Разрешите приложению доступ к карте памяти для экспорта/импорта файла</string>
+	<string name="to_disable_press_further">Если вы не хотите видеть этот вопрос, нажмите далее</string>
 	<string name="permission_cancelled_msg_storage">Доступ к карте памяти отклонен</string>
-	<string name="further">далее</string>
+	<string name="further">Далее</string>
 	<string name="previous_exercise_data">Прошлый раз вы выполнили это упражнение:</string>
 	<string name="no_data">нет данных</string>
 	<string name="previous_training_data_formatter" formatted="false">%s %s x %s x %s</string>
@@ -107,6 +108,7 @@
 	<string name="mid_muscle_bundle_swings">Махи на центральный пучок</string>
 	<string name="rear_muscle_bundle_swings">Махи на задний пучок</string>
 	<string name="front_plate_raise">Подъем диска перед собой</string>
+	<string name="dumbbell_press_above_head">Жим гантелей над головой</string>
 	
 	//Трапеции (шраги)
 	<string name="upright_barbell_rows">Тяга штанги к подбородку</string>

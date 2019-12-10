@@ -12,10 +12,7 @@
         android:text="@string/heroes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/marginHalf"
-        android:paddingBottom="@dimen/marginHalf"
-        android:paddingLeft="@dimen/marginNormal"
-        android:paddingRight="@dimen/marginNormal"
+        android:padding="@dimen/marginNormal"
         style="@style/SelectableItemBackground"/>
     
     <TextView
@@ -23,10 +20,7 @@
         android:text="@string/champions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/marginHalf"
-        android:paddingBottom="@dimen/marginHalf"
-        android:paddingLeft="@dimen/marginNormal"
-        android:paddingRight="@dimen/marginNormal"
+        android:padding="@dimen/marginNormal"
         style="@style/SelectableItemBackground"/>
     
     <TextView
@@ -34,10 +28,7 @@
         android:text="@string/database"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/marginHalf"
-        android:paddingBottom="@dimen/marginHalf"
-        android:paddingLeft="@dimen/marginNormal"
-        android:paddingRight="@dimen/marginNormal"
+        android:padding="@dimen/marginNormal"
         style="@style/SelectableItemBackground"/>
     
     <TextView
@@ -45,10 +36,7 @@
         android:text="@string/export_to_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/marginHalf"
-        android:paddingBottom="@dimen/marginHalf"
-        android:paddingLeft="@dimen/marginNormal"
-        android:paddingRight="@dimen/marginNormal"
+        android:padding="@dimen/marginNormal"
         style="@style/SelectableItemBackground"/>
     
     <TextView
@@ -56,9 +44,6 @@
         android:text="@string/import_from_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/marginHalf"
-        android:paddingBottom="@dimen/marginHalf"
-        android:paddingLeft="@dimen/marginNormal"
-        android:paddingRight="@dimen/marginNormal"
+        android:padding="@dimen/marginNormal"
         style="@style/SelectableItemBackground"/>
 </LinearLayout>

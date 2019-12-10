@@ -5,4 +5,5 @@
     <dimen name="marginNormal">16dp</dimen>
     <dimen name="marginNormalPlus">19dp</dimen>
     <dimen name="marginHalf">8dp</dimen>
+    <dimen name="functionsIconsSize">40dp</dimen>
 </resources>

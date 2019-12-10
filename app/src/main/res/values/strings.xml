@@ -5,6 +5,7 @@
     <string name="hour_formatter" formatted="false" translatable="false">%d:00</string>
     <string name="vk_id_base" translatable="false">https://vk.com/</string>
     <string name="vk_id_formatter" formatted="false" translatable="false">https://vk.com/%s</string>
+    <string name="permission_explanation_formatter" formatted="false" translatable="false">%s.\n%s</string>
     
     <string name="app_name">Iron Heroes</string>
     <string name="heroes">Heroes</string>
@@ -17,7 +18,7 @@
     <string name="export_to_file">Export to file</string>
     <string name="import_from_file">Import from file</string>
     <string name="export_error">Error while saving file</string>
-    <string name="exported_formatter" formatted="false">%s and %s\nsaved to file</string>
+    <string name="exported_formatter" formatted="false">%s and %s\nsaved to file at \"Downloads\" folder</string>
     <string name="imported_formatter" formatted="false">%s and %s\nread from file</string>
     <string name="choose_action">Choose action</string>
     <string name="hero_edit">Edit hero</string>
@@ -66,12 +67,13 @@
     
     <string name="permission_needed">Permission required</string>
     <string name="permission_cancelled_msg_gps">GPS sensor access denied</string>
-    <string name="permission_explanation_gps">The app needs access to the GPS sensor. If you do not want to see this question, click next</string>
+    <string name="permission_explanation_gps">The app needs access to the GPS sensor</string>
     <string name="permission_cancelled_msg_call">Calls access denied</string>
-    <string name="permission_explanation_call">Allow the app to make calls to communicate with the heroes. If you do not want to see this question, click next</string>
-    <string name="permission_explanation_storage">Allow the application to access the memory card to export / import the file.</string>
+    <string name="permission_explanation_call">Allow the app to make calls to communicate with the heroes</string>
+    <string name="permission_explanation_storage">Allow the application to access the memory card to export / import the file</string>
+    <string name="to_disable_press_further">If you do not want to see this question, click further</string>
     <string name="permission_cancelled_msg_storage">Access to memory card declined</string>
-    <string name="further">further</string>
+    <string name="further">Further</string>
     <string name="previous_exercise_data">Last time you completed this exercise:</string>
     <string name="no_data">there is no data</string>
     <string name="previous_training_data_formatter" formatted="false">%s %s x %s x %s</string>
@@ -113,6 +115,7 @@
     <string name="mid_muscle_bundle_swings">Mid muscle bundle swings</string>
     <string name="rear_muscle_bundle_swings">Rear muscle bundle swings</string>
     <string name="front_plate_raise">Front plate raise</string>
+    <string name="dumbbell_press_above_head">Dumbbell press above head</string>
     
     //Shrugs
     <string name="upright_barbell_rows">Upright barbell rows</string>

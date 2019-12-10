@@ -20,6 +20,8 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
 
     lateinit var presenter: TrainingsPresenter
     private var adapter: TrainingsAdapter? = null
+    private var championContainer: View? = null
+    private var heroContainer: View? = null
     private var champion: Spinner? = null
     private var hero: Spinner? = null
     private var listView: RecyclerView? = null
@@ -66,11 +68,16 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
         AppUtils.initSpinner(hero, list, selectedIndex, context)
     //</editor-fold>
 
+    fun updateSpinnersVisibility() {
+        championContainer?.visibility = if (presenter.isChampionFilterNeeded()) View.VISIBLE else View.GONE
+        heroContainer?.visibility = if (presenter.isHeroFilterNeeded()) View.VISIBLE else View.GONE
+    }
+
 
     //<editor-fold desc="Private methods">
     private fun initUi(root: View) {
-        val championContainer = root.findViewById<View>(R.id.championContainer)
-        val heroContainer = root.findViewById<View>(R.id.heroContainer)
+        championContainer = root.findViewById(R.id.championContainer)
+        heroContainer = root.findViewById(R.id.heroContainer)
         champion = root.findViewById(R.id.champion)
         hero = root.findViewById(R.id.hero)
         listView = root.findViewById(R.id.listView)
@@ -78,9 +85,7 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
 
         listView?.postDelayed({ fab?.show() }, Constants.STANDARD_DELAY_MS)
         fab?.setOnClickListener { TrainingDetailsActivity.newInstance(context, null) }
-
-        championContainer?.visibility = if (presenter.isChampionFilterNeeded()) View.VISIBLE else View.GONE
-        heroContainer?.visibility = if (presenter.isHeroFilterNeeded()) View.VISIBLE else View.GONE
+        updateSpinnersVisibility()
     }
 
     private fun initList() {
