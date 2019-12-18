@@ -1,5 +1,6 @@
 package com.devtau.ironHeroes.data.model
 
+import android.content.Context
 import android.text.TextUtils
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -66,26 +67,31 @@ class Hero(
                     && !TextUtils.isEmpty(phone)
                     && !TextUtils.isEmpty(gender)
 
-        fun getMockChampions(): List<Hero> {
+        fun getMockChampions(c: Context): List<Hero> {
             val romaPhone = if (BuildConfig.DEBUG) "+79111718219" else "+79210000000"
             val antonPhone = if (BuildConfig.DEBUG) "+79500400027" else "+79210000000"
             return listOf(
-                Hero(1, HumanType.CHAMPION, "Рома", "Богданов", romaPhone, Gender.MALE.code, "romanyurievich93", "d29028@yandex.ru",
+                Hero(1, HumanType.CHAMPION, c.getString(R.string.roma_first_name), c.getString(R.string.roma_last_name),
+                    romaPhone, Gender.MALE.code, "romanyurievich93", "d29028@yandex.ru",
                     AppUtils.parseDate("20.07.1993").timeInMillis, null, R.drawable.roma),
-                Hero(2, HumanType.CHAMPION, "Антон", "Щукин", antonPhone, Gender.MALE.code, "shukin2007", "d29029@yandex.ru",
+                Hero(2, HumanType.CHAMPION, c.getString(R.string.anton_first_name), c.getString(R.string.anton_last_name),
+                    antonPhone, Gender.MALE.code, "shukin2007", "d29029@yandex.ru",
                     AppUtils.parseDate("28.02.1993").timeInMillis, null, R.drawable.anton))
         }
 
-        fun getMockHeroes(): List<Hero> {
+        fun getMockHeroes(c: Context): List<Hero> {
             val denisPhone = if (BuildConfig.DEBUG) "+79219781372" else "+79210000000"
             val mashaPhone = if (BuildConfig.DEBUG) "+79210000000" else "+79210000000"
             val eugenPhone = if (BuildConfig.DEBUG) "+79210000000" else "+79210000000"
             return listOf(
-                Hero(3, HumanType.HERO, "Денис", "Русских", denisPhone, Gender.MALE.code, "devtau", "d29025@yandex.ru",
+                Hero(3, HumanType.HERO, c.getString(R.string.denis_first_name), c.getString(R.string.denis_last_name),
+                    denisPhone, Gender.MALE.code, "devtau", "d29025@yandex.ru",
                     AppUtils.parseDate("25.09.1983").timeInMillis, null, R.drawable.denis),
-                Hero(4, HumanType.HERO, "Маша", "Черничкина", mashaPhone, Gender.FEMALE.code, "iiaquamarieii", "d29026@yandex.ru",
+                Hero(4, HumanType.HERO, c.getString(R.string.masha_first_name), c.getString(R.string.masha_last_name),
+                    mashaPhone, Gender.FEMALE.code, "iiaquamarieii", "d29026@yandex.ru",
                     AppUtils.parseDate("26.05.1993").timeInMillis, null, R.drawable.masha),
-                Hero(5, HumanType.HERO, "Евгений", "Стирманов", eugenPhone, Gender.MALE.code, "uginstarr", "d29027@yandex.ru",
+                Hero(5, HumanType.HERO, c.getString(R.string.eugen_first_name), c.getString(R.string.eugen_last_name),
+                    eugenPhone, Gender.MALE.code, "uginstarr", "d29027@yandex.ru",
                     AppUtils.parseDate("25.10.1993").timeInMillis, null, R.drawable.evgen))
         }
 

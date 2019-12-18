@@ -28,7 +28,7 @@ class OtherPresenterImpl(
     }
 
     override fun exportToFile() {
-        val heroId = Hero.getMockHeroes()[0].id ?: return
+        val heroId = view.provideMockHeroes()[0].id ?: return
         var trainingsCount = 0
         var exercisesCount = 0
         fun showExported() {
@@ -83,6 +83,8 @@ class OtherPresenterImpl(
             })
         })
     }
+
+    override fun clearDB() = dataLayer.clearDB()
     //</editor-fold>
 
     //<editor-fold desc="Private methods">

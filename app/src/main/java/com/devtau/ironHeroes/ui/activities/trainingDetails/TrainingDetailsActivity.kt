@@ -2,22 +2,19 @@ package com.devtau.ironHeroes.ui.activities.trainingDetails
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.ExercisesInTrainingAdapter
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
-import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
 import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants.TRAINING_ID
 import com.devtau.ironHeroes.util.Logger
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
@@ -27,7 +24,8 @@ import java.util.*
 class TrainingDetailsActivity: ViewSubscriberActivity(),
     TrainingDetailsView {
 
-    lateinit var presenter: TrainingDetailsPresenter
+    private lateinit var presenter: TrainingDetailsPresenter
+    private lateinit var coordinator: Coordinator
     private var exercisesAdapter: ExercisesInTrainingAdapter? = null
     private var deleteTrainingBtn: MenuItem? = null
     private var deleteTrainingBtnVisibility: Boolean = true
@@ -38,7 +36,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_training_details)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
         initUi()
         initList()
     }
@@ -109,9 +107,15 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     override fun closeScreen() = finish()
 
     override fun showNewExerciseDialog(position: Int) =
-        ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
+        coordinator.showExerciseDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
             presenter.provideTraining()?.id, null, position)
     //</editor-fold>
+
+
+    fun configureWith(presenter: TrainingDetailsPresenter, coordinator: Coordinator) {
+        this.presenter = presenter
+        this.coordinator = coordinator
+    }
 
 
     //<editor-fold desc="Private methods">
@@ -129,7 +133,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     private fun initList() {
         exercisesAdapter = ExercisesInTrainingAdapter(presenter.provideExercises(), Consumer {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
+            coordinator.showExerciseDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
                 presenter.provideTraining()?.id, it.id, it.position)
         })
         listView?.layoutManager = CustomLinearLayoutManager(this)
@@ -180,11 +184,5 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     companion object {
         private const val LOG_TAG = "TrainingDetailsActivity"
-
-        fun newInstance(context: Context?, trainingId: Long?) {
-            val intent = Intent(context, TrainingDetailsActivity::class.java)
-            if (trainingId != null) intent.putExtra(TRAINING_ID, trainingId)
-            context?.startActivity(intent)
-        }
     }
 }

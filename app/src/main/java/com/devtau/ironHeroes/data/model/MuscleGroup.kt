@@ -23,7 +23,6 @@ class MuscleGroup(
             MuscleGroup(4, c.getString(R.string.delta)),
             MuscleGroup(5, c.getString(R.string.back)),
             MuscleGroup(6, c.getString(R.string.press)),
-            MuscleGroup(7, c.getString(R.string.shrugs)),
             MuscleGroup(8, c.getString(R.string.legs))
         )
     }

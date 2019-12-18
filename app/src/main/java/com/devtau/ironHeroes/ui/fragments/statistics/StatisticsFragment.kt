@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
+import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.enums.StatisticsType
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants.HERO_ID
 import com.devtau.ironHeroes.util.Logger
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -25,17 +25,20 @@ import io.reactivex.functions.Consumer
 class StatisticsFragment: ViewSubscriberFragment(),
     StatisticsView {
 
-    lateinit var presenter: StatisticsPresenter
-    private var statisticsType: StatisticsType? = null
+    private lateinit var presenter: StatisticsPresenter
+    private lateinit var coordinator: Coordinator
+
+    private var selectedContainer: View? = null
+    private var selected: TextView? = null
+    private var chart: LineChart? = null
     private var muscleGroup: Spinner? = null
     private var exercise: Spinner? = null
-    private var chart: LineChart? = null
 
 
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -47,8 +50,25 @@ class StatisticsFragment: ViewSubscriberFragment(),
     override fun onStart() {
         super.onStart()
         presenter.restartLoaders()
-        subscribeField(muscleGroup, Consumer { applyFilter() })
-        subscribeField(exercise, Consumer { applyFilter() })
+        subscribeField(muscleGroup, Consumer { applyFilter(muscleGroup?.selectedItemPosition ?: 0, 0) })
+        subscribeField(exercise, Consumer { selectedExerciseIndex ->
+            val dataSets = chart?.lineData?.dataSets
+            val selectedExerciseName = exercise?.getItemAtPosition(selectedExerciseIndex) as String
+            var exerciseFound = false
+            if (dataSets != null && dataSets.isNotEmpty()) {
+                val showAll = selectedExerciseIndex == 0
+                for (i in dataSets.indices) {
+                    val next = dataSets[i]
+                    val isCurrentExerciseSelected = next.label == selectedExerciseName
+                    next.isVisible = showAll || isCurrentExerciseSelected
+                    next.isHighlightEnabled = showAll || isCurrentExerciseSelected
+                    if (!exerciseFound) exerciseFound = showAll || isCurrentExerciseSelected
+                }
+            }
+            closeHighlight()
+            chart?.invalidate()
+            if (!exerciseFound) Toast.makeText(context, R.string.no_exercise_data, Toast.LENGTH_SHORT).show()
+        })
     }
 
     override fun onStop() {
@@ -72,17 +92,25 @@ class StatisticsFragment: ViewSubscriberFragment(),
 
     override fun showExerciseDetails(heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?) {
         Logger.d(LOG_TAG, "showExerciseDetails. heroId=$heroId, trainingId=$trainingId, exerciseInTrainingId=$exerciseInTrainingId")
-        ExerciseDialog.showDialog(childFragmentManager, heroId, trainingId, exerciseInTrainingId)
+        coordinator.showExerciseDialog(childFragmentManager, heroId, trainingId, exerciseInTrainingId)
     }
     //</editor-fold>
+
+
+    fun configureWith(presenter: StatisticsPresenter, coordinator: Coordinator) {
+        this.presenter = presenter
+        this.coordinator = coordinator
+    }
 
 
     //<editor-fold desc="Private methods">
 
     private fun initUI(root: View?) {
+        selectedContainer = root?.findViewById(R.id.selectedContainer)
+        selected = root?.findViewById(R.id.selected)
+        chart = root?.findViewById(R.id.chart)
         muscleGroup = root?.findViewById(R.id.muscleGroup)
         exercise = root?.findViewById(R.id.exercise)
-        chart = root?.findViewById(R.id.chart)
     }
 
     private fun initChart(lineData: LineData?) {
@@ -93,19 +121,23 @@ class StatisticsFragment: ViewSubscriberFragment(),
         chart.description.isEnabled = false
         chart.setTouchEnabled(true)
         chart.isDragEnabled = true
-        chart.setScaleEnabled(false)
-        chart.setPinchZoom(false)// if disabled, scaling can be done on x- and y-axis separately
+        chart.setScaleEnabled(true)
+        chart.setPinchZoom(true)// if disabled, scaling can be done on x- and y-axis separately
         chart.setDrawGridBackground(false)
         chart.maxHighlightDistance = 300f
         chart.legend.isEnabled = false
         chart.marker = CustomMarkerView(context, R.layout.custom_marker_view)
-        chart.highlightValues(null)
+        closeHighlight()
+
         chart.setOnChartValueSelectedListener(object: OnChartValueSelectedListener {
             var trainingId: Long? = null
             var exerciseId: Long? = null
             override fun onValueSelected(e: Entry?, h: Highlight?) {
-                trainingId = (e?.data as Tag?)?.trainingId
-                exerciseId = (e?.data as Tag?)?.exerciseInTrainingId
+                val tag = e?.data as Tag?
+                trainingId = tag?.trainingId
+                exerciseId = tag?.exerciseInTrainingId
+                selectedContainer?.visibility = View.VISIBLE
+                selected?.text = tag?.title?.replace("\n", " ")
                 Logger.d(LOG_TAG, "onValueSelected. trainingId=$trainingId, exerciseId=$exerciseId")
             }
             override fun onNothingSelected() = presenter.onBalloonClicked(trainingId, exerciseId)
@@ -120,14 +152,6 @@ class StatisticsFragment: ViewSubscriberFragment(),
         chart.invalidate()
     }
 
-    private fun tuneAxes(xLabelsCount: Int, axisTextColor: Int, yAxisMinimum: Int) {
-        val chart = chart ?: return
-        tuneXAxis(chart, xLabelsCount, axisTextColor)
-        tuneYAxis(chart, axisTextColor, yAxisMinimum)
-        chart.extraBottomOffset = chart.rendererXAxis.paintAxisLabels.textSize
-        chart.axisRight?.isEnabled = false
-    }
-
     private fun tuneXAxis(chart: LineChart, labelsCount: Int, axisTextColor: Int) {
         val xAxis = chart.xAxis
         xAxis.isEnabled = true
@@ -136,7 +160,7 @@ class StatisticsFragment: ViewSubscriberFragment(),
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.isGranularityEnabled = true
         xAxis.granularity = 1.0f
-        xAxis.setDrawGridLines(false)
+        xAxis.setDrawGridLines(true)
 
         chart.setXAxisRenderer(CustomXAxisRenderer(chart.viewPortHandler, xAxis, chart.getTransformer(YAxis.AxisDependency.LEFT)))
 //        xAxis.axisLineColor = Color.TRANSPARENT
@@ -163,25 +187,23 @@ class StatisticsFragment: ViewSubscriberFragment(),
 //        yAxis.typeface = someTypeface
     }
 
-    private fun applyFilter() {
-        presenter.filterAndUpdateChart(muscleGroup?.selectedItemPosition ?: 0, exercise?.selectedItemPosition ?: 0)
+    private fun applyFilter(muscleGroupIndex: Int, exerciseIndex: Int) {
+        Logger.d(LOG_TAG, "applyFilter. muscleGroupIndex=$muscleGroupIndex, exerciseIndex=$exerciseIndex")
+        presenter.filterAndUpdateChart(muscleGroupIndex, exerciseIndex)
+    }
+
+    private fun closeHighlight() {
+        chart?.highlightValues(null)
+        selectedContainer?.visibility = View.INVISIBLE
+        selected?.text = ""
     }
     //</editor-fold>
 
 
     companion object {
-        const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment"
         private const val LOG_TAG = "StatisticsFragment"
-        private const val X_LABELS_COUNT = 10
+        private const val X_LABELS_COUNT = 8
         private const val Y_LABELS_COUNT = 5
         private const val Y_AXIS_MINIMUM = 0
-
-        fun newInstance(heroId: Long): StatisticsFragment {
-            val fragment = StatisticsFragment()
-            val args = Bundle()
-            args.putLong(HERO_ID, heroId)
-            fragment.arguments = args
-            return fragment
-        }
     }
 }

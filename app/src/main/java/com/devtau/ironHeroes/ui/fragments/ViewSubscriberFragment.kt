@@ -28,8 +28,10 @@ abstract class ViewSubscriberFragment: Fragment(), StandardView {
         super.onStop()
     }
 
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
-    override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(getLogTag(), msg, context, confirmedListener)
+    override fun showMsg(msgId: Int, confirmedListener: Action?, cancelledListener: Action?)
+            = showMsg(getString(msgId), confirmedListener)
+    override fun showMsg(msg: String, confirmedListener: Action?, cancelledListener: Action?)
+            = AppUtils.alertD(getLogTag(), msg, context, confirmedListener)
     override fun resolveString(@StringRes stringId: Int): String = getString(stringId)
     override fun resolveColor(@ColorRes colorId: Int): Int {
         val context = context
@@ -52,7 +54,7 @@ abstract class ViewSubscriberFragment: Fragment(), StandardView {
         spinner ?: return
         compositeUiDisposable.add(RxAdapterView.itemSelections(spinner)
             .subscribeOn(AndroidSchedulers.mainThread())
-            .skip(2)
+            .skip(1)
             .subscribe(onNext))
     }
 }

@@ -28,10 +28,11 @@ abstract class ViewSubscriberDialog: DialogFragment(), StandardView {
         super.onStop()
     }
 
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
-    override fun showMsg(msg: String, confirmedListener: Action?) {
+    override fun showMsg(msgId: Int, confirmedListener: Action?, cancelledListener: Action?)
+            = showMsg(getString(msgId), confirmedListener)
+    override fun showMsg(msg: String, confirmedListener: Action?, cancelledListener: Action?) {
         val context = context ?: return
-        AppUtils.alertD(getLogTag(), msg, context, confirmedListener)
+        AppUtils.alertD(getLogTag(), msg, context, confirmedListener, cancelledListener)
     }
     override fun resolveString(@StringRes stringId: Int): String = getString(stringId)
     override fun resolveColor(@ColorRes colorId: Int): Int {

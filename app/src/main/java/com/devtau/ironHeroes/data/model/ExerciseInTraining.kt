@@ -1,11 +1,14 @@
 package com.devtau.ironHeroes.data.model
 
+import android.content.Context
 import android.text.TextUtils
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.devtau.ironHeroes.util.Constants.INTEGER_NOT_PARSED
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Entity(
     tableName = "ExercisesInTraining",
@@ -39,6 +42,18 @@ class ExerciseInTraining(
 
     fun calculateWork(): Int = if (weight == 0) repeats * count else weight * repeats * count
 
+    override fun equals(other: Any?): Boolean = when {
+        other !is ExerciseInTraining -> false
+        other.id != this.id -> false
+        other.exerciseId != this.exerciseId -> false
+        other.weight != this.weight -> false
+        other.repeats != this.repeats -> false
+        other.count != this.count -> false
+        else -> true
+    }
+
+    override fun hashCode(): Int = Objects.hash(id, exerciseId, weight, repeats, count)
+
 
     companion object {
         const val DEFAULT_REPEATS = 3.toString()
@@ -50,8 +65,8 @@ class ExerciseInTraining(
                     && repeats != null && repeats != INTEGER_NOT_PARSED
                     && count != null && count != INTEGER_NOT_PARSED
 
-        fun getMock(): List<ExerciseInTraining> {
-            var trainingId = Training.getMock()[0].id
+        fun getMock(c: Context): List<ExerciseInTraining> {
+            var trainingId = Training.getMock(c)[0].id
             val list = ArrayList<ExerciseInTraining>()
             //08.10
             list.addAll(listOf(
@@ -62,7 +77,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 32, 0, 3, 20, 4)))
 
             //09.10
-            trainingId = Training.getMock()[1].id
+            trainingId = Training.getMock(c)[1].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 2, 55, 3, 15, 0),
                 ExerciseInTraining(null, trainingId, 30, 6, 3, 15, 1),
@@ -72,7 +87,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 40, 3, 3, 15, 5)))
 
             //11.10
-            trainingId = Training.getMock()[2].id
+            trainingId = Training.getMock(c)[2].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 15, 7, 4, 20, 0),
                 ExerciseInTraining(null, trainingId, 18, 10, 4, 20, 1),
@@ -82,7 +97,7 @@ class ExerciseInTraining(
 
             //--------------------------------------------------------------------------------------
             //14.10
-            trainingId = Training.getMock()[3].id
+            trainingId = Training.getMock(c)[3].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 46, 24, 4, 15, 0),
                 ExerciseInTraining(null, trainingId, 44, 32, 4, 15, 1),
@@ -91,7 +106,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 32, 0, 4, 15, 4)))
 
             //15.10
-            trainingId = Training.getMock()[4].id
+            trainingId = Training.getMock(c)[4].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 29, 7, 4, 15, 0),
                 ExerciseInTraining(null, trainingId, 36, 27, 4, 15, 1),
@@ -103,7 +118,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 47, 4, 3, 15, 7)))
 
             //17.10
-            trainingId = Training.getMock()[5].id
+            trainingId = Training.getMock(c)[5].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 8, 7, 4, 12, 0),
                 ExerciseInTraining(null, trainingId, 9, 10, 3, 15, 1),
@@ -114,7 +129,7 @@ class ExerciseInTraining(
 
             //--------------------------------------------------------------------------------------
             //21.10
-            trainingId = Training.getMock()[6].id
+            trainingId = Training.getMock(c)[6].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 40, 4, 4, 20, 0),
                 ExerciseInTraining(null, trainingId, 37, 6, 4, 20, 1),
@@ -124,7 +139,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 32, 0, 5, 20, 5)))
 
             //22.10
-            trainingId = Training.getMock()[7].id
+            trainingId = Training.getMock(c)[7].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 29, 7, 4, 15, 0),
                 ExerciseInTraining(null, trainingId, 19, 40, 4, 15, 1),
@@ -134,7 +149,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 20, 4, 4, 15, 5)))
 
             //25.10
-            trainingId = Training.getMock()[8].id
+            trainingId = Training.getMock(c)[8].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 13, 0, 4, 10, 0),
                 ExerciseInTraining(null, trainingId, 1, 40, 4, 15, 1),
@@ -144,7 +159,7 @@ class ExerciseInTraining(
 
             //--------------------------------------------------------------------------------------
             //28.10
-            trainingId = Training.getMock()[9].id
+            trainingId = Training.getMock(c)[9].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 37, 6, 4, 20, 0),
                 ExerciseInTraining(null, trainingId, 38, 0, 4, 20, 1),
@@ -154,7 +169,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 32, 0, 4, 20, 5)))
 
             //29.10
-            trainingId = Training.getMock()[10].id
+            trainingId = Training.getMock(c)[10].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 29, 7, 4, 15, 0, "5-6-7-8 разными хватами"),
                 ExerciseInTraining(null, trainingId, 20, 3, 4, 15, 1),
@@ -164,7 +179,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 35, 40, 4, 15, 5)))
 
             //1.11
-            trainingId = Training.getMock()[11].id
+            trainingId = Training.getMock(c)[11].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 2, 60, 4, 8, 0),
                 ExerciseInTraining(null, trainingId, 42, 28, 3, 27, 1),
@@ -174,7 +189,7 @@ class ExerciseInTraining(
 
             //--------------------------------------------------------------------------------------
             //4.11
-            trainingId = Training.getMock()[12].id
+            trainingId = Training.getMock(c)[12].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 41, 0, 4, 20, 0),
                 ExerciseInTraining(null, trainingId, 45, 10, 4, 12, 1),
@@ -183,16 +198,15 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 32, 0, 4, 20, 4)))
 
             //5.11
-            trainingId = Training.getMock()[13].id
+            trainingId = Training.getMock(c)[13].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 29, 7, 4, 15, 0),
                 ExerciseInTraining(null, trainingId, 50, 75, 4, 12, 1, "2 резинки"),
                 ExerciseInTraining(null, trainingId, 31, 12, 4, 15, 2),
-                ExerciseInTraining(null, trainingId, 51, 20, 4, 10, 3),
                 ExerciseInTraining(null, trainingId, 20, 4, 4, 15, 4)))
 
             //8.11
-            trainingId = Training.getMock()[14].id
+            trainingId = Training.getMock(c)[14].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 7, 20, 3, 15, 0, "17-20-22 кг * 15-12-10"),
                 ExerciseInTraining(null, trainingId, 16, 12, 3, 15, 1, "15-12-10"),
@@ -203,7 +217,7 @@ class ExerciseInTraining(
 
             //--------------------------------------------------------------------------------------
             //11.11
-            trainingId = Training.getMock()[15].id
+            trainingId = Training.getMock(c)[15].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 52, 5, 3, 17, 0),
                 ExerciseInTraining(null, trainingId, 45, 40, 3, 15, 1),
@@ -212,7 +226,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 53, 0, 3, 20, 4)))
 
             //14.11
-            trainingId = Training.getMock()[16].id
+            trainingId = Training.getMock(c)[16].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 52, 5, 3, 17, 0),
                 ExerciseInTraining(null, trainingId, 50, 75, 3, 12, 1, "2 резинки"),
@@ -223,7 +237,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 30, 4, 3, 12, 6, "широким")))
 
             //15.11
-            trainingId = Training.getMock()[17].id
+            trainingId = Training.getMock(c)[17].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 1, 50, 3, 10, 0, "третий 8"),
                 ExerciseInTraining(null, trainingId, 15, 15, 3, 15, 1),
@@ -233,7 +247,7 @@ class ExerciseInTraining(
 
             //--------------------------------------------------------------------------------------
             //18.11
-            trainingId = Training.getMock()[18].id
+            trainingId = Training.getMock(c)[18].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 52, 5, 3, 17, 0),
                 ExerciseInTraining(null, trainingId, 46, 34, 4, 15, 1),
@@ -242,7 +256,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 32, 20, 4, 20, 4)))
 
             //21.11
-            trainingId = Training.getMock()[19].id
+            trainingId = Training.getMock(c)[19].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, 52, 5, 3, 17, 0),
                 ExerciseInTraining(null, trainingId, 50, 75, 3, 15, 1, "2 резинки"),
@@ -252,7 +266,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, 54, 15, 3, 12, 5)))
 
             //22.11
-            trainingId = Training.getMock()[20].id
+            trainingId = Training.getMock(c)[20].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, exerciseId = 52, weight = 10, repeats = 3, count = 17, position = 0),
                 ExerciseInTraining(null, trainingId, exerciseId = 2, weight = 60, repeats = 4, count = 8, position = 1),

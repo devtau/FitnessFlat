@@ -1,6 +1,5 @@
 package com.devtau.ironHeroes.ui.activities.heroDetails
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -8,14 +7,15 @@ import android.os.Bundle
 import android.text.TextUtils
 import com.devtau.ironHeroes.IronHeroesApp
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.enums.Gender
 import com.devtau.ironHeroes.data.model.Hero
+import com.devtau.ironHeroes.enums.Gender
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
-import com.devtau.ironHeroes.util.*
-import com.devtau.ironHeroes.util.Constants.HERO_ID
-import com.devtau.ironHeroes.util.Constants.HUMAN_TYPE
+import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.Constants
+import com.devtau.ironHeroes.util.Logger
+import com.devtau.ironHeroes.util.PermissionHelperImpl
 import com.vk.sdk.VKSdk
 import com.vk.sdk.api.VKApiConst
 import com.vk.sdk.api.VKParameters
@@ -29,7 +29,7 @@ import java.util.*
 class HeroDetailsActivity: ViewSubscriberActivity(),
     HeroDetailsView {
 
-    lateinit var presenter: HeroDetailsPresenter
+    private lateinit var presenter: HeroDetailsPresenter
     private var newHero: Boolean = false
     private var avatarUrl: String? = null
 
@@ -38,7 +38,7 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hero_details)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
         initUi()
     }
 
@@ -66,7 +66,7 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        val authListener = IronHeroesApp.getVKAuthListener(this, PreferencesManager(this))
+        val authListener = IronHeroesApp.getVKAuthListener(this)
         if (VKSdk.onActivityResult(requestCode, resultCode, intent, authListener)) {
             val params = VKParameters()
             params[VKApiConst.FIELDS] = "photo_max_orig"
@@ -132,6 +132,11 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
 
     override fun closeScreen() = finish()
     //</editor-fold>
+
+
+    fun configureWith(presenter: HeroDetailsPresenter) {
+        this.presenter = presenter
+    }
 
 
     //<editor-fold desc="Private methods">
@@ -230,12 +235,5 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
 
     companion object {
         private const val LOG_TAG = "HeroDetailsActivity"
-
-        fun newInstance(context: Context, heroId: Long?, humanType: HumanType) {
-            val intent = Intent(context, HeroDetailsActivity::class.java)
-            if (heroId != null) intent.putExtra(HERO_ID, heroId)
-            intent.putExtra(HUMAN_TYPE, humanType)
-            context.startActivity(intent)
-        }
     }
 }

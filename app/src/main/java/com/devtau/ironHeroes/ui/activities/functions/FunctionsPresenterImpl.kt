@@ -1,13 +1,13 @@
 package com.devtau.ironHeroes.ui.activities.functions
 
-import com.devtau.ironHeroes.BuildConfig
+import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
-import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.PreferencesManager
+import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 
 class FunctionsPresenterImpl(
@@ -19,16 +19,13 @@ class FunctionsPresenterImpl(
 
     init {
         disposeOnStop(dataLayer.getHeroes(Consumer { heroes ->
-            if (heroes == null || heroes.isEmpty()) {
-                dataLayer.updateMuscleGroups(view.provideMockMuscleGroups())
-                dataLayer.updateExercises(view.provideMockExercises())
-                dataLayer.updateHeroes(Hero.getMockChampions())
-                dataLayer.updateHeroes(Hero.getMockHeroes())
-
-                if (BuildConfig.DEBUG) {
-                    dataLayer.updateTrainings(Training.getMock())
-                    dataLayer.updateExercisesInTraining(ExerciseInTraining.getMock())
-                }
+            if (prefs.firstLaunch && (heroes == null || heroes.isEmpty())) {
+                view.showMsg(R.string.load_demo_configuration, Action {
+                    prefs.firstLaunch = false
+                    loadDemoConfig()
+                }, Action {
+                    prefs.firstLaunch = false
+                })
             }
         }))
     }
@@ -39,6 +36,16 @@ class FunctionsPresenterImpl(
 
     }
     //</editor-fold>
+
+
+    private fun loadDemoConfig() {
+        dataLayer.updateMuscleGroups(view.provideMockMuscleGroups())
+        dataLayer.updateExercises(view.provideMockExercises())
+        dataLayer.updateHeroes(view.provideMockHeroes())
+        dataLayer.updateHeroes(view.provideMockChampions())
+        dataLayer.updateTrainings(view.provideMockTrainings())
+        dataLayer.updateExercisesInTraining(view.provideMockExercisesInTrainings())
+    }
 
 
     companion object {

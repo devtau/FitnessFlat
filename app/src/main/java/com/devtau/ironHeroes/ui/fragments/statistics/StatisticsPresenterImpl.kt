@@ -10,6 +10,7 @@ import com.devtau.ironHeroes.data.model.MuscleGroup
 import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.EntriesWrapper
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
 import com.github.mikephil.charting.data.Entry
@@ -29,9 +30,12 @@ class StatisticsPresenterImpl(
 ): DBSubscriber(), StatisticsPresenter {
 
     private var muscleGroups: List<MuscleGroup>? = null
+
     private var exercises: List<Exercise>? = null
+    private var exercisesFiltered: List<Exercise>? = null
+
     private var exercisesInTrainings: List<ExerciseInTraining>? = null
-    private var exercisesFiltered: List<ExerciseInTraining>? = null
+    private var exercisesInTrainingsFiltered: List<ExerciseInTraining>? = null
 
 
     //<editor-fold desc="Presenter overrides">
@@ -52,13 +56,18 @@ class StatisticsPresenterImpl(
 
     override fun filterAndUpdateChart(muscleGroupIndex: Int, exerciseIndex: Int) {
         val muscleGroupId = muscleGroups?.get(muscleGroupIndex)?.id
-        exercisesFiltered = filter(exercisesInTrainings, muscleGroupId)
-        view.showStatisticsData(convertToDataSets(exercisesFiltered, parseTrainingDates(exercisesFiltered), R.color.colorAccent))
-//        view.showStatisticsData(generateMockDataSets(20, 50, 150))
+        exercisesInTrainingsFiltered = filterExercisesInTrainings(exercisesInTrainings, muscleGroupId)
+        view.showStatisticsData(convertToDataSets(exercisesInTrainingsFiltered,
+            parseTrainingDates(exercisesInTrainingsFiltered), R.color.colorAccent))
+        exercisesFiltered = filterExercises(exercises, muscleGroupId)
+        view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered, true), 0)
     }
 
-    override fun onBalloonClicked(trainingId: Long?, exerciseInTrainingId: Long?) =
-        view.showExerciseDetails(heroId, trainingId, exerciseInTrainingId)
+    override fun onBalloonClicked(trainingId: Long?, exerciseInTrainingId: Long?) {
+        if (prefs.openEditDialogFromStatistics)
+            view.showExerciseDetails(heroId, trainingId, exerciseInTrainingId)
+    }
+
     //</editor-fold>
 
 
@@ -67,35 +76,41 @@ class StatisticsPresenterImpl(
         if (AppUtils.isEmpty(muscleGroups) || AppUtils.isEmpty(exercises) || AppUtils.isEmpty(exercisesInTrainings)) return
 
         view.showMuscleGroups(AppUtils.getMuscleGroupsSpinnerStrings(muscleGroups), 0)
-        view.showExercises(AppUtils.getExercisesSpinnerStrings(exercises), 0)
+        view.showExercises(AppUtils.getExercisesSpinnerStrings(exercises, true), 0)
         filterAndUpdateChart(0, 0)
     }
 
-    private fun filter(list: List<ExerciseInTraining>?, muscleGroupId: Long?): List<ExerciseInTraining>? {
+    private fun filterExercisesInTrainings(list: List<ExerciseInTraining>?, muscleGroupId: Long?): List<ExerciseInTraining>? {
         val filtered = ArrayList<ExerciseInTraining>()
         if (list != null) for (next in list)
             if (muscleGroupId == null || next.exercise?.muscleGroupId == muscleGroupId) filtered.add(next)
-        Logger.d(LOG_TAG, "filter. list size=${list?.size}, muscleGroupId=$muscleGroupId, filtered size=${filtered.size}")
+        Logger.d(LOG_TAG, "filterExercisesInTrainings. list size=${list?.size}, muscleGroupId=$muscleGroupId, filtered size=${filtered.size}")
+        return filtered
+    }
+
+    private fun filterExercises(list: List<Exercise>?, muscleGroupId: Long?): List<Exercise> {
+        val filtered = ArrayList<Exercise>()
+        if (list != null) for (next in list)
+            if (muscleGroupId == null || next.muscleGroupId == muscleGroupId) filtered.add(next)
+        Logger.d(LOG_TAG, "filterExercises. list size=${list?.size}, muscleGroupId=$muscleGroupId, filtered size=${filtered.size}")
         return filtered
     }
 
     private fun parseLine(exerciseId: Long?, exercises: List<ExerciseInTraining>?, dates: List<Calendar>?,
-                          markerColorId: Int): ArrayList<Entry> {
+                          markerColorId: Int): EntriesWrapper {
         val values = ArrayList<Entry>()
+        var label = ""
         if (exercises != null && exercises.isNotEmpty()) {
             for (next in exercises) {
-                if (next.exerciseId == exerciseId) {
-                    val dateIndex = getDateIndex(next.training?.date, dates)
-                    if (dateIndex == null) {
-                        view.showMsg("parseLine. bad data. aborting")
-                        return values
-                    }
-                    val tag = Tag(markerColorId, Tag.getTitle(next), next.trainingId, next.id)
-                    values.add(Entry(dateIndex.toFloat(), next.calculateWork().toFloat(), tag))
+                val date = next.training?.date
+                if (next.exerciseId == exerciseId && date != null) {
+                    val tag = Tag(markerColorId, Tag.getTitle(next), next.trainingId, next.training?.date, next.id)
+                    values.add(Entry(date.toFloat(), next.calculateWork().toFloat(), tag))
+                    label = next.exercise?.name ?: ""
                 }
             }
         }
-        return values
+        return EntriesWrapper(values, label)
     }
 
     private fun getDateIndex(trainingDate: Long?, list: List<Calendar>?): Int? {
@@ -174,9 +189,9 @@ class StatisticsPresenterImpl(
         val dataSets = ArrayList<ILineDataSet>()
 
         for (i in 0 until valuesMap.size()) {
-            val line = parseLine(valuesMap.keyAt(i), exercises, dates, getLineColor(i))
+            val lineWrapper = parseLine(valuesMap.keyAt(i), exercises, dates, getLineColor(i))
             val lineColor = view.resolveColor(getLineColor(i))
-            dataSets.add(formatLine(LineDataSet(line, ""), lineColor))
+            dataSets.add(formatLine(LineDataSet(lineWrapper.entries, lineWrapper.label), lineColor))
         }
 
         val data = LineData(dataSets)

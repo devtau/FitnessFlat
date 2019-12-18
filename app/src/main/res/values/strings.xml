@@ -9,8 +9,10 @@
     
     <string name="app_name">Iron Heroes</string>
     <string name="heroes">Heroes</string>
+    <string name="trainees">Heroes (trainees)</string>
     <string name="hero">Hero</string>
     <string name="champions">Champions</string>
+    <string name="trainers">Champions (trainers)</string>
     <string name="champion">Champion</string>
     <string name="trainings">Workouts</string>
     <string name="statistics">Statistics</string>
@@ -52,12 +54,12 @@
     <string name="exercise">Exercise</string>
     <string name="weight">Weight</string>
     <string name="count">Count</string>
-	<string name="error_formatter" formatted="false">Error: %s</string>
+    <string name="error_formatter" formatted="false">Error: %s</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="filters">Filters</string>
-	
-	<string name="check_internet_connection">Check your internet connection</string>
+    
+    <string name="check_internet_connection">Check your internet connection</string>
     <string name="serializable_object_changed">It looks like one of the serializable objects received from the server has changed</string>
     <string name="internal_server_error">Sorry, it seems we have a server error. Please try again later</string>
     <string name="not_ready">Try again later</string>
@@ -81,6 +83,24 @@
     <string name="other">Other</string>
     <string name="show_champion_filter">Show champion filter</string>
     <string name="show_hero_filter">Show hero filter</string>
+    <string name="show_edit_dialog_at_statistics_screen">Show edit dialog at statistics screen on balloon click</string>
+    <string name="selected">Selected:</string>
+    <string name="no_exercise_data">You have not done this exercise yet</string>
+    <string name="load_demo_configuration">Load demo configuration</string>
+    <string name="clear_db">Clear database</string>
+    
+    <string name="roma_first_name">Roman</string>
+    <string name="anton_first_name">Antony</string>
+    <string name="denis_first_name">Denis</string>
+    <string name="masha_first_name">Mary</string>
+    <string name="eugen_first_name">Eugen</string>
+    
+    <string name="roma_last_name">Bogdanov</string>
+    <string name="anton_last_name">Shukin</string>
+    <string name="denis_last_name">Russikh</string>
+    <string name="masha_last_name">Chernyichkina</string>
+    <string name="eugen_last_name">Strimanov</string>
+    
     
     //Chest
     <string name="barbell_bench_press_top">Barbell bench press (top)</string>
@@ -116,10 +136,7 @@
     <string name="rear_muscle_bundle_swings">Rear muscle bundle swings</string>
     <string name="front_plate_raise">Front plate raise</string>
     <string name="dumbbell_press_above_head">Dumbbell press above head</string>
-    
-    //Shrugs
-    <string name="upright_barbell_rows">Upright barbell rows</string>
-    <string name="dumbbells_shrug">Dumbbells shrug</string>
+    <string name="military_press">Military press</string>
     
     //Back
     <string name="upper_block_pull">Upper block pull</string>
@@ -129,13 +146,15 @@
     <string name="pullover">Pullover</string>
     <string name="pull_ups">Pull-ups</string>
     <string name="hyperextension">Hyperextension</string>
+    <string name="upright_barbell_rows">Upright barbell rows</string>
+    <string name="dumbbells_shrug">Dumbbells shrug</string>
+    <string name="barbell_shrug">Barbell shrug</string>
     
     //Triceps
     <string name="close_grip_bench_press">Close-grip bench press</string>
-    <string name="cable_push_down">Cable push-down</string>
+    <string name="triceps_extension_in_machine">Extension in machine</string>
     <string name="french_press">French press</string>
     <string name="french_press_in_machine">French press in machine</string>
-    <string name="triangle_press">Triangle press</string>
     
     //Legs
     <string name="leg_extension">Leg extension</string>

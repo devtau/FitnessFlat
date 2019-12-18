@@ -26,8 +26,13 @@ class SettingsPresenterImpl(
         prefs.showHeroFilter = checked
     }
 
+    override fun openEditDialogFromStatisticsClicked(checked: Boolean) {
+        prefs.openEditDialogFromStatistics = checked
+    }
+
     override fun isChampionFilterNeeded() = prefs.showChampionFilter
     override fun isHeroFilterNeeded() = prefs.showHeroFilter
+    override fun isEditDialogNeeded() = prefs.openEditDialogFromStatistics
     //</editor-fold>
 
     //<editor-fold desc="Private methods">

@@ -5,4 +5,5 @@ interface OtherPresenter {
     fun restartLoaders()
     fun exportToFile()
     fun importFromFile()
+    fun clearDB()
 }

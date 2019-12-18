@@ -1,14 +1,12 @@
 package com.devtau.ironHeroes.ui.activities.functions
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
+import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.FunctionsPagerAdapter
-import com.devtau.ironHeroes.data.model.Exercise
-import com.devtau.ironHeroes.data.model.MuscleGroup
+import com.devtau.ironHeroes.data.model.*
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
 import com.devtau.ironHeroes.ui.fragments.settings.SettingsFragment
@@ -19,7 +17,8 @@ import kotlinx.android.synthetic.main.activity_functions.*
 
 class FunctionsActivity: ViewSubscriberActivity(), FunctionsView, SettingsFragment.Listener {
 
-    lateinit var presenter: FunctionsPresenter
+    private lateinit var presenter: FunctionsPresenter
+    private lateinit var coordinator: Coordinator
     private var pageIndex: Int = 0
     private var adapter: FunctionsPagerAdapter? = null
 
@@ -28,7 +27,7 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsView, SettingsFragme
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_functions)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
         if (savedInstanceState != null) pageIndex = savedInstanceState.getInt(PAGE_INDEX)
         initUi()
         initPager()
@@ -67,11 +66,21 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsView, SettingsFragme
         showMsg(String.format(getString(R.string.imported_formatter), trainings, exercises))
     }
 
+    override fun provideMockHeroes() = Hero.getMockHeroes(this)
+    override fun provideMockChampions() = Hero.getMockChampions(this)
     override fun provideMockExercises() = Exercise.getMock(this)
     override fun provideMockMuscleGroups() = MuscleGroup.getMock(this)
+    override fun provideMockTrainings() = Training.getMock(this)
+    override fun provideMockExercisesInTrainings() = ExerciseInTraining.getMock(this)
 
     override fun updateSpinnersVisibility() = (adapter?.getItem(0) as TrainingsFragment).updateSpinnersVisibility()
     //</editor-fold>
+
+
+    fun configureWith(presenter: FunctionsPresenter, coordinator: Coordinator) {
+        this.presenter = presenter
+        this.coordinator = coordinator
+    }
 
 
     //<editor-fold desc="Private methods">
@@ -83,7 +92,7 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsView, SettingsFragme
     }
 
     private fun initPager() {
-        adapter = FunctionsPagerAdapter(supportFragmentManager)
+        adapter = FunctionsPagerAdapter(supportFragmentManager, coordinator)
         functionsPager?.adapter = adapter
         functionsPager?.offscreenPageLimit = 3
         functionsPager?.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
@@ -153,10 +162,5 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsView, SettingsFragme
     companion object {
         private const val LOG_TAG = "FunctionsActivity"
         private const val PAGE_INDEX = "pageIndex"
-
-        fun newInstance(context: Context) {
-            val intent = Intent(context, FunctionsActivity::class.java)
-            context.startActivity(intent)
-        }
     }
 }

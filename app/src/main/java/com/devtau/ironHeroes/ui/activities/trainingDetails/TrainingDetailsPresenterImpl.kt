@@ -184,7 +184,7 @@ class TrainingDetailsPresenterImpl(
             else -> {
                 for (nextOld in oldList) {
                     var found = false
-                    for (nextNew in newList) if (nextNew.id == nextOld.id) found = true
+                    for (nextNew in newList) if (nextNew == nextOld) found = true
                     if (!found) return false
                 }
                 return true

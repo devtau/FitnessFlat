@@ -60,10 +60,7 @@ class Exercise(
             Exercise(27, c.getString(R.string.rear_muscle_bundle_swings), 4),
             Exercise(28, c.getString(R.string.front_plate_raise), 4),
             Exercise(58, c.getString(R.string.dumbbell_press_above_head), 4),
-
-            //Трапеции (шраги)
-            Exercise(35, c.getString(R.string.upright_barbell_rows), 7),
-            Exercise(36, c.getString(R.string.dumbbells_shrug), 7),
+            Exercise(59, c.getString(R.string.military_press), 4),
 
             //Спина
             Exercise(29, c.getString(R.string.upper_block_pull), 5),
@@ -73,13 +70,15 @@ class Exercise(
             Exercise(47, c.getString(R.string.pullover), 5),
             Exercise(50, c.getString(R.string.pull_ups), 5),
             Exercise(52, c.getString(R.string.hyperextension), 5),
+            Exercise(35, c.getString(R.string.upright_barbell_rows), 5),
+            Exercise(36, c.getString(R.string.dumbbells_shrug), 5),
+            Exercise(60, c.getString(R.string.barbell_shrug), 5),
 
             //Трицепс
             Exercise(19, c.getString(R.string.close_grip_bench_press), 3),
-            Exercise(20, c.getString(R.string.cable_push_down), 3),
+            Exercise(20, c.getString(R.string.triceps_extension_in_machine), 3),
             Exercise(21, c.getString(R.string.french_press), 3),
             Exercise(22, c.getString(R.string.french_press_in_machine), 3),
-            Exercise(51, c.getString(R.string.triangle_press), 3),
 
             //Ноги
             Exercise(37, c.getString(R.string.leg_extension), 8),

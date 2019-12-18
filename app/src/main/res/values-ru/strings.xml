@@ -2,8 +2,10 @@
 	<string name="app_name">Iron Heroes</string>
 	<string name="heroes">Герои</string>
 	<string name="hero">Герой</string>
+	<string name="trainees">Герои (тренируемые)</string>
 	<string name="champions">Чемпионы</string>
 	<string name="champion">Чемпион</string>
+	<string name="trainers">Чемпионы (тренеры)</string>
 	<string name="trainings">Тренировки</string>
 	<string name="statistics">Статистика</string>
 	<string name="database">База данных</string>
@@ -73,6 +75,23 @@
 	<string name="other">Прочее</string>
 	<string name="show_champion_filter">Показывать фильтр по чемпиону</string>
 	<string name="show_hero_filter">Показывать фильтр по герою</string>
+	<string name="show_edit_dialog_at_statistics_screen">Диалог при клике на балун на экране статистики</string>
+	<string name="selected">Выбрано:</string>
+	<string name="no_exercise_data">Вы еще не выполняли это упражнение</string>
+	<string name="load_demo_configuration">Загрузить демонстрационную конфигурацию</string>
+	<string name="clear_db">Очистить базу данных</string>
+	
+	<string name="roma_first_name">Рома</string>
+	<string name="anton_first_name">Антон</string>
+	<string name="denis_first_name">Денис</string>
+	<string name="masha_first_name">Маша</string>
+	<string name="eugen_first_name">Евгений</string>
+	
+	<string name="roma_last_name">Богданов</string>
+	<string name="anton_last_name">Щукин</string>
+	<string name="denis_last_name">Русских</string>
+	<string name="masha_last_name">Черничкина</string>
+	<string name="eugen_last_name">Стирманов</string>
 	
 	
 	//Грудь
@@ -109,10 +128,7 @@
 	<string name="rear_muscle_bundle_swings">Махи на задний пучок</string>
 	<string name="front_plate_raise">Подъем диска перед собой</string>
 	<string name="dumbbell_press_above_head">Жим гантелей над головой</string>
-	
-	//Трапеции (шраги)
-	<string name="upright_barbell_rows">Тяга штанги к подбородку</string>
-	<string name="dumbbells_shrug">Тяга гантелей</string>
+	<string name="military_press">Армейский жим</string>
 	
 	//Спина
 	<string name="upper_block_pull">Тяга верхнего блока</string>
@@ -122,13 +138,15 @@
 	<string name="pullover">Пуловер</string>
 	<string name="pull_ups">Подтягивания</string>
 	<string name="hyperextension">Гиперэкстензия</string>
+	<string name="upright_barbell_rows">Тяга штанги к подбородку</string>
+	<string name="dumbbells_shrug">Шраги с гантелями</string>
+	<string name="barbell_shrug">Шраги со штангой</string>
 	
 	//Трицепс
 	<string name="close_grip_bench_press">Жим узким хватом</string>
-	<string name="cable_push_down">Тяга верхнего блока</string>
+	<string name="triceps_extension_in_machine">Разгибание в тренажере</string>
 	<string name="french_press">Французский со свободным весом</string>
 	<string name="french_press_in_machine">Французский в тренажере</string>
-	<string name="triangle_press">Треугольный жим</string>
 	
 	//Ноги
 	<string name="leg_extension">Разгибания на квадрицепс</string>

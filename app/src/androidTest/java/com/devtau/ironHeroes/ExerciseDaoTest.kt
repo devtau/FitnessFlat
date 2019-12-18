@@ -43,7 +43,7 @@ class ExerciseDaoTest {
         runBlocking {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             database = Room.inMemoryDatabaseBuilder(context, DB::class.java).build()
-            dataLayer = DataLayerImpl(context, database)
+            dataLayer = DataLayerImpl
 
             //non-alphabetical order to test that results are sorted by name
             lock = CountDownLatch(1)

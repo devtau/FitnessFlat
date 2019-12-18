@@ -1,8 +1,12 @@
 package com.devtau.ironHeroes.ui
 
-import com.devtau.ironHeroes.data.DB
+import android.os.Bundle
+import com.devtau.ironHeroes.Coordinator
+import com.devtau.ironHeroes.CoordinatorImpl
+import com.devtau.ironHeroes.data.DataLayer
 import com.devtau.ironHeroes.data.DataLayerImpl
 import com.devtau.ironHeroes.enums.HumanType
+import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.rest.NetworkLayerImpl
 import com.devtau.ironHeroes.ui.activities.functions.FunctionsActivity
 import com.devtau.ironHeroes.ui.activities.functions.FunctionsPresenterImpl
@@ -22,7 +26,6 @@ import com.devtau.ironHeroes.ui.fragments.other.OtherFragment
 import com.devtau.ironHeroes.ui.fragments.other.OtherPresenterImpl
 import com.devtau.ironHeroes.ui.fragments.settings.SettingsFragment
 import com.devtau.ironHeroes.ui.fragments.settings.SettingsPresenterImpl
-import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
 import com.devtau.ironHeroes.util.Constants.HERO_ID
 import com.devtau.ironHeroes.util.Constants.HUMAN_TYPE
@@ -30,66 +33,55 @@ import com.devtau.ironHeroes.util.Constants.POSITION
 import com.devtau.ironHeroes.util.Constants.TRAINING_ID
 import com.devtau.ironHeroes.util.PreferencesManager
 
-class DependencyRegistry {
+object DependencyRegistry {
 
+    private const val LOG_TAG = "DependencyRegistry"
+    private val dataLayer: DataLayer = DataLayerImpl
+    private val networkLayer: NetworkLayer = NetworkLayerImpl
+    private val prefs = PreferencesManager
+    private val coordinator: Coordinator = CoordinatorImpl
+
+
+    //<editor-fold desc="injectors">
     fun inject(activity: FunctionsActivity) {
-        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
-        val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager(activity)
-        activity.presenter = FunctionsPresenterImpl(activity, dataLayer, networkLayer, prefs)
+        val presenter = FunctionsPresenterImpl(activity, dataLayer, networkLayer, prefs)
+        activity.configureWith(presenter, coordinator)
     }
 
+    @Throws(NoSuchElementException::class)
     fun inject(activity: HeroesActivity) {
-        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
-        val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager(activity)
-        val humanType = activity.intent?.extras?.getSerializable(HUMAN_TYPE) as HumanType? ?: return
-        activity.presenter = HeroesPresenterImpl(activity, dataLayer, networkLayer, prefs, humanType)
+        val humanType = humanTypeFromBundleOrThrow(activity.intent?.extras)
+        val presenter = HeroesPresenterImpl(activity, dataLayer, networkLayer, prefs, humanType)
+        activity.configureWith(presenter, coordinator)
     }
 
+    @Throws(NoSuchElementException::class)
     fun inject(activity: HeroDetailsActivity) {
-        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
-        val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager(activity)
-        val heroId = if (activity.intent?.hasExtra(HERO_ID) == true) activity.intent?.extras?.getLong(HERO_ID) else null
-        val humanType = activity.intent?.extras?.getSerializable(HUMAN_TYPE) as HumanType? ?: return
-        activity.presenter = HeroDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, heroId, humanType)
+        val heroId = heroIdFromBundle(activity.intent?.extras)
+        val humanType = humanTypeFromBundleOrThrow(activity.intent?.extras)
+        val presenter = HeroDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, heroId, humanType)
+        activity.configureWith(presenter)
     }
 
     fun inject(fragment: TrainingsFragment) {
-        val context = fragment.context ?: return
-        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
-        val networkLayer = NetworkLayerImpl(context)
-        val prefs = PreferencesManager(context)
-        fragment.presenter = TrainingsPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        val presenter = TrainingsPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        fragment.configureWith(presenter, coordinator)
     }
 
     fun inject(activity: TrainingDetailsActivity) {
-        val dataLayer = DataLayerImpl(activity, DB.getInstance(activity))
-        val networkLayer = NetworkLayerImpl(activity)
-        val prefs = PreferencesManager(activity)
-        val trainingId = if (activity.intent?.hasExtra(TRAINING_ID) == true) activity.intent?.extras?.getLong(TRAINING_ID) else null
-        activity.presenter = TrainingDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, trainingId)
+        val trainingId = trainingIdFromBundle(activity.intent?.extras)
+        val presenter = TrainingDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, trainingId)
+        activity.configureWith(presenter, coordinator)
     }
 
+    @Throws(NoSuchElementException::class)
     fun inject(dialog: ExerciseDialog) {
-        val context = dialog.context ?: return
-        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
-        val networkLayer = NetworkLayerImpl(context)
-        val prefs = PreferencesManager(context)
-        val heroId = if (dialog.arguments?.containsKey(HERO_ID) == true)
-            dialog.arguments?.getLong(HERO_ID) else null
-        val trainingId = if (dialog.arguments?.containsKey(TRAINING_ID) == true)
-            dialog.arguments?.getLong(TRAINING_ID) else null
-        val exerciseId = if (dialog.arguments?.containsKey(EXERCISE_IN_TRAINING_ID) == true)
-            dialog.arguments?.getLong(EXERCISE_IN_TRAINING_ID) else null
-        val position = if (dialog.arguments?.containsKey(POSITION) == true)
-            dialog.arguments?.getInt(POSITION) else null
-        if (heroId == null) {
-            AppUtils.alert(LOG_TAG, "$dialog misses necessary heroId", context)
-            return
-        }
-        dialog.presenter = ExercisePresenterImpl(
+        val heroId = heroIdFromBundleOrThrow(dialog.arguments)
+        val trainingId = trainingIdFromBundle(dialog.arguments)
+        val exerciseId = exerciseIdFromBundle(dialog.arguments)
+        val position = positionFromBundle(dialog.arguments)
+
+        val presenter = ExercisePresenterImpl(
             dialog,
             dataLayer,
             networkLayer,
@@ -99,38 +91,49 @@ class DependencyRegistry {
             exerciseId,
             position
         )
+        dialog.configureWith(presenter)
     }
 
+    @Throws(NoSuchElementException::class)
     fun inject(fragment: StatisticsFragment) {
-        val context = fragment.context ?: return
-        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
-        val networkLayer = NetworkLayerImpl(context)
-        val prefs = PreferencesManager(context)
-        val heroId = if (fragment.arguments?.containsKey(HERO_ID) == true) fragment.arguments?.getLong(HERO_ID) else null
-        if (heroId == null) {
-            AppUtils.alert(LOG_TAG, "$fragment misses necessary heroId", context)
-            return
-        }
-        fragment.presenter = StatisticsPresenterImpl(fragment, dataLayer, networkLayer, prefs, heroId)
+        val heroId = heroIdFromBundleOrThrow(fragment.arguments)
+        val presenter = StatisticsPresenterImpl(fragment, dataLayer, networkLayer, prefs, heroId)
+        fragment.configureWith(presenter, coordinator)
     }
 
     fun inject(fragment: SettingsFragment) {
-        val context = fragment.context ?: return
-        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
-        val networkLayer = NetworkLayerImpl(context)
-        val prefs = PreferencesManager(context)
-        fragment.presenter = SettingsPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        val presenter = SettingsPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        fragment.configureWith(presenter)
     }
 
     fun inject(fragment: OtherFragment) {
-        val context = fragment.context ?: return
-        val dataLayer = DataLayerImpl(context, DB.getInstance(context))
-        val networkLayer = NetworkLayerImpl(context)
-        val prefs = PreferencesManager(context)
-        fragment.presenter = OtherPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        val presenter = OtherPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        fragment.configureWith(presenter, coordinator)
     }
+    //</editor-fold>
 
-    companion object {
-        private const val LOG_TAG = "DependencyRegistry"
-    }
+
+    //<editor-fold desc="private helpers">
+    @Throws(NoSuchElementException::class)
+    private fun humanTypeFromBundleOrThrow(bundle: Bundle?): HumanType =
+        bundle?.getSerializable(HUMAN_TYPE) as HumanType?
+            ?: throw NoSuchElementException("bundle misses necessary HUMAN_TYPE")
+
+    private fun heroIdFromBundle(bundle: Bundle?): Long? =
+        if (bundle?.containsKey(HERO_ID) == true) bundle.getLong(HERO_ID) else null
+
+    @Throws(NoSuchElementException::class)
+    private fun heroIdFromBundleOrThrow(bundle: Bundle?): Long =
+        if (bundle?.containsKey(HERO_ID) == true) bundle.getLong(HERO_ID) else null
+            ?: throw NoSuchElementException("bundle misses necessary HERO_ID")
+
+    private fun trainingIdFromBundle(bundle: Bundle?): Long? =
+        if (bundle?.containsKey(TRAINING_ID) == true) bundle.getLong(TRAINING_ID) else null
+
+    private fun exerciseIdFromBundle(bundle: Bundle?): Long? =
+        if (bundle?.containsKey(EXERCISE_IN_TRAINING_ID) == true) bundle.getLong(EXERCISE_IN_TRAINING_ID) else null
+
+    private fun positionFromBundle(bundle: Bundle?): Int? =
+        if (bundle?.containsKey(POSITION) == true) bundle.getInt(POSITION) else null
+    //</editor-fold>
 }

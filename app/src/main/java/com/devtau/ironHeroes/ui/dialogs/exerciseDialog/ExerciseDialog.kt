@@ -1,31 +1,25 @@
 package com.devtau.ironHeroes.ui.dialogs.exerciseDialog
 
 import android.os.Bundle
-import androidx.fragment.app.FragmentManager
 import android.view.*
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.dialogs.ViewSubscriberDialog
 import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
-import com.devtau.ironHeroes.util.Constants.HERO_ID
-import com.devtau.ironHeroes.util.Constants.POSITION
-import com.devtau.ironHeroes.util.Constants.TRAINING_ID
-import com.devtau.ironHeroes.util.Logger
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.dialog_exercise.*
 
 class ExerciseDialog: ViewSubscriberDialog(),
     ExerciseView {
 
-    lateinit var presenter: ExercisePresenter
+    private lateinit var presenter: ExercisePresenter
 
 
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -81,6 +75,11 @@ class ExerciseDialog: ViewSubscriberDialog(),
     //</editor-fold>
 
 
+    fun configureWith(presenter: ExercisePresenter) {
+        this.presenter = presenter
+    }
+
+
     //<editor-fold desc="Private methods">
     private fun initUi() {
         cancel.setOnClickListener { dialog?.dismiss() }
@@ -118,32 +117,6 @@ class ExerciseDialog: ViewSubscriberDialog(),
 
 
     companion object {
-        private const val LOG_TAG = "ExerciseDialog"
-        private const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog"
-
-        fun showDialog(fragmentManager: FragmentManager?, heroId: Long?, trainingId: Long?,
-                       exerciseInTrainingId: Long?, position: Int? = null) {
-            if (fragmentManager == null || heroId == null || trainingId == null) {
-                Logger.e(LOG_TAG, "showDialog. bad data. aborting")
-                return
-            }
-            val ft = fragmentManager.beginTransaction()
-            val prev = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
-            if (prev != null) ft.remove(prev)
-            ft.addToBackStack(null)
-            val newFragment = newInstance(heroId, trainingId, exerciseInTrainingId, position)
-            newFragment.show(ft, FRAGMENT_TAG)
-        }
-
-        private fun newInstance(heroId: Long, trainingId: Long?, exerciseInTrainingId: Long?, position: Int?): ExerciseDialog {
-            val fragment = ExerciseDialog()
-            val args = Bundle()
-            args.putLong(HERO_ID, heroId)
-            if (trainingId != null) args.putLong(TRAINING_ID, trainingId)
-            if (exerciseInTrainingId != null) args.putLong(EXERCISE_IN_TRAINING_ID, exerciseInTrainingId)
-            if (position != null) args.putInt(POSITION, position)
-            fragment.arguments = args
-            return fragment
-        }
+        const val LOG_TAG = "ExerciseDialog"
     }
 }

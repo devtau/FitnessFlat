@@ -28,8 +28,10 @@ abstract class ViewSubscriberActivity: AppCompatActivity(), StandardView {
         super.onStop()
     }
 
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
-    override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(getLogTag(), msg, this, confirmedListener)
+    override fun showMsg(msgId: Int, confirmedListener: Action?, cancelledListener: Action?)
+            = showMsg(getString(msgId), confirmedListener, cancelledListener)
+    override fun showMsg(msg: String, confirmedListener: Action?, cancelledListener: Action?)
+            = AppUtils.alertD(getLogTag(), msg, this, confirmedListener, cancelledListener)
     override fun resolveString(@StringRes stringId: Int): String = getString(stringId)
     override fun resolveColor(@ColorRes colorId: Int): Int = ContextCompat.getColor(this, colorId)
 

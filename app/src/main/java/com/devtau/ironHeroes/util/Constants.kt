@@ -12,6 +12,7 @@ object Constants {
     const val DATE_FORMATTER = "dd.MM.yyyy"
     const val DATE_TIME_FORMATTER = "dd.MM.yyyy HH:mm"
     const val DATE_WITH_WEEK_DAY_FORMATTER = "dd.MM (EE)"
+    const val SHORT_DATE_FORMATTER = "dd.MM"
     const val DATE_TIME_WITH_WEEK_DAY_FORMATTER = "dd.MM HH:mm (EE)"
 
     const val INTERNAL_SERVER_ERROR = 500

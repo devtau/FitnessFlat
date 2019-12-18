@@ -12,14 +12,14 @@ import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 
 class SettingsFragment: ViewSubscriberFragment(), SettingsView {
 
-    lateinit var presenter: SettingsPresenter
+    private lateinit var presenter: SettingsPresenter
     private var listener: Listener? = null
 
 
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -51,6 +51,11 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsView {
     //</editor-fold>
 
 
+    fun configureWith(presenter: SettingsPresenter) {
+        this.presenter = presenter
+    }
+
+
     //<editor-fold desc="Private methods">
     private fun initUi(root: View) {
         val showChampionFilter = root.findViewById<CheckBox>(R.id.showChampionFilter)
@@ -65,6 +70,11 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsView {
             presenter.showHeroFilterClicked(isChecked)
             listener?.updateSpinnersVisibility()
         }
+        val openEditDialogFromStatistics = root.findViewById<CheckBox>(R.id.openEditDialogFromStatistics)
+        openEditDialogFromStatistics?.isChecked = presenter.isEditDialogNeeded()
+        openEditDialogFromStatistics?.setOnCheckedChangeListener { _, isChecked ->
+            presenter.openEditDialogFromStatisticsClicked(isChecked)
+        }
     }
     //</editor-fold>
 
@@ -75,14 +85,6 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsView {
 
 
     companion object {
-        const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.fragments.settings.SettingsFragment"
         private const val LOG_TAG = "SettingsFragment"
-
-        fun newInstance(): SettingsFragment {
-            val fragment = SettingsFragment()
-            val args = Bundle()
-            fragment.arguments = args
-            return fragment
-        }
     }
 }

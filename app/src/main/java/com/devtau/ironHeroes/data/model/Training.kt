@@ -1,5 +1,6 @@
 package com.devtau.ironHeroes.data.model
 
+import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
@@ -46,10 +47,10 @@ class Training(
         fun allObligatoryPartsPresent(championId: Long?, heroId: Long?, date: Long?) =
             championId != null && heroId != null && date != null
 
-        fun getMock(): List<Training> {
-            val roma = Hero.getMockChampions()[0]
-            val anton = Hero.getMockChampions()[1]
-            val denis = Hero.getMockHeroes()[0]
+        fun getMock(c: Context): List<Training> {
+            val roma = Hero.getMockChampions(c)[0]
+            val anton = Hero.getMockChampions(c)[1]
+            val denis = Hero.getMockHeroes(c)[0]
 
             return listOf(
                 Training(1, anton.id, denis.id, AppUtils.parseDateTime("8.10.2019 8:00").timeInMillis),
@@ -81,8 +82,8 @@ class Training(
                 Training(21, anton.id, denis.id, AppUtils.parseDateTime("22.11.2019 9:00").timeInMillis),
 
 
-                Training(101, roma.id, Hero.getMockHeroes()[1].id, AppUtils.parseDateTime("21.10.2019 9:30").timeInMillis),
-                Training(102, roma.id, Hero.getMockHeroes()[2].id, AppUtils.parseDateTime("21.10.2019 10:00").timeInMillis)
+                Training(101, roma.id, Hero.getMockHeroes(c)[1].id, AppUtils.parseDateTime("21.10.2019 9:30").timeInMillis),
+                Training(102, roma.id, Hero.getMockHeroes(c)[2].id, AppUtils.parseDateTime("21.10.2019 10:00").timeInMillis)
             )
         }
     }

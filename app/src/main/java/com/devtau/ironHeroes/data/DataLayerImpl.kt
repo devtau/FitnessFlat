@@ -1,5 +1,7 @@
 package com.devtau.ironHeroes.data
 
+import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import com.devtau.ironHeroes.data.model.*
 import com.devtau.ironHeroes.data.relations.ExerciseInTrainingRelation
@@ -14,13 +16,25 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.Callable
 
-class DataLayerImpl(
-    val context: Context,
-    val db: DB
-): DataLayer {
+@SuppressLint("StaticFieldLeak")
+object DataLayerImpl: DataLayer {
+
+    private lateinit var context: Context
+    private lateinit var db: DB
+    private const val LOG_TAG = "DataLayer"
+
+
+    @Synchronized
+    @Throws(Exception::class)
+    fun init(context: Context) {
+        if (context !is Application) throw Exception("don't call init() other than from Application.onCreate() for this leads to memory leaks")
+        this.context = context
+        this.db = DB.getInstance(context)
+    }
 
 
     override fun updateHeroes(list: List<Hero?>?) = if (list == null) {
@@ -115,7 +129,9 @@ class DataLayerImpl(
 
     override fun clearDB() {
         Logger.w(LOG_TAG, "going to clearDB")
-        db.heroDao().delete().subscribeDefault("clearDB. orders deleted")
+        db.heroDao().delete().subscribeDefault("clearDB. heroes & champions deleted")
+        db.trainingDao().delete().subscribeDefault("clearDB. trainings deleted")
+        db.exerciseInTrainingDao().delete().subscribeDefault("clearDB. exercises in trainings deleted")
     }
 
     override fun getHero(id: Long, listener: Consumer<Hero?>): Disposable = db.heroDao().getById(id)
@@ -304,10 +320,5 @@ class DataLayerImpl(
             Logger.d(LOG_TAG, msg)
             disposable?.dispose()
         }
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "DataLayer"
     }
 }

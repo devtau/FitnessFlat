@@ -5,24 +5,27 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.devtau.ironHeroes.BuildConfig
+import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.DBViewerActivity
-import com.devtau.ironHeroes.ui.activities.heroesList.HeroesActivity
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.PermissionHelperImpl
 
 class OtherFragment: ViewSubscriberFragment(), OtherView {
 
-    lateinit var presenter: OtherPresenter
+    private lateinit var presenter: OtherPresenter
+    private lateinit var coordinator: Coordinator
     private var exportRequested: Boolean = true
 
 
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -60,14 +63,31 @@ class OtherFragment: ViewSubscriberFragment(), OtherView {
         val exercises = resources.getQuantityString(R.plurals.exercises, exercisesCount, exercisesCount)
         showMsg(String.format(getString(R.string.imported_formatter), trainings, exercises))
     }
+
+    override fun provideMockHeroes(): List<Hero> {
+        val context = context
+        return if (context == null) ArrayList() else Hero.getMockHeroes(context)
+    }
     //</editor-fold>
+
+
+    fun configureWith(presenter: OtherPresenter, coordinator: Coordinator) {
+        this.presenter = presenter
+        this.coordinator = coordinator
+    }
 
 
     //<editor-fold desc="Private methods">
     private fun initUi(root: View) {
-        root.findViewById<View>(R.id.heroes)?.setOnClickListener { HeroesActivity.newInstance(context, HumanType.HERO) }
-        root.findViewById<View>(R.id.champions)?.setOnClickListener { HeroesActivity.newInstance(context, HumanType.CHAMPION) }
-        root.findViewById<View>(R.id.database)?.setOnClickListener { DBViewerActivity.newInstance(context) }
+        root.findViewById<View>(R.id.heroes)?.setOnClickListener {
+            coordinator.launchHeroesActivity(context, HumanType.HERO)
+        }
+        root.findViewById<View>(R.id.champions)?.setOnClickListener {
+            coordinator.launchHeroesActivity(context, HumanType.CHAMPION)
+        }
+        val database = root.findViewById<View>(R.id.database)
+        database?.visibility = if (BuildConfig.DEBUG) View.VISIBLE else View.GONE
+        database?.setOnClickListener { DBViewerActivity.newInstance(context) }
         root.findViewById<View>(R.id.exportToFile)?.setOnClickListener {
             val context = context ?: return@setOnClickListener
             val permissionHelper = PermissionHelperImpl()
@@ -88,19 +108,12 @@ class OtherFragment: ViewSubscriberFragment(), OtherView {
             }
             presenter.importFromFile()
         }
+        root.findViewById<View>(R.id.clearDB)?.setOnClickListener { presenter.clearDB() }
     }
     //</editor-fold>
 
 
     companion object {
-        const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.fragments.other.OtherFragment"
         private const val LOG_TAG = "OtherFragment"
-
-        fun newInstance(): OtherFragment {
-            val fragment = OtherFragment()
-            val args = Bundle()
-            fragment.arguments = args
-            return fragment
-        }
     }
 }

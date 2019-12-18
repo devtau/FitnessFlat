@@ -1,24 +1,27 @@
 package com.devtau.ironHeroes.ui.fragments.trainingsList
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Spinner
 import androidx.recyclerview.widget.RecyclerView
+import com.devtau.ironHeroes.Coordinator
+import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.TrainingsAdapter
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsActivity
+import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants
-import io.reactivex.functions.Consumer
-import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import io.reactivex.functions.Consumer
 
 class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
 
-    lateinit var presenter: TrainingsPresenter
+    private lateinit var presenter: TrainingsPresenter
+    private lateinit var coordinator: Coordinator
     private var adapter: TrainingsAdapter? = null
     private var championContainer: View? = null
     private var heroContainer: View? = null
@@ -31,7 +34,7 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,6 +71,12 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
         AppUtils.initSpinner(hero, list, selectedIndex, context)
     //</editor-fold>
 
+
+    fun configureWith(presenter: TrainingsPresenter, coordinator: Coordinator) {
+        this.presenter = presenter
+        this.coordinator = coordinator
+    }
+
     fun updateSpinnersVisibility() {
         championContainer?.visibility = if (presenter.isChampionFilterNeeded()) View.VISIBLE else View.GONE
         heroContainer?.visibility = if (presenter.isHeroFilterNeeded()) View.VISIBLE else View.GONE
@@ -84,14 +93,14 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
         fab = root.findViewById(R.id.fab)
 
         listView?.postDelayed({ fab?.show() }, Constants.STANDARD_DELAY_MS)
-        fab?.setOnClickListener { TrainingDetailsActivity.newInstance(context, null) }
+        fab?.setOnClickListener { coordinator.launchTrainingDetailsActivity(context, null) }
         updateSpinnersVisibility()
     }
 
     private fun initList() {
         val context = context ?: return
         adapter = TrainingsAdapter(presenter.provideTrainings(), Consumer {
-            TrainingDetailsActivity.newInstance(context, it.id)
+            coordinator.launchTrainingDetailsActivity(context, it.id)
         })
         listView?.layoutManager = CustomLinearLayoutManager(context)
         listView?.adapter = adapter
@@ -102,14 +111,6 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
 
 
     companion object {
-        const val FRAGMENT_TAG = "com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment"
         private const val LOG_TAG = "TrainingsFragment"
-
-        fun newInstance(): TrainingsFragment {
-            val fragment = TrainingsFragment()
-            val args = Bundle()
-            fragment.arguments = args
-            return fragment
-        }
     }
 }
