@@ -10,7 +10,6 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.core.content.PermissionChecker
 import androidx.appcompat.app.AlertDialog
-import android.widget.Toast
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.Manifest.permission.CALL_PHONE
@@ -129,7 +128,7 @@ class PermissionHelperImpl: PermissionHelper {
             DialogInterface.OnClickListener { _, _ -> fragment.requestPermissions(arrayOf(permission), requestCode) },
             DialogInterface.OnClickListener { _, _ -> fragment.requestPermissions(arrayOf(permission), requestCode) },
             DialogInterface.OnClickListener { _, _ ->
-                if (fragment.context != null) Toast.makeText(fragment.context, declinedText, Toast.LENGTH_LONG).show()
+                if (fragment.context != null) fragment.context?.toastLong(declinedText)
             })
 
     }
@@ -140,7 +139,7 @@ class PermissionHelperImpl: PermissionHelper {
         showExplanationDialog(activity, explanationText, permission,
             DialogInterface.OnClickListener { _, _ -> activity.requestPermissions(arrayOf(permission), requestCode) },
             DialogInterface.OnClickListener { _, _ -> activity.requestPermissions(arrayOf(permission), requestCode) },
-            DialogInterface.OnClickListener { _, _ -> Toast.makeText(activity, declinedText, Toast.LENGTH_LONG).show() })
+            DialogInterface.OnClickListener { _, _ -> activity.toastLong(declinedText) })
     }
 
     @TargetApi(23)

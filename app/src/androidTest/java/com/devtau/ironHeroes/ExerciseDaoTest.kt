@@ -1,87 +1,77 @@
 package com.devtau.ironHeroes
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.devtau.ironHeroes.data.DB
-import com.devtau.ironHeroes.data.DataLayer
-import com.devtau.ironHeroes.data.DataLayerImpl
+import com.devtau.ironHeroes.data.dao.ExerciseDao
 import com.devtau.ironHeroes.data.model.Exercise
-import io.reactivex.functions.Consumer
-import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class ExerciseDaoTest {
 
-    private lateinit var database: DB
-    private lateinit var dataLayer: DataLayer
-
-    private val exerciseA = Exercise(1, "A", 1)
-    private val exerciseB = Exercise(2, "B", 1)
-    private val exerciseC = Exercise(3, "C", 1)
-
-    private var lock: CountDownLatch? = null
-    private var exercises: List<Exercise?>? = null
-    private var exercise: Exercise? = null
+    private lateinit var db: DB
+    private lateinit var dao: ExerciseDao
 
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @Before
-    fun createDb() {
-        runBlocking {
-            val context = InstrumentationRegistry.getInstrumentation().targetContext
-            database = Room.inMemoryDatabaseBuilder(context, DB::class.java).build()
-            dataLayer = DataLayerImpl
+    @Before fun createDb() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        db = Room.inMemoryDatabaseBuilder(context, DB::class.java)
+            .allowMainThreadQueries()
+            .build()
+        dao = db.exerciseDao()
+    }
 
-            //non-alphabetical order to test that results are sorted by name
-            lock = CountDownLatch(1)
-            dataLayer.updateExercises(listOf(exerciseB, exerciseC, exerciseA))
-            lock?.countDown()
-            lock?.await(2000, TimeUnit.MILLISECONDS)
+    @After fun closeDb() = db.close()
+
+
+    @Test fun insertAndGet() {
+        dao.insert(listOf(exerciseA)).blockingAwait()
+        dao.getById(exerciseA.id).test().assertValue {
+            exerciseA.id == it.exercise.id
         }
     }
 
-    @After fun closeDb() = database.close()
 
-
-    @Test fun testGetExercises() {
-        lock = CountDownLatch(1)
-        dataLayer.getExercises(Consumer {
-            exercises = it
-            lock?.countDown()
-        })
-        lock?.await(2000, TimeUnit.MILLISECONDS)
-        assertNotNull(exercises)
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals(exercises?.size, Exercise.getMock(context).size)
-
-        // Ensure list is sorted by name
-        assertEquals(exercises?.get(0)?.id, exerciseA.id)
-        assertEquals(exercises?.get(1)?.id, exerciseB.id)
-        assertEquals(exercises?.get(2)?.id, exerciseC.id)
+    @Test fun testQtyAndSortOrder() {
+        dao.insert(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
+        dao.getList().test().assertValue { list ->
+            val sorted = arrayListOf<Exercise>()
+            for (next in list) sorted.add(next.exercise)
+            sorted.sortBy { it.name }
+            3 == list.size
+                    && sorted[0].name == list[0].exercise.name
+                    && sorted[1].name == list[1].exercise.name
+                    && sorted[2].name == list[2].exercise.name
+        }
     }
 
-    @Test fun testGetExercise() {
-        lock = CountDownLatch(1)
-        val idA = exerciseA.id
-        if (idA != null) dataLayer.getExercise(idA, Consumer {
-            exercise = it
-            lock?.countDown()
-        })
-        lock?.await(2000, TimeUnit.MILLISECONDS)
-        assertNotNull(exercise)
-        assertEquals(exercise?.id, exerciseA.id)
+    @Test fun deleteAllAndGet() {
+        dao.insert(listOf(exerciseA)).blockingAwait()
+        dao.delete().blockingAwait()
+        dao.getById(exerciseA.id).test().assertNoValues()
+    }
+
+    @Test fun deleteListAndGet() {
+        dao.insert(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
+        dao.delete(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
+        dao.getById(exerciseA.id).test().assertNoValues()
+    }
+
+
+    companion object {
+        private val exerciseA = Exercise(1, "A", 1)
+        private val exerciseB = Exercise(2, "B", 1)
+        private val exerciseC = Exercise(3, "C", 1)
     }
 }

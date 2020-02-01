@@ -3,7 +3,6 @@ package com.devtau.ironHeroes.ui.fragments.trainingsList
 import com.devtau.ironHeroes.data.DataLayer
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
@@ -11,11 +10,10 @@ import com.devtau.ironHeroes.util.PreferencesManager
 import io.reactivex.functions.Consumer
 
 class TrainingsPresenterImpl(
-    private val view: TrainingsView,
+    private val view: TrainingsContract.View,
     private val dataLayer: DataLayer,
-    private val networkLayer: NetworkLayer,
     private val prefs: PreferencesManager
-): DBSubscriber(), TrainingsPresenter {
+): DBSubscriber(), TrainingsContract.Presenter {
 
     private var trainings: List<Training>? = null
     private var champions: List<Hero>? = null
@@ -62,8 +60,10 @@ class TrainingsPresenterImpl(
 
     private fun getSelectedItemIndex(list: List<Hero>?, selectedId: Long?): Int {
         var index = 0
-        if (list != null) for (i in list.indices)
-            if (list[i].id == selectedId) index = i + 1
+        if (list != null)
+            for ((i, next) in list.withIndex())
+                if (next.id == selectedId)
+                    index = i + 1
         Logger.d(LOG_TAG, "getSelectedItemIndex. list size=${list?.size}, selectedId=$selectedId, index=$index")
         return index
     }

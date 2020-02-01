@@ -15,6 +15,7 @@ import com.devtau.ironHeroes.rest.response.RegistrationResponse
 import com.devtau.ironHeroes.rest.response.HeroResponse
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
+import com.devtau.ironHeroes.util.toast
 import com.google.gson.GsonBuilder
 import io.reactivex.functions.Consumer
 import okhttp3.OkHttpClient
@@ -51,7 +52,9 @@ object NetworkLayerImpl: NetworkLayer {
         if (!AppUtils.checkConnection(context)) return
         getBackendApiClient(true).validatePhone(phone)
             .enqueue(object: BaseCallback<BaseResponse>() {
-                override fun processBody(responseBody: BaseResponse?) = showToast(R.string.wait_for_sms)
+                override fun processBody(responseBody: BaseResponse?) {
+                    showToast(R.string.wait_for_sms)
+                }
             })
     }
 
@@ -84,7 +87,7 @@ object NetworkLayerImpl: NetworkLayer {
 
 
     fun showToast(@StringRes msgId: Int) = showToast(context.getString(msgId))
-    fun showToast(msg: String) = Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    fun showToast(msg: String) = context.toast(msg)
     fun showDialog(@StringRes msgId: Int) = AppUtils.alertD(LOG_TAG, msgId, context)
 
     private fun getBackendApiClient(loggerNeeded: Boolean): BackendAPI = Retrofit.Builder()

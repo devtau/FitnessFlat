@@ -1,9 +1,13 @@
 package com.devtau.ironHeroes
 
 import android.app.Application
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import com.devtau.ironHeroes.data.DataLayerImpl
+import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.rest.NetworkLayerImpl
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
@@ -43,6 +47,12 @@ class IronHeroesApp: Application() {
                 }
             }
         }.startTracking()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+            AppUtils.createChannelIfNeeded(notificationManager, ChannelStats.DEFAULT_SOUND)
+            AppUtils.createChannelIfNeeded(notificationManager, ChannelStats.CUSTOM_SOUND)
+        }
     }
 
     companion object {

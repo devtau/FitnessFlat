@@ -2,8 +2,10 @@ package com.devtau.ironHeroes.ui.activities.trainingDetails
 
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
-import com.devtau.ironHeroes.data.model.*
-import com.devtau.ironHeroes.rest.NetworkLayer
+import com.devtau.ironHeroes.data.model.Exercise
+import com.devtau.ironHeroes.data.model.ExerciseInTraining
+import com.devtau.ironHeroes.data.model.Hero
+import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
@@ -13,12 +15,11 @@ import io.reactivex.functions.Consumer
 import java.util.*
 
 class TrainingDetailsPresenterImpl(
-    private val view: TrainingDetailsView,
+    private val view: TrainingDetailsContract.View,
     private val dataLayer: DataLayer,
-    private val networkLayer: NetworkLayer,
     private val prefs: PreferencesManager,
     private var trainingId: Long?
-): DBSubscriber(), TrainingDetailsPresenter {
+): DBSubscriber(), TrainingDetailsContract.Presenter {
 
     private var training: Training? = null
     private var champions: List<Hero>? = null
@@ -102,6 +103,7 @@ class TrainingDetailsPresenterImpl(
 
     override fun deleteTraining() {
         view.showMsg(R.string.confirm_delete, Action {
+            dataLayer.deleteExercisesInTraining(training?.exercises)
             dataLayer.deleteTrainings(listOf(training))
             view.closeScreen()
         })
@@ -116,7 +118,7 @@ class TrainingDetailsPresenterImpl(
         val item = exercises.removeAt(fromPosition)
         exercises.add(toPosition, item)
 
-        for (i in exercises.indices) exercises[i].position = i
+        for ((i, next) in exercises.withIndex()) next.position = i
         dataLayer.updateExercisesInTraining(exercises)
     }
 
@@ -133,8 +135,10 @@ class TrainingDetailsPresenterImpl(
 
     private fun getSelectedItemIndex(list: List<Hero>?, selectedId: Long?): Int {
         var index = 0
-        if (list != null) for (i in list.indices)
-            if (list[i].id == selectedId) index = i
+        if (list != null)
+            for ((i, next) in list.withIndex())
+                if (next.id == selectedId)
+                    index = i
         return index
     }
 

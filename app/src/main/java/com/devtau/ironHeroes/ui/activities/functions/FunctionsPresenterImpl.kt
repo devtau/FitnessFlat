@@ -2,20 +2,16 @@ package com.devtau.ironHeroes.ui.activities.functions
 
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
-import com.devtau.ironHeroes.data.model.ExerciseInTraining
-import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.PreferencesManager
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 
 class FunctionsPresenterImpl(
-    private val view: FunctionsView,
+    private val view: FunctionsContract.View,
     private val dataLayer: DataLayer,
-    private val networkLayer: NetworkLayer,
     private val prefs: PreferencesManager
-): DBSubscriber(), FunctionsPresenter {
+): DBSubscriber(), FunctionsContract.Presenter {
 
     init {
         disposeOnStop(dataLayer.getHeroes(Consumer { heroes ->
@@ -49,6 +45,6 @@ class FunctionsPresenterImpl(
 
 
     companion object {
-        private const val LOG_TAG = "LauncherPresenter"
+        private const val LOG_TAG = "FunctionsPresenter"
     }
 }

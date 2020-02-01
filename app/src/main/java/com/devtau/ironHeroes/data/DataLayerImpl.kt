@@ -75,24 +75,12 @@ object DataLayerImpl: DataLayer {
         db.trainingDao().delete(list).subscribeDefault("deleteTrainings. deleted")
     }
 
-    override fun updateExercises(list: List<Exercise?>?) = if (list == null) {
-        Logger.e(LOG_TAG, "updateExercises. list is null. aborting")
-    } else {
+    override fun updateExercises(list: List<Exercise>) {
         Logger.d(LOG_TAG, "updateExercises. list=$list")
         db.exerciseDao().insert(list).subscribeDefault("updateExercises. inserted")
     }
 
-    override fun updateExercise(exercise: Exercise?, listener: Consumer<Long>?) {
-        if (exercise == null) {
-            Logger.e(LOG_TAG, "updateExercise. exercise is null. aborting")
-            listener?.accept(EMPTY_OBJECT_ID)
-        } else {
-            Logger.d(LOG_TAG, "updateExercise. exercise=$exercise")
-            Threading.async(Callable { listener?.accept(db.exerciseDao().insert(exercise)) })
-        }
-    }
-
-    override fun deleteExercises(list: List<Exercise?>?) = if (list == null) {
+    override fun deleteExercises(list: List<Exercise>?) = if (list == null) {
         Logger.e(LOG_TAG, "deleteExercises. list is null. aborting")
     } else {
         Logger.d(LOG_TAG, "deleteExercises. list=$list")
@@ -197,6 +185,14 @@ object DataLayerImpl: DataLayer {
         .map { ExerciseInTrainingRelation.convertList(it) }
         .subscribe({ listener.accept(it) })
         { Logger.e(LOG_TAG, "Error in getExercisesInTraining: ${it.message}") }
+
+    override fun getAllExercisesInTrainings(heroId: Long, listener: Consumer<List<ExerciseInTraining>?>): Disposable
+            = db.exerciseInTrainingDao().getListAsc(heroId)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .map { ExerciseInTrainingRelation.convertList(it) }
+        .subscribe({ listener.accept(it) })
+        { Logger.e(LOG_TAG, "Error in getAllExercisesInTrainings: ${it.message}") }
 
     override fun getMuscleGroup(id: Long, listener: Consumer<MuscleGroup?>): Disposable = db.muscleGroupDao().getById(id)
         .subscribeOn(Schedulers.io())

@@ -2,23 +2,18 @@ package com.devtau.ironHeroes.ui.fragments.other
 
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
-import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.FileUtils
-import com.devtau.ironHeroes.util.PreferencesManager
 import com.devtau.ironHeroes.util.Threading
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
 
 class OtherPresenterImpl(
-    private val view: OtherView,
-    private val dataLayer: DataLayer,
-    private val networkLayer: NetworkLayer,
-    private val prefs: PreferencesManager
-): DBSubscriber(), OtherPresenter {
+    private val view: OtherContract.View,
+    private val dataLayer: DataLayer
+): DBSubscriber(), OtherContract.Presenter {
 
     private val exchangeDirName = view.resolveString(R.string.app_name)
 

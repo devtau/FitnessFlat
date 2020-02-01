@@ -3,7 +3,6 @@ package com.devtau.ironHeroes.util
 import android.text.TextUtils
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Training
-import java.util.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -14,31 +13,31 @@ object Serializer {
     fun serializeList(list: List<*>?): String? = if (AppUtils.isEmpty(list)) null else Gson().toJson(list)
 
 
-    fun deserializeListOfLongs(string: String?): ArrayList<Long>? =
+    fun deserializeListOfLongs(string: String?): List<Long>? =
             if (TextUtils.isEmpty(string)) null
             else {
-                val listType = object: TypeToken<ArrayList<Long>>() {}.type
-                Gson().fromJson<ArrayList<Long>>(string, listType)
+                val listType = object: TypeToken<List<Long>>() {}.type
+                Gson().fromJson<List<Long>>(string, listType)
             }
 
-    fun deserializeListOfInts(string: String?): ArrayList<Int>? =
+    fun deserializeListOfInts(string: String?): List<Int>? =
             if (TextUtils.isEmpty(string)) null
             else {
-                val listType = object: TypeToken<ArrayList<Int>>() {}.type
-                Gson().fromJson<ArrayList<Int>>(string, listType)
+                val listType = object: TypeToken<List<Int>>() {}.type
+                Gson().fromJson<List<Int>>(string, listType)
             }
 
-    fun deserializeListOfTrainings(string: String?): ArrayList<Training>? =
+    fun deserializeListOfTrainings(string: String?): List<Training>? =
         if (TextUtils.isEmpty(string)) null
         else {
-            val listType = object: TypeToken<ArrayList<Training>>() {}.type
-            Gson().fromJson<ArrayList<Training>>(string, listType)
+            val listType = object: TypeToken<List<Training>>() {}.type
+            Gson().fromJson<List<Training>>(string, listType)
         }
 
-    fun deserializeListOfExercisesInTrainings(string: String?): ArrayList<ExerciseInTraining>? =
+    fun deserializeListOfExercisesInTrainings(string: String?): List<ExerciseInTraining>? =
         if (TextUtils.isEmpty(string)) null
         else {
-            val listType = object: TypeToken<ArrayList<ExerciseInTraining>>() {}.type
-            Gson().fromJson<ArrayList<ExerciseInTraining>>(string, listType)
+            val listType = object: TypeToken<List<ExerciseInTraining>>() {}.type
+            Gson().fromJson<List<ExerciseInTraining>>(string, listType)
         }
 }

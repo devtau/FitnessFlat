@@ -24,14 +24,6 @@
         style="@style/SelectableItemBackground"/>
     
     <TextView
-        android:id="@+id/database"
-        android:text="@string/database"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/marginNormal"
-        style="@style/SelectableItemBackground"/>
-    
-    <TextView
         android:id="@+id/exportToFile"
         android:text="@string/export_to_file"
         android:layout_width="match_parent"

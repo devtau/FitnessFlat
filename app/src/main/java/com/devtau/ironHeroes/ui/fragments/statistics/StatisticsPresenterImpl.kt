@@ -7,7 +7,6 @@ import com.devtau.ironHeroes.data.DataLayer
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.MuscleGroup
-import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.EntriesWrapper
@@ -18,16 +17,14 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import io.reactivex.functions.Consumer
-import java.lang.IndexOutOfBoundsException
 import java.util.*
 
 class StatisticsPresenterImpl(
-    private val view: StatisticsView,
+    private val view: StatisticsContract.View,
     private val dataLayer: DataLayer,
-    private val networkLayer: NetworkLayer,
     private val prefs: PreferencesManager,
     private val heroId: Long
-): DBSubscriber(), StatisticsPresenter {
+): DBSubscriber(), StatisticsContract.Presenter {
 
     private var muscleGroups: List<MuscleGroup>? = null
 
@@ -48,7 +45,7 @@ class StatisticsPresenterImpl(
             exercises = it
             prepareAndPublishDataToView()
         }))
-        dataLayer.getAllExercisesInTrainingsAndClose(heroId, Calendar.getInstance().timeInMillis, true, Consumer {
+        dataLayer.getAllExercisesInTrainings(heroId, Consumer {
             exercisesInTrainings = it
             prepareAndPublishDataToView()
         })
@@ -115,8 +112,7 @@ class StatisticsPresenterImpl(
 
     private fun getDateIndex(trainingDate: Long?, list: List<Calendar>?): Int? {
         if (trainingDate != null && list != null && list.isNotEmpty()) {
-            for (i in list.indices) {
-                val dateStart = list[i]
+            for ((i, dateStart) in list.withIndex()) {
                 val dateEnd = Calendar.getInstance()
                 dateEnd.timeInMillis = dateStart.timeInMillis
                 dateEnd.add(Calendar.DAY_OF_MONTH, 1)

@@ -42,6 +42,7 @@ object CoordinatorImpl: Coordinator {
     }
     //</editor-fold>
 
+
     //<editor-fold desc="dialogs">
     override fun showExerciseDialog(fragmentManager: FragmentManager?, heroId: Long?, trainingId: Long?,
                                     exerciseInTrainingId: Long?, position: Int?) {
@@ -58,7 +59,7 @@ object CoordinatorImpl: Coordinator {
         }
 
         if (fragmentManager == null || heroId == null || trainingId == null) {
-            Logger.e(ExerciseDialog.LOG_TAG, "showDialog. bad data. aborting")
+            Logger.e(ExerciseDialog.LOG_TAG, "showExerciseDialog. bad data. aborting")
             return
         }
         val ft = fragmentManager.beginTransaction()
@@ -71,19 +72,9 @@ object CoordinatorImpl: Coordinator {
     //</editor-fold>
 
     //<editor-fold desc="fragments">
-    override fun newOtherFragmentInstance(): OtherFragment {
-        val fragment = OtherFragment()
-        val args = Bundle()
-        fragment.arguments = args
-        return fragment
-    }
+    override fun newOtherFragmentInstance() = OtherFragment()
 
-    override fun newSettingsFragmentInstance(): SettingsFragment {
-        val fragment = SettingsFragment()
-        val args = Bundle()
-        fragment.arguments = args
-        return fragment
-    }
+    override fun newSettingsFragmentInstance() = SettingsFragment()
 
     override fun newStatisticsFragmentInstance(heroId: Long): StatisticsFragment {
         val fragment = StatisticsFragment()
@@ -93,11 +84,6 @@ object CoordinatorImpl: Coordinator {
         return fragment
     }
 
-    override fun newTrainingsFragmentInstance(): TrainingsFragment {
-        val fragment = TrainingsFragment()
-        val args = Bundle()
-        fragment.arguments = args
-        return fragment
-    }
+    override fun newTrainingsFragmentInstance() = TrainingsFragment()
     //</editor-fold>
 }

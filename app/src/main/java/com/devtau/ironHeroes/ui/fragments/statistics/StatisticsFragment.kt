@@ -6,13 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Spinner
 import android.widget.TextView
-import android.widget.Toast
 import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
+import com.devtau.ironHeroes.util.toast
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
@@ -23,9 +23,9 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import io.reactivex.functions.Consumer
 
 class StatisticsFragment: ViewSubscriberFragment(),
-    StatisticsView {
+    StatisticsContract.View {
 
-    private lateinit var presenter: StatisticsPresenter
+    private lateinit var presenter: StatisticsContract.Presenter
     private lateinit var coordinator: Coordinator
 
     private var selectedContainer: View? = null
@@ -57,8 +57,7 @@ class StatisticsFragment: ViewSubscriberFragment(),
             var exerciseFound = false
             if (dataSets != null && dataSets.isNotEmpty()) {
                 val showAll = selectedExerciseIndex == 0
-                for (i in dataSets.indices) {
-                    val next = dataSets[i]
+                for (next in dataSets) {
                     val isCurrentExerciseSelected = next.label == selectedExerciseName
                     next.isVisible = showAll || isCurrentExerciseSelected
                     next.isHighlightEnabled = showAll || isCurrentExerciseSelected
@@ -67,7 +66,7 @@ class StatisticsFragment: ViewSubscriberFragment(),
             }
             closeHighlight()
             chart?.invalidate()
-            if (!exerciseFound) Toast.makeText(context, R.string.no_exercise_data, Toast.LENGTH_SHORT).show()
+            if (!exerciseFound) context?.toast(R.string.no_exercise_data)
         })
     }
 
@@ -97,7 +96,7 @@ class StatisticsFragment: ViewSubscriberFragment(),
     //</editor-fold>
 
 
-    fun configureWith(presenter: StatisticsPresenter, coordinator: Coordinator) {
+    fun configureWith(presenter: StatisticsContract.Presenter, coordinator: Coordinator) {
         this.presenter = presenter
         this.coordinator = coordinator
     }
@@ -140,7 +139,10 @@ class StatisticsFragment: ViewSubscriberFragment(),
                 selected?.text = tag?.title?.replace("\n", " ")
                 Logger.d(LOG_TAG, "onValueSelected. trainingId=$trainingId, exerciseId=$exerciseId")
             }
-            override fun onNothingSelected() = presenter.onBalloonClicked(trainingId, exerciseId)
+            override fun onNothingSelected() {
+                closeHighlight()
+                presenter.onBalloonClicked(trainingId, exerciseId)
+            }
         })
 
         tuneXAxis(chart, X_LABELS_COUNT, resolveColor(R.color.colorBlack))

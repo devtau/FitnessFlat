@@ -78,8 +78,12 @@
 	<string name="show_edit_dialog_at_statistics_screen">Диалог при клике на балун на экране статистики</string>
 	<string name="selected">Выбрано:</string>
 	<string name="no_exercise_data">Вы еще не выполняли это упражнение</string>
-	<string name="load_demo_configuration">Загрузить демонстрационную конфигурацию</string>
+	<string name="load_demo_configuration">Загрузить демонстрационную конфигурацию?</string>
 	<string name="clear_db">Очистить базу данных</string>
+	<string name="clear_db_confirm">Вы собираетесь удалить все тренировки, упражнения в этих тренировках, героев и чемпионов. Продолжить?</string>
+	<string name="next_set">Следующий подход</string>
+	<string name="recreation">Отдых</string>
+	<string name="recreation_formatter" formatted="false">Вы отдохнули %s</string>
 	
 	<string name="roma_first_name">Рома</string>
 	<string name="anton_first_name">Антон</string>
@@ -188,5 +192,11 @@
 		<item quantity="one">%d упражнение</item>
 		<item quantity="few">%d упражнения</item>
 		<item quantity="many">%d упражнений</item>
+	</plurals>
+	
+	<plurals name="seconds">
+		<item quantity="one">%d секунду</item>
+		<item quantity="few">%d секунды</item>
+		<item quantity="many">%d секунд</item>
 	</plurals>
 </resources>

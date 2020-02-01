@@ -4,26 +4,22 @@ import com.devtau.ironHeroes.data.DataLayer
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.MuscleGroup
-import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.INTEGER_NOT_PARSED
 import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.PreferencesManager
 import io.reactivex.functions.Consumer
 import java.util.*
 import kotlin.collections.ArrayList
 
 class ExercisePresenterImpl(
-    private val view: ExerciseView,
+    private val view: ExerciseContract.View,
     private val dataLayer: DataLayer,
-    private val networkLayer: NetworkLayer,
-    private val prefs: PreferencesManager?,
     private val heroId: Long,
     private val trainingId: Long?,
     private var exerciseInTrainingId: Long?,
     private var position: Int?
-): DBSubscriber(), ExercisePresenter {
+): DBSubscriber(), ExerciseContract.Presenter {
 
     private var muscleGroups: List<MuscleGroup>? = null
     private var exercises: List<Exercise>? = null

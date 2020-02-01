@@ -44,14 +44,14 @@ object DependencyRegistry {
 
     //<editor-fold desc="injectors">
     fun inject(activity: FunctionsActivity) {
-        val presenter = FunctionsPresenterImpl(activity, dataLayer, networkLayer, prefs)
+        val presenter = FunctionsPresenterImpl(activity, dataLayer, prefs)
         activity.configureWith(presenter, coordinator)
     }
 
     @Throws(NoSuchElementException::class)
     fun inject(activity: HeroesActivity) {
         val humanType = humanTypeFromBundleOrThrow(activity.intent?.extras)
-        val presenter = HeroesPresenterImpl(activity, dataLayer, networkLayer, prefs, humanType)
+        val presenter = HeroesPresenterImpl(activity, dataLayer, humanType)
         activity.configureWith(presenter, coordinator)
     }
 
@@ -59,18 +59,18 @@ object DependencyRegistry {
     fun inject(activity: HeroDetailsActivity) {
         val heroId = heroIdFromBundle(activity.intent?.extras)
         val humanType = humanTypeFromBundleOrThrow(activity.intent?.extras)
-        val presenter = HeroDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, heroId, humanType)
+        val presenter = HeroDetailsPresenterImpl(activity, dataLayer, heroId, humanType)
         activity.configureWith(presenter)
     }
 
     fun inject(fragment: TrainingsFragment) {
-        val presenter = TrainingsPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        val presenter = TrainingsPresenterImpl(fragment, dataLayer, prefs)
         fragment.configureWith(presenter, coordinator)
     }
 
     fun inject(activity: TrainingDetailsActivity) {
         val trainingId = trainingIdFromBundle(activity.intent?.extras)
-        val presenter = TrainingDetailsPresenterImpl(activity, dataLayer, networkLayer, prefs, trainingId)
+        val presenter = TrainingDetailsPresenterImpl(activity, dataLayer, prefs, trainingId)
         activity.configureWith(presenter, coordinator)
     }
 
@@ -81,33 +81,24 @@ object DependencyRegistry {
         val exerciseId = exerciseIdFromBundle(dialog.arguments)
         val position = positionFromBundle(dialog.arguments)
 
-        val presenter = ExercisePresenterImpl(
-            dialog,
-            dataLayer,
-            networkLayer,
-            prefs,
-            heroId,
-            trainingId,
-            exerciseId,
-            position
-        )
+        val presenter = ExercisePresenterImpl(dialog, dataLayer, heroId, trainingId, exerciseId, position)
         dialog.configureWith(presenter)
     }
 
     @Throws(NoSuchElementException::class)
     fun inject(fragment: StatisticsFragment) {
         val heroId = heroIdFromBundleOrThrow(fragment.arguments)
-        val presenter = StatisticsPresenterImpl(fragment, dataLayer, networkLayer, prefs, heroId)
+        val presenter = StatisticsPresenterImpl(fragment, dataLayer, prefs, heroId)
         fragment.configureWith(presenter, coordinator)
     }
 
     fun inject(fragment: SettingsFragment) {
-        val presenter = SettingsPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        val presenter = SettingsPresenterImpl(fragment, prefs)
         fragment.configureWith(presenter)
     }
 
     fun inject(fragment: OtherFragment) {
-        val presenter = OtherPresenterImpl(fragment, dataLayer, networkLayer, prefs)
+        val presenter = OtherPresenterImpl(fragment, dataLayer)
         fragment.configureWith(presenter, coordinator)
     }
     //</editor-fold>

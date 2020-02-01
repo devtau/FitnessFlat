@@ -22,9 +22,9 @@ import kotlinx.android.synthetic.main.activity_training_details.*
 import java.util.*
 
 class TrainingDetailsActivity: ViewSubscriberActivity(),
-    TrainingDetailsView {
+    TrainingDetailsContract.View {
 
-    private lateinit var presenter: TrainingDetailsPresenter
+    private lateinit var presenter: TrainingDetailsContract.Presenter
     private lateinit var coordinator: Coordinator
     private var exercisesAdapter: ExercisesInTrainingAdapter? = null
     private var deleteTrainingBtn: MenuItem? = null
@@ -112,7 +112,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     //</editor-fold>
 
 
-    fun configureWith(presenter: TrainingDetailsPresenter, coordinator: Coordinator) {
+    fun configureWith(presenter: TrainingDetailsContract.Presenter, coordinator: Coordinator) {
         this.presenter = presenter
         this.coordinator = coordinator
     }

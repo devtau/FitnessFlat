@@ -19,13 +19,12 @@ class CSVWriter(writer: Writer) {
 
     private fun convertToLine(nextLine: Array<String?>): String {
         val sb = StringBuffer()
-        for (i in nextLine.indices) {
+        for ((i, next) in nextLine.withIndex()) {
             if (i != 0) sb.append(Constants.SEPARATOR)
-            val nextElement = nextLine[i]
-            nextElement ?: continue
+            next ?: continue
             sb.append(Constants.QUOTE_CHAR)
-            for (j in 0 until nextElement.length) {
-                val nextChar = nextElement[j]
+            for (j in 0 until next.length) {
+                val nextChar = next[j]
                 if (nextChar == Constants.QUOTE_CHAR || nextChar == Constants.ESCAPE_CHAR) {
                     sb.append(Constants.ESCAPE_CHAR).append(nextChar)
                 } else {

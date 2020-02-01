@@ -27,9 +27,9 @@ import kotlinx.android.synthetic.main.activity_hero_details.*
 import java.util.*
 
 class HeroDetailsActivity: ViewSubscriberActivity(),
-    HeroDetailsView {
+    HeroDetailsContract.View {
 
-    private lateinit var presenter: HeroDetailsPresenter
+    private lateinit var presenter: HeroDetailsContract.Presenter
     private var newHero: Boolean = false
     private var avatarUrl: String? = null
 
@@ -134,7 +134,7 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     //</editor-fold>
 
 
-    fun configureWith(presenter: HeroDetailsPresenter) {
+    fun configureWith(presenter: HeroDetailsContract.Presenter) {
         this.presenter = presenter
     }
 

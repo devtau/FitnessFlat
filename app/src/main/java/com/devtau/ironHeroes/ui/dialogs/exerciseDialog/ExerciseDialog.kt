@@ -1,19 +1,32 @@
 package com.devtau.ironHeroes.ui.dialogs.exerciseDialog
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.*
-import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.dialogs.ViewSubscriberDialog
 import com.devtau.ironHeroes.util.AppUtils
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.dialog_exercise.*
+import android.app.Notification
+import android.graphics.BitmapFactory
+import androidx.core.app.NotificationCompat
+import com.devtau.ironHeroes.enums.ChannelStats
+import com.devtau.ironHeroes.util.AlarmReceiver
+import com.devtau.ironHeroes.util.Logger
+import android.os.CountDownTimer
+import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.util.Animator
 
 class ExerciseDialog: ViewSubscriberDialog(),
-    ExerciseView {
+    ExerciseContract.View {
 
-    private lateinit var presenter: ExercisePresenter
+    private lateinit var presenter: ExerciseContract.Presenter
 
 
     //<editor-fold desc="Framework overrides">
@@ -36,7 +49,9 @@ class ExerciseDialog: ViewSubscriberDialog(),
         super.onStart()
         presenter.restartLoaders()
         subscribeField(muscleGroup, Consumer { applyFilter() })
-        subscribeField(exercise, Consumer { presenter.updatePreviousExerciseData(exercise?.selectedItemPosition ?: 0) })
+        subscribeField(exercise, Consumer {
+            presenter.updatePreviousExerciseData(exercise?.selectedItemPosition ?: 0)
+        })
     }
 
     override fun onResume() {
@@ -75,7 +90,7 @@ class ExerciseDialog: ViewSubscriberDialog(),
     //</editor-fold>
 
 
-    fun configureWith(presenter: ExercisePresenter) {
+    fun configureWith(presenter: ExerciseContract.Presenter) {
         this.presenter = presenter
     }
 
@@ -91,6 +106,11 @@ class ExerciseDialog: ViewSubscriberDialog(),
             updateExerciseData()
             dialog?.dismiss()
         }
+
+        one.setOnClickListener { startRecreationTimer(parseRecreationTime()) }
+        two.setOnClickListener { startRecreationTimer(parseRecreationTime()) }
+        three.setOnClickListener { startRecreationTimer(parseRecreationTime()) }
+        four.setOnClickListener { startRecreationTimer(parseRecreationTime()) }
     }
 
     private fun updateExerciseData() {
@@ -101,6 +121,61 @@ class ExerciseDialog: ViewSubscriberDialog(),
             repeatsInput?.text?.toString(),
             countInput?.text?.toString(),
             commentInput?.text?.toString())
+    }
+
+    private fun parseRecreationTime(): Int {
+        val delayText = recreationInput?.text?.toString()
+        var delaySeconds = 90
+        try {
+            if (delayText != null) delaySeconds = delayText.toInt()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG, "recreationInput parse error. $e")
+        }
+        return delaySeconds
+    }
+
+    private fun startRecreationTimer(restTimeSeconds: Int) {
+        val futureMs = SystemClock.elapsedRealtime() + restTimeSeconds * 1000
+        val formatter = getString(R.string.recreation_formatter)
+        val seconds = resources.getQuantityString(R.plurals.seconds, restTimeSeconds, restTimeSeconds)
+        val msg = String.format(formatter, seconds)
+        val notification = getNotification(context, msg) ?: return
+        val intent = Intent(context, AlarmReceiver::class.java)
+        intent.putExtra(AlarmReceiver.NOTIFICATION_ID, 1)
+        intent.putExtra(AlarmReceiver.NOTIFICATION, notification)
+        val pendingIntent = PendingIntent.getBroadcast(context, 100, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager?
+
+        alarmManager?.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureMs, pendingIntent)
+
+
+        var i = 0
+        progressBar.progress = i
+        val restTimeMs = restTimeSeconds * 1000L
+        val countDownIntervalMs = 1000L
+        val maxProgressValue = progressBar.max
+        Animator.animateProgressBar(progressBar, 0f, maxProgressValue.toFloat(), restTimeMs)
+        object: CountDownTimer(restTimeMs, countDownIntervalMs) {
+            override fun onTick(msLeft: Long) {
+                Logger.d(LOG_TAG, "CountDownTimer. Tick of Progress $i, $msLeft ms left")
+                i++
+            }
+
+            override fun onFinish() {
+                Logger.d(LOG_TAG, "CountDownTimer. onFinish")
+//                progressBar.progress = maxProgressValue
+            }
+        }.start()
+    }
+
+    private fun getNotification(context: Context?, content: String): Notification? {
+        context ?: return null
+        return NotificationCompat.Builder(context, ChannelStats.DEFAULT_SOUND.id)
+            .setContentTitle(getString(R.string.next_set))
+            .setContentText(content)
+            .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_round))
+            .setSmallIcon(R.drawable.ic_workouts_white)
+            .build()
     }
 
     private fun applyFilter() = presenter.filterAndUpdateList(muscleGroup?.selectedItemPosition ?: 0)

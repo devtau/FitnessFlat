@@ -15,9 +15,9 @@ import com.devtau.ironHeroes.util.Logger
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_functions.*
 
-class FunctionsActivity: ViewSubscriberActivity(), FunctionsView, SettingsFragment.Listener {
+class FunctionsActivity: ViewSubscriberActivity(), FunctionsContract.View, SettingsFragment.Listener {
 
-    private lateinit var presenter: FunctionsPresenter
+    private lateinit var presenter: FunctionsContract.Presenter
     private lateinit var coordinator: Coordinator
     private var pageIndex: Int = 0
     private var adapter: FunctionsPagerAdapter? = null
@@ -77,7 +77,7 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsView, SettingsFragme
     //</editor-fold>
 
 
-    fun configureWith(presenter: FunctionsPresenter, coordinator: Coordinator) {
+    fun configureWith(presenter: FunctionsContract.Presenter, coordinator: Coordinator) {
         this.presenter = presenter
         this.coordinator = coordinator
     }

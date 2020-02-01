@@ -11,13 +11,13 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.activities.DBViewerActivity
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.PermissionHelperImpl
+import io.reactivex.functions.Action
 
-class OtherFragment: ViewSubscriberFragment(), OtherView {
+class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
 
-    private lateinit var presenter: OtherPresenter
+    private lateinit var presenter: OtherContract.Presenter
     private lateinit var coordinator: Coordinator
     private var exportRequested: Boolean = true
 
@@ -71,7 +71,7 @@ class OtherFragment: ViewSubscriberFragment(), OtherView {
     //</editor-fold>
 
 
-    fun configureWith(presenter: OtherPresenter, coordinator: Coordinator) {
+    fun configureWith(presenter: OtherContract.Presenter, coordinator: Coordinator) {
         this.presenter = presenter
         this.coordinator = coordinator
     }
@@ -85,9 +85,6 @@ class OtherFragment: ViewSubscriberFragment(), OtherView {
         root.findViewById<View>(R.id.champions)?.setOnClickListener {
             coordinator.launchHeroesActivity(context, HumanType.CHAMPION)
         }
-        val database = root.findViewById<View>(R.id.database)
-        database?.visibility = if (BuildConfig.DEBUG) View.VISIBLE else View.GONE
-        database?.setOnClickListener { DBViewerActivity.newInstance(context) }
         root.findViewById<View>(R.id.exportToFile)?.setOnClickListener {
             val context = context ?: return@setOnClickListener
             val permissionHelper = PermissionHelperImpl()
@@ -108,7 +105,9 @@ class OtherFragment: ViewSubscriberFragment(), OtherView {
             }
             presenter.importFromFile()
         }
-        root.findViewById<View>(R.id.clearDB)?.setOnClickListener { presenter.clearDB() }
+        root.findViewById<View>(R.id.clearDB)?.setOnClickListener {
+            showMsg(R.string.clear_db_confirm, Action { presenter.clearDB() }, Action {  })
+        }
     }
     //</editor-fold>
 

@@ -10,13 +10,13 @@ import io.reactivex.Flowable
 interface ExerciseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(list: List<Exercise?>): Completable
+    fun insert(list: List<Exercise>): Completable
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(exercise: Exercise?): Long
 
     @Query("SELECT * FROM Exercises WHERE exerciseId = :id")
-    fun getById(id: Long): Flowable<ExerciseRelation>
+    fun getById(id: Long?): Flowable<ExerciseRelation>
 
     @Transaction
     @Query("SELECT * FROM Exercises ORDER BY name")

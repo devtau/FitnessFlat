@@ -6,6 +6,10 @@
     <string name="vk_id_base" translatable="false">https://vk.com/</string>
     <string name="vk_id_formatter" formatted="false" translatable="false">https://vk.com/%s</string>
     <string name="permission_explanation_formatter" formatted="false" translatable="false">%s.\n%s</string>
+    <string name="one" translatable="false">1</string>
+    <string name="two" translatable="false">2</string>
+    <string name="three" translatable="false">3</string>
+    <string name="four" translatable="false">4</string>
     
     <string name="app_name">Iron Heroes</string>
     <string name="heroes">Heroes</string>
@@ -86,8 +90,12 @@
     <string name="show_edit_dialog_at_statistics_screen">Show edit dialog at statistics screen on balloon click</string>
     <string name="selected">Selected:</string>
     <string name="no_exercise_data">You have not done this exercise yet</string>
-    <string name="load_demo_configuration">Load demo configuration</string>
+    <string name="load_demo_configuration">Load demo configuration?</string>
     <string name="clear_db">Clear database</string>
+    <string name="clear_db_confirm">You are about to remove all workouts, exercises in these workouts, heroes and champions. Proceed?</string>
+    <string name="next_set">Next set</string>
+    <string name="recreation">Recreation</string>
+    <string name="recreation_formatter" formatted="false">It was %s recreation</string>
     
     <string name="roma_first_name">Roman</string>
     <string name="anton_first_name">Antony</string>
@@ -196,5 +204,11 @@
         <item quantity="one">%d exercise</item>
         <item quantity="many">%d exercises</item>
         <item quantity="other">%d exercises</item>
+    </plurals>
+    
+    <plurals name="seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="many">%d seconds</item>
+        <item quantity="other">%d seconds</item>
     </plurals>
 </resources>

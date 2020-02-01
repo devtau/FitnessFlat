@@ -14,9 +14,9 @@ import com.devtau.ironHeroes.util.Constants
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_heroes.*
 
-class HeroesActivity: ViewSubscriberActivity(), HeroesView {
+class HeroesActivity: ViewSubscriberActivity(), HeroesContract.View {
 
-    private lateinit var presenter: HeroesPresenter
+    private lateinit var presenter: HeroesContract.Presenter
     private lateinit var coordinator: Coordinator
     private var adapter: HeroesAdapter? = null
 
@@ -53,7 +53,7 @@ class HeroesActivity: ViewSubscriberActivity(), HeroesView {
     //</editor-fold>
 
 
-    fun configureWith(presenter: HeroesPresenter, coordinator: Coordinator) {
+    fun configureWith(presenter: HeroesContract.Presenter, coordinator: Coordinator) {
         this.presenter = presenter
         this.coordinator = coordinator
     }

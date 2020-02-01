@@ -4,25 +4,21 @@ import android.app.DatePickerDialog
 import android.content.Context
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
-import com.devtau.ironHeroes.rest.NetworkLayer
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.PreferencesManager
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
 
 class HeroDetailsPresenterImpl(
-    private val view: HeroDetailsView,
+    private val view: HeroDetailsContract.View,
     private val dataLayer: DataLayer,
-    private val networkLayer: NetworkLayer,
-    private val prefs: PreferencesManager,
     private val heroId: Long?,
     private val humanType: HumanType
-): DBSubscriber(), HeroDetailsPresenter {
+): DBSubscriber(), HeroDetailsContract.Presenter {
 
     private var hero: Hero? = null
 

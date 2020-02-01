@@ -30,7 +30,6 @@
             </intent-filter>
         </activity>
     
-        <activity android:name=".ui.activities.DBViewerActivity"/>
         <activity android:name=".ui.activities.heroesList.HeroesActivity"/>
         <activity android:name=".ui.activities.heroDetails.HeroDetailsActivity"/>
         <activity android:name="com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment"/>
@@ -48,5 +47,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+        <receiver android:name=".util.AlarmReceiver"/>
     </application>
 </manifest>

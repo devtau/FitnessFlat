@@ -10,9 +10,9 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 
-class SettingsFragment: ViewSubscriberFragment(), SettingsView {
+class SettingsFragment: ViewSubscriberFragment(), SettingsContract.View {
 
-    private lateinit var presenter: SettingsPresenter
+    private lateinit var presenter: SettingsContract.Presenter
     private var listener: Listener? = null
 
 
@@ -51,7 +51,7 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsView {
     //</editor-fold>
 
 
-    fun configureWith(presenter: SettingsPresenter) {
+    fun configureWith(presenter: SettingsContract.Presenter) {
         this.presenter = presenter
     }
 

@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/marginHalf"
@@ -11,20 +10,14 @@
     android:paddingRight="@dimen/marginNormal"
     style="@style/SelectableItemBackground"
     android:orientation="horizontal">
-
-    <androidx.cardview.widget.CardView
+    
+    <ImageView
+        android:id="@+id/image"
+        tools:src="@color/colorAccent"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        app:cardCornerRadius="20dp">
-
-        <ImageView
-            android:id="@+id/image"
-            tools:src="@color/colorAccent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"/>
-    </androidx.cardview.widget.CardView>
-
+        android:scaleType="centerCrop"/>
+    
     <TextView
         android:id="@+id/name"
         tools:text="Денис Русских"

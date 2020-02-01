@@ -18,9 +18,9 @@ import com.devtau.ironHeroes.util.Constants
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.reactivex.functions.Consumer
 
-class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
+class TrainingsFragment: ViewSubscriberFragment(), TrainingsContract.View {
 
-    private lateinit var presenter: TrainingsPresenter
+    private lateinit var presenter: TrainingsContract.Presenter
     private lateinit var coordinator: Coordinator
     private var adapter: TrainingsAdapter? = null
     private var championContainer: View? = null
@@ -72,7 +72,7 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsView {
     //</editor-fold>
 
 
-    fun configureWith(presenter: TrainingsPresenter, coordinator: Coordinator) {
+    fun configureWith(presenter: TrainingsContract.Presenter, coordinator: Coordinator) {
         this.presenter = presenter
         this.coordinator = coordinator
     }

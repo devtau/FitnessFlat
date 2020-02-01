@@ -1,7 +1,11 @@
 package com.devtau.ironHeroes.util
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.media.AudioAttributes
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Looper
 import android.telephony.PhoneNumberUtils
 import android.view.WindowManager
@@ -15,6 +19,7 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.HourMinute
 import com.devtau.ironHeroes.data.model.MuscleGroup
+import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_WITH_WEEK_DAY_FORMATTER
@@ -156,7 +161,7 @@ object AppUtils {
             Logger.e(logTag ?: LOG_TAG, msg)
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            context.toast(msg)
         }
     }
 
@@ -174,7 +179,7 @@ object AppUtils {
             builder.setMessage(msg).show()
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            context.toast(msg)
         }
     }
 
@@ -200,7 +205,7 @@ object AppUtils {
             builder.setMessage(msg).show()
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alertD. cannot show dialog")
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            context.toast(msg)
         }
     }
 
@@ -270,15 +275,19 @@ object AppUtils {
 
     fun getSelectedExerciseIndex(list: List<Exercise>?, selectedId: Long?): Int {
         var index = 0
-        if (list != null) for (i in list.indices)
-            if (list[i].id == selectedId) index = i
+        if (list != null)
+            for ((i, next) in list.withIndex())
+                if (next.id == selectedId)
+                    index = i
         return index
     }
 
     fun getSelectedMuscleGroupIndex(list: List<MuscleGroup>?, selectedId: Long?): Int {
         var index = 0
-        if (list != null) for (i in list.indices)
-            if (list[i].id == selectedId) index = i
+        if (list != null)
+            for ((i, next) in list.withIndex())
+                if (next.id == selectedId)
+                    index = i
         return index
     }
 
@@ -286,4 +295,33 @@ object AppUtils {
         if (Looper.getMainLooper().thread == Thread.currentThread())
             throw RuntimeException("method should not be called from UI thread")
     }
+
+    fun createChannelIfNeeded(notificationManager: NotificationManager?, channelStats: ChannelStats) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelStats.id, channelStats.channelName, NotificationManager.IMPORTANCE_DEFAULT)
+            channel.description = channelStats.description
+
+            when (channelStats) {
+                ChannelStats.DEFAULT_SOUND -> {/*NOP*/}
+                ChannelStats.CUSTOM_SOUND -> {
+                    val attrs = AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build()
+                    channel.setSound(ChannelStats.getCustomNotificationSound(), attrs)
+                }
+            }
+
+            channel.vibrationPattern = if (channelStats.withVibration)
+                longArrayOf(300, 400, 300, 400, 300, 400)//pause-ring-pause...
+            else null
+            notificationManager?.createNotificationChannel(channel)
+        }
+    }
 }
+
+fun Context?.toast(@StringRes msgId: Int) { this?.toast(this.getString(msgId)) }
+fun Context?.toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+fun Context?.toastLong(@StringRes msgId: Int) { this?.toastLong(this.getString(msgId)) }
+fun Context?.toastLong(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
