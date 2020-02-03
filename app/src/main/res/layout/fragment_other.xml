@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.fragments.other.OtherFragment">
+    
+    <TextView
+        android:id="@+id/heroes"
+        android:text="@string/trainees"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/marginNormal"
+        style="@style/SelectableItemBackground"/>
+    
+    <TextView
+        android:id="@+id/champions"
+        android:text="@string/trainers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/marginNormal"
+        style="@style/SelectableItemBackground"/>
+    
+    <TextView
+        android:id="@+id/exportToFile"
+        android:text="@string/export_to_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/marginNormal"
+        style="@style/SelectableItemBackground"/>
+    
+    <TextView
+        android:id="@+id/importFromFile"
+        android:text="@string/import_from_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/marginNormal"
+        style="@style/SelectableItemBackground"/>
+    
+    <TextView
+        android:id="@+id/clearDB"
+        android:text="@string/clear_db"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/marginNormal"
+        style="@style/SelectableItemBackground"/>
+</LinearLayout>

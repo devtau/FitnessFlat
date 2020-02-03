@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "726232632078",
+    "firebase_url": "https://iron-heroes.firebaseio.com",
+    "project_id": "iron-heroes",
+    "storage_bucket": "iron-heroes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726232632078:android:04271b8f9d82a74282255f",
+        "android_client_info": {
+          "package_name": "com.devtau.ironHeroes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "726232632078-s00hr3u95f2nj29dd5bp8rrsptae8olq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCBc9ZDhw6NgDUhl7iSvnByU2SF9DecvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "726232632078-s00hr3u95f2nj29dd5bp8rrsptae8olq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
