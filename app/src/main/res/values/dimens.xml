@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="extraLargeTextSize">51sp</dimen>
+    <dimen name="largeTextSize">34sp</dimen>
     <dimen name="primaryTextSize">17sp</dimen>
     <dimen name="secondaryTextSize">14sp</dimen>
     <dimen name="marginNormal">16dp</dimen>
     <dimen name="marginNormalPlus">19dp</dimen>
     <dimen name="marginHalf">8dp</dimen>
+    <dimen name="functionsIconsSize">40dp</dimen>
 </resources>

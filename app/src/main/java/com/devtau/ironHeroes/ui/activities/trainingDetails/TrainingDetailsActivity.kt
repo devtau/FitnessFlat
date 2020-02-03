@@ -2,20 +2,19 @@ package com.devtau.ironHeroes.ui.activities.trainingDetails
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.ExercisesInTrainingAdapter
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
-import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
 import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants.TRAINING_ID
 import com.devtau.ironHeroes.util.Logger
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
@@ -23,12 +22,13 @@ import kotlinx.android.synthetic.main.activity_training_details.*
 import java.util.*
 
 class TrainingDetailsActivity: ViewSubscriberActivity(),
-    TrainingDetailsView, ExerciseDialog.Listener {
+    TrainingDetailsContract.View {
 
-    lateinit var presenter: TrainingDetailsPresenter
+    private lateinit var presenter: TrainingDetailsContract.Presenter
+    private lateinit var coordinator: Coordinator
     private var exercisesAdapter: ExercisesInTrainingAdapter? = null
     private var deleteTrainingBtn: MenuItem? = null
-    private var deleteTrainingBtnVisibility: Boolean = false
+    private var deleteTrainingBtnVisibility: Boolean = true
     private var trainingDate: Calendar? = null
 
 
@@ -36,7 +36,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_training_details)
-        DependencyRegistry().inject(this)
+        DependencyRegistry.inject(this)
         initUi()
         initList()
     }
@@ -75,9 +75,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
 
     //<editor-fold desc="View overrides">
-    override fun showMsg(msgId: Int, confirmedListener: Action?) = showMsg(getString(msgId), confirmedListener)
-    override fun showMsg(msg: String, confirmedListener: Action?) = AppUtils.alertD(LOG_TAG, msg, this, confirmedListener)
-
+    override fun getLogTag() = LOG_TAG
     override fun showScreenTitle(newTraining: Boolean) {
         val toolbarTitle = if (newTraining) R.string.training_add else R.string.training_edit
         AppUtils.initToolbar(this, toolbarTitle, true)
@@ -107,15 +105,23 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     }
 
     override fun closeScreen() = finish()
+
+    override fun showNewExerciseDialog(position: Int) =
+        coordinator.showExerciseDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
+            presenter.provideTraining()?.id, null, position)
     //</editor-fold>
+
+
+    fun configureWith(presenter: TrainingDetailsContract.Presenter, coordinator: Coordinator) {
+        this.presenter = presenter
+        this.coordinator = coordinator
+    }
 
 
     //<editor-fold desc="Private methods">
     private fun initUi() {
         dateInput?.setOnClickListener { presenter.dateDialogRequested(trainingDate) }
-        addExercise?.setOnClickListener {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.id, null, this)
-        }
+        addExercise?.setOnClickListener { presenter.addExerciseClicked() }
     }
 
     private fun updateTrainingData() {
@@ -127,10 +133,38 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     private fun initList() {
         exercisesAdapter = ExercisesInTrainingAdapter(presenter.provideExercises(), Consumer {
-            ExerciseDialog.showDialog(supportFragmentManager, presenter.provideTraining()?.id, it.id, this)
+            coordinator.showExerciseDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
+                presenter.provideTraining()?.id, it.id, it.position)
         })
         listView?.layoutManager = CustomLinearLayoutManager(this)
         listView?.adapter = exercisesAdapter
+
+        val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {
+            override fun isLongPressDragEnabled() = true
+            override fun isItemViewSwipeEnabled() = false
+
+            override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+                val swipeFlags = if (isItemViewSwipeEnabled) ItemTouchHelper.START or ItemTouchHelper.END else 0
+                return makeMovementFlags(dragFlags, swipeFlags)
+            }
+
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                if (viewHolder.itemViewType != target.itemViewType) return false
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+                presenter.onExerciseMoved(fromPosition, toPosition)
+                recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//                val position = viewHolder.adapterPosition
+//                items.remove(position)
+//                listView.adapter?.notifyItemRemoved(position)
+            }
+        })
+        itemTouchHelper.attachToRecyclerView(listView)
     }
 
     private fun onDateSet(date: Calendar, year: Int, month: Int, dayOfMonth: Int) {
@@ -150,11 +184,5 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
 
     companion object {
         private const val LOG_TAG = "TrainingDetailsActivity"
-
-        fun newInstance(context: Context, trainingId: Long?) {
-            val intent = Intent(context, TrainingDetailsActivity::class.java)
-            if (trainingId != null) intent.putExtra(TRAINING_ID, trainingId)
-            context.startActivity(intent)
-        }
     }
 }

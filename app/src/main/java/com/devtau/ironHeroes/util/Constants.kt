@@ -12,6 +12,7 @@ object Constants {
     const val DATE_FORMATTER = "dd.MM.yyyy"
     const val DATE_TIME_FORMATTER = "dd.MM.yyyy HH:mm"
     const val DATE_WITH_WEEK_DAY_FORMATTER = "dd.MM (EE)"
+    const val SHORT_DATE_FORMATTER = "dd.MM"
     const val DATE_TIME_WITH_WEEK_DAY_FORMATTER = "dd.MM HH:mm (EE)"
 
     const val INTERNAL_SERVER_ERROR = 500
@@ -24,4 +25,14 @@ object Constants {
     const val HUMAN_TYPE = "humanType"
     const val TRAINING_ID = "trainingId"
     const val EXERCISE_IN_TRAINING_ID = "exerciseInTrainingId"
+    const val POSITION = "position"
+
+    const val CSV_EXT = ".csv"
+    const val TXT_EXT = ".txt"
+    const val SEPARATOR = ','
+    const val QUOTE_CHAR = '"'
+    const val ESCAPE_CHAR = '"'
+    const val LINE_END = "\n"
+    const val TRAININGS_FILE_NAME = "Trainings"
+    const val EXERCISES_FILE_NAME = "ExercisesInTrainings"
 }

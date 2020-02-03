@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.viewHolders.ExercisesInTrainingViewHolder
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.util.Animator
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.Threading
-import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 
 class ExercisesInTrainingAdapter(
@@ -26,8 +26,15 @@ class ExercisesInTrainingAdapter(
     override fun onBindViewHolder(holder: ExercisesInTrainingViewHolder, position: Int) {
         val exercise = exercises?.get(position) ?: return
         Logger.v(LOG_TAG, "onBindViewHolder. exercise=$exercise")
+        if (BuildConfig.DEBUG) {
+            holder.position.visibility = View.GONE
+//            holder.position.text = exercise.position.toString()
+        } else {
+            holder.position.visibility = View.GONE
+        }
         holder.exercise.text = exercise.exercise?.name
         holder.weight.text = exercise.weight.toString()
+        holder.repeats.text = exercise.repeats.toString()
         holder.count.text = exercise.count.toString()
         holder.root.setOnClickListener { listener.accept(exercise) }
     }

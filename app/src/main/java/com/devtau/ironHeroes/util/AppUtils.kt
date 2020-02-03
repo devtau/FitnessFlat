@@ -1,7 +1,12 @@
 package com.devtau.ironHeroes.util
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.media.AudioAttributes
 import android.net.ConnectivityManager
+import android.os.Build
+import android.os.Looper
 import android.telephony.PhoneNumberUtils
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -11,12 +16,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.HourMinute
+import com.devtau.ironHeroes.data.model.MuscleGroup
+import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_WITH_WEEK_DAY_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_WITH_WEEK_DAY_FORMATTER
 import com.devtau.ironHeroes.util.Constants.PHONE_MASK
+import com.devtau.ironHeroes.util.Constants.SHORT_DATE_FORMATTER
 import com.devtau.ironHeroes.util.Constants.STANDARD_DELAY_MS
 import com.redmadrobot.inputmask.MaskedTextChangedListener
 import io.reactivex.functions.Action
@@ -76,6 +85,17 @@ object AppUtils {
         return formatDateWithWeekDay(date)
     }
     fun formatDateWithWeekDay(cal: Calendar): String = formatAnyDate(cal, DATE_WITH_WEEK_DAY_FORMATTER)
+
+    fun formatShortDate(timeInMillis: String?): String {
+        val timeTrimmed = timeInMillis?.replace(",", "")?.replace(" ", "")
+        val date = Calendar.getInstance()
+        try {
+            if (timeTrimmed != null) date.timeInMillis = timeTrimmed.toLong()
+        } catch (e: NumberFormatException) {
+            Logger.e(LOG_TAG, "formatShortDate. bad input=$timeInMillis")
+        }
+        return formatAnyDate(date, SHORT_DATE_FORMATTER)
+    }
 
     private fun formatAnyDate(cal: Calendar, formatter: String): String =
         SimpleDateFormat(formatter, Locale.getDefault()).format(cal.time)
@@ -141,41 +161,51 @@ object AppUtils {
             Logger.e(logTag ?: LOG_TAG, msg)
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            context.toast(msg)
         }
     }
 
-    fun alert(logTag: String?, msg: String, context: Context, confirmedListener: Action) {
+    fun alert(logTag: String?, msg: String, context: Context, confirmedListener: Action? = null) {
+        Logger.e(logTag ?: LOG_TAG, msg)
         try {
-            AlertDialog.Builder(context)
+            val builder = AlertDialog.Builder(context)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    confirmedListener.run()
+                    confirmedListener?.run()
                     dialog.dismiss()
                 }
-                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                .setMessage(msg).show()
-            Logger.e(logTag ?: LOG_TAG, msg)
+            if (confirmedListener != null)
+                builder.setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+
+            builder.setMessage(msg).show()
         } catch (e: WindowManager.BadTokenException) {
             Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            context.toast(msg)
         }
     }
 
     fun alertD(logTag: String?, @StringRes msgId: Int, context: Context, confirmedListener: Action? = null)
             = alertD(logTag, context.getString(msgId), context, confirmedListener)
 
-    fun alertD(logTag: String?, msg: String, context: Context, confirmedListener: Action? = null) {
+    fun alertD(logTag: String?, msg: String, context: Context?, confirmedListener: Action? = null, cancelledListener: Action? = null) {
+        context ?: return
+        Logger.d(logTag ?: LOG_TAG, msg)
         try {
-            AlertDialog.Builder(context)
+            val builder = AlertDialog.Builder(context)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     confirmedListener?.run()
                     dialog.dismiss()
                 }
-                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                .setMessage(msg).show()
+            if (cancelledListener != null) {
+                builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                    cancelledListener.run()
+                    dialog.dismiss()
+                }
+            }
+
+            builder.setMessage(msg).show()
         } catch (e: WindowManager.BadTokenException) {
-            Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            Logger.e(logTag ?: LOG_TAG, "in alertD. cannot show dialog")
+            context.toast(msg)
         }
     }
 
@@ -184,9 +214,16 @@ object AppUtils {
             Logger.e(LOG_TAG, "initSpinner. bad data. aborting")
             return
         }
-        val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, spinnerStrings)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+        var adapter = spinner.adapter as ArrayAdapter<String>?
+        if (adapter == null) {
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, spinnerStrings)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter
+        } else {
+            adapter.clear()
+            adapter.addAll(spinnerStrings)
+            adapter.notifyDataSetChanged()
+        }
         spinner.setSelection(selectedIndex)
     }
 
@@ -222,4 +259,69 @@ object AppUtils {
         date.set(Calendar.SECOND, 0)
         return date
     }
+
+    fun getMuscleGroupsSpinnerStrings(list: List<MuscleGroup>?): List<String> {
+        val spinnerStrings = ArrayList<String>()
+        if (list != null) for (next in list) spinnerStrings.add(next.name)
+        return spinnerStrings
+    }
+
+    fun getExercisesSpinnerStrings(list: List<Exercise>?, withEmptyString: Boolean = false): List<String> {
+        val spinnerStrings = ArrayList<String>()
+        if (withEmptyString) spinnerStrings.add("- -")
+        if (list != null) for (next in list) spinnerStrings.add(next.name)
+        return spinnerStrings
+    }
+
+    fun getSelectedExerciseIndex(list: List<Exercise>?, selectedId: Long?): Int {
+        var index = 0
+        if (list != null)
+            for ((i, next) in list.withIndex())
+                if (next.id == selectedId)
+                    index = i
+        return index
+    }
+
+    fun getSelectedMuscleGroupIndex(list: List<MuscleGroup>?, selectedId: Long?): Int {
+        var index = 0
+        if (list != null)
+            for ((i, next) in list.withIndex())
+                if (next.id == selectedId)
+                    index = i
+        return index
+    }
+
+    fun checkNotMainThread() {
+        if (Looper.getMainLooper().thread == Thread.currentThread())
+            throw RuntimeException("method should not be called from UI thread")
+    }
+
+    fun createChannelIfNeeded(notificationManager: NotificationManager?, channelStats: ChannelStats) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelStats.id, channelStats.channelName, NotificationManager.IMPORTANCE_DEFAULT)
+            channel.description = channelStats.description
+
+            when (channelStats) {
+                ChannelStats.DEFAULT_SOUND -> {/*NOP*/}
+                ChannelStats.CUSTOM_SOUND -> {
+                    val attrs = AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build()
+                    channel.setSound(ChannelStats.getCustomNotificationSound(), attrs)
+                }
+            }
+
+            channel.vibrationPattern = if (channelStats.withVibration)
+                longArrayOf(300, 400, 300, 400, 300, 400)//pause-ring-pause...
+            else null
+            notificationManager?.createNotificationChannel(channel)
+        }
+    }
 }
+
+fun Context?.toast(@StringRes msgId: Int) { this?.toast(this.getString(msgId)) }
+fun Context?.toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+fun Context?.toastLong(@StringRes msgId: Int) { this?.toastLong(this.getString(msgId)) }
+fun Context?.toastLong(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()

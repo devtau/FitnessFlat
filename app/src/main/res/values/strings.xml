@@ -1,69 +1,214 @@
 <resources>
-    <string name="app_name">Iron Heroes</string>
-    <string name="heroes">Герои</string>
-    <string name="hero">Герой</string>
-    <string name="champions">Чемпионы</string>
-    <string name="champion">Чемпион</string>
-    <string name="trainings">Тренировки</string>
-    <string name="choose_action">Выберите действие</string>
-    <string name="hero_edit">Редактировать героя</string>
-    <string name="hero_add">Добавить героя</string>
-    <string name="champion_edit">Редактировать чемпиона</string>
-    <string name="champion_add">Добавить чемпиона</string>
-    <string name="training_edit">Редактировать тренировку</string>
-    <string name="training_add">Добавить тренировку</string>
-    <string name="exercise_add">Добавить упражнение</string>
-    <string name="wait_for_sms">Ожидайте СМС с кодом подтверждения</string>
-    <string name="first_name">Имя</string>
-    <string name="second_name">Фамилия</string>
-    <string name="phone">Телефон</string>
-    <string name="email">Email</string>
-    <string name="birthday">День рождения</string>
-    <string name="date">Дата</string>
-    <string name="gender">Пол</string>
-    <string name="is_champion">Это тренер</string>
-    <string name="use_vk_avatar">Использовать аватар ВК</string>
-    <string name="vk_id">ID Вконтакте</string>
-    <string name="vk_id_base">https://vk.com/</string>
-    <string name="vk_id_formatter" formatted="false" translatable="false">https://vk.com/%s</string>
-    <string name="phone_empty">Заполните телефон</string>
-    <string name="email_empty">Заполните email</string>
-    <string name="vk_id_empty">Заполните ник или id героя</string>
-    <string name="not_filled">не заполнено</string>
-    <string name="hero_not_saved">Новый герой не сохранен.\nДействительно выйти?</string>
-    <string name="champion_not_saved">Новый чемпион не сохранен.\nДействительно выйти?</string>
-    <string name="training_not_saved">Новая тренировка не сохранена.\nДействительно выйти?</string>
-    <string name="delete">Удалить</string>
-    <string name="confirm_delete">Подтвердите удаление</string>
-    <string name="exercises">Упражнения:</string>
-    <string name="exercise">Упражнение</string>
-    <string name="weight">Вес</string>
-    <string name="count">Повторы</string>
-	<string name="error_formatter" formatted="false">Ошибка: %s</string>
-    <string name="cancel">Отмена</string>
-    <string name="save">Сохранить</string>
-    <string name="filters">Фильтры</string>
-	
-	<string name="check_internet_connection">Проверьте подключение к сети интернет</string>
-    <string name="serializable_object_changed">Похоже, что изменился один из сериализуемых объектов, получаемых от сервера</string>
-    <string name="internal_server_error">Извините, кажется у нас ошибка на сервере. Повторите запрос позже</string>
-    <string name="not_ready">Повторите запрос позже</string>
-    <string name="device_offline">Нет интернета</string>
-    <string name="too_many_requests">Слишком много попыток. Повторите запрос позже</string>
-    <string name="comment">Заметки</string>
-    
-    <string name="permission_needed">Требуется разрешение</string>
-    <string name="permission_cancelled_msg_gps">Доступ к GPS-датчику отклонен</string>
-    <string name="permission_explanation_gps">Приложению необходим доступ к GPS-датчику. Если вы не хотите видеть этот вопрос, нажмите далее</string>
-    <string name="permission_cancelled_msg_call">Доступ к звонкам отклонен</string>
-    <string name="permission_explanation_call">Разрешите приложению совершать звонки для связи с героями. Если вы не хотите видеть этот вопрос, нажмите далее</string>
-    <string name="permission_explanation_storage">Разрешите приложению доступ к карте памяти для выбора изображения</string>
-    <string name="permission_cancelled_msg_storage">Доступ к карте памяти отклонен</string>
-    <string name="further">далее</string>
-    <string name="previous_exercise_data">Прошлый раз вы выполнили это упражнение:</string>
-    <string name="no_data">нет данных</string>
-    <string name="previous_training_data_formatter" formatted="false">%s %s x %s</string>
-    
-    <!--TODO: заполнить из профиля приложения-->
     <integer name="com_vk_sdk_AppId" translatable="false">7173607</integer>
+    
+    <string name="day_formatter" formatted="false" translatable="false">%d\n%s</string>
+    <string name="hour_formatter" formatted="false" translatable="false">%d:00</string>
+    <string name="vk_id_base" translatable="false">https://vk.com/</string>
+    <string name="vk_id_formatter" formatted="false" translatable="false">https://vk.com/%s</string>
+    <string name="permission_explanation_formatter" formatted="false" translatable="false">%s.\n%s</string>
+    <string name="one" translatable="false">1</string>
+    <string name="two" translatable="false">2</string>
+    <string name="three" translatable="false">3</string>
+    <string name="four" translatable="false">4</string>
+    
+    <string name="app_name">Iron Heroes</string>
+    <string name="heroes">Heroes</string>
+    <string name="trainees">Heroes (trainees)</string>
+    <string name="hero">Hero</string>
+    <string name="champions">Champions</string>
+    <string name="trainers">Champions (trainers)</string>
+    <string name="champion">Champion</string>
+    <string name="trainings">Workouts</string>
+    <string name="statistics">Statistics</string>
+    <string name="database">Database</string>
+    <string name="export_to_file">Export to file</string>
+    <string name="import_from_file">Import from file</string>
+    <string name="export_error">Error while saving file</string>
+    <string name="exported_formatter" formatted="false">%s and %s\nsaved to file at \"Downloads\" folder</string>
+    <string name="imported_formatter" formatted="false">%s and %s\nread from file</string>
+    <string name="choose_action">Choose action</string>
+    <string name="hero_edit">Edit hero</string>
+    <string name="hero_add">Add hero</string>
+    <string name="champion_edit">Edit champion</string>
+    <string name="champion_add">Add champion</string>
+    <string name="training_edit">Edit workout</string>
+    <string name="training_add">Add workout</string>
+    <string name="exercise_add">Add exercise</string>
+    <string name="wait_for_sms">Expect SMS with verification code</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="phone">Phone</string>
+    <string name="email">Email</string>
+    <string name="birthday">Birthday</string>
+    <string name="date">Date</string>
+    <string name="gender">Gender</string>
+    <string name="is_champion">Is champion</string>
+    <string name="use_vk_avatar">Use avatar Vkontakte</string>
+    <string name="vk_id">ID Vkontakte</string>
+    <string name="phone_empty">Fill in the phone</string>
+    <string name="email_empty">Fill in email</string>
+    <string name="vk_id_empty">Fill in hero nickname or id</string>
+    <string name="not_filled">not filled</string>
+    <string name="hero_not_saved">New hero not saved.\nContinue exit?</string>
+    <string name="champion_not_saved">New champion not saved.\nContinue exit?</string>
+    <string name="training_not_saved">New workout not saved.\nContinue exit?</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_delete">Confirm deletion</string>
+    <string name="exercises">Exercises:</string>
+    <string name="exercise">Exercise</string>
+    <string name="weight">Weight</string>
+    <string name="count">Count</string>
+    <string name="error_formatter" formatted="false">Error: %s</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="filters">Filters</string>
+    
+    <string name="check_internet_connection">Check your internet connection</string>
+    <string name="serializable_object_changed">It looks like one of the serializable objects received from the server has changed</string>
+    <string name="internal_server_error">Sorry, it seems we have a server error. Please try again later</string>
+    <string name="not_ready">Try again later</string>
+    <string name="device_offline">Device offline</string>
+    <string name="too_many_requests">Too many attempts. Please try again later</string>
+    <string name="comment">Notes</string>
+    
+    <string name="permission_needed">Permission required</string>
+    <string name="permission_cancelled_msg_gps">GPS sensor access denied</string>
+    <string name="permission_explanation_gps">The app needs access to the GPS sensor</string>
+    <string name="permission_cancelled_msg_call">Calls access denied</string>
+    <string name="permission_explanation_call">Allow the app to make calls to communicate with the heroes</string>
+    <string name="permission_explanation_storage">Allow the application to access the memory card to export / import the file</string>
+    <string name="to_disable_press_further">If you do not want to see this question, click further</string>
+    <string name="permission_cancelled_msg_storage">Access to memory card declined</string>
+    <string name="further">Further</string>
+    <string name="previous_exercise_data">Last time you completed this exercise:</string>
+    <string name="no_data">there is no data</string>
+    <string name="previous_training_data_formatter" formatted="false">%s %s x %s x %s</string>
+    <string name="settings">Settings</string>
+    <string name="other">Other</string>
+    <string name="show_champion_filter">Show champion filter</string>
+    <string name="show_hero_filter">Show hero filter</string>
+    <string name="show_edit_dialog_at_statistics_screen">Show edit dialog at statistics screen on balloon click</string>
+    <string name="selected">Selected:</string>
+    <string name="no_exercise_data">You have not done this exercise yet</string>
+    <string name="load_demo_configuration">Load demo configuration?</string>
+    <string name="clear_db">Clear database</string>
+    <string name="clear_db_confirm">You are about to remove all workouts, exercises in these workouts, heroes and champions. Proceed?</string>
+    <string name="next_set">Next set</string>
+    <string name="recreation">Recreation</string>
+    <string name="recreation_formatter" formatted="false">It was %s recreation</string>
+    
+    <string name="roma_first_name">Roman</string>
+    <string name="anton_first_name">Antony</string>
+    <string name="denis_first_name">Denis</string>
+    <string name="masha_first_name">Mary</string>
+    <string name="eugen_first_name">Eugen</string>
+    
+    <string name="roma_last_name">Bogdanov</string>
+    <string name="anton_last_name">Shukin</string>
+    <string name="denis_last_name">Russikh</string>
+    <string name="masha_last_name">Chernyichkina</string>
+    <string name="eugen_last_name">Strimanov</string>
+    
+    
+    //Chest
+    <string name="barbell_bench_press_top">Barbell bench press (top)</string>
+    <string name="barbell_bench_press_mid">Barbell bench press (mid)</string>
+    <string name="barbell_bench_press_low">Barbell bench press (low)</string>
+    <string name="machine_bench_press_top">Machine bench press (top)</string>
+    <string name="machine_bench_press_mid">Machine bench press (mid)</string>
+    <string name="machine_bench_press_low">Machine bench press (low)</string>
+    <string name="dumbbells_bench_press_top">Dumbbells bench press (top)</string>
+    <string name="dumbbells_bench_press_mid">Dumbbells bench press (mid)</string>
+    <string name="dumbbells_bench_press_low">Dumbbells bench press (low)</string>
+    <string name="eagle_bench_press">Eagle bench press</string>
+    <string name="dumbbells_fly_top">Dumbbells fly (top)</string>
+    <string name="dumbbells_fly_mid">Dumbbells fly (mid)</string>
+    <string name="dumbbells_fly_low">Dumbbells fly (low)</string>
+    <string name="push_ups">Push-ups</string>
+    <string name="dumbbells_push_ups">Dumbbells push-ups</string>
+    <string name="trx_push_ups">TRX push-ups</string>
+    
+    //Biceps
+    <string name="sitting_dumbbell_curl">Sitting dumbbell curl</string>
+    <string name="sitting_dumbbell_curl_scott">Sitting dumbbell curl (Scott)</string>
+    <string name="standing_dumbbell_curl">Standing dumbbell curl</string>
+    <string name="standing_barbell_curl">Standing barbell curl</string>
+    <string name="reverse_barbell_curl">Reverse barbell curl</string>
+    <string name="hammer_curls">Hammer curls</string>
+    
+    //Delta
+    <string name="dumbbell_cuban_press">Dumbbell cuban press</string>
+    <string name="trio_swings">Trio swings</string>
+    <string name="front_muscle_bundle_swings">Front muscle bundle swings</string>
+    <string name="mid_muscle_bundle_swings">Mid muscle bundle swings</string>
+    <string name="rear_muscle_bundle_swings">Rear muscle bundle swings</string>
+    <string name="front_plate_raise">Front plate raise</string>
+    <string name="dumbbell_press_above_head">Dumbbell press above head</string>
+    <string name="military_press">Military press</string>
+    
+    //Back
+    <string name="upper_block_pull">Upper block pull</string>
+    <string name="lower_block_pull">Lower block pull</string>
+    <string name="belt_dumbbell_pull">Belt dumbbell pull</string>
+    <string name="belt_dumbbells_pull_on_bench">Belt dumbbells pull on bench</string>
+    <string name="pullover">Pullover</string>
+    <string name="pull_ups">Pull-ups</string>
+    <string name="hyperextension">Hyperextension</string>
+    <string name="upright_barbell_rows">Upright barbell rows</string>
+    <string name="dumbbells_shrug">Dumbbells shrug</string>
+    <string name="barbell_shrug">Barbell shrug</string>
+    
+    //Triceps
+    <string name="close_grip_bench_press">Close-grip bench press</string>
+    <string name="triceps_extension_in_machine">Extension in machine</string>
+    <string name="french_press">French press</string>
+    <string name="french_press_in_machine">French press in machine</string>
+    
+    //Legs
+    <string name="leg_extension">Leg extension</string>
+    <string name="bend_over_in_trx">Bend over in TRX</string>
+    <string name="lunges">Lunges</string>
+    <string name="biceps_flexion_while_standing">Biceps flexion while standing</string>
+    <string name="biceps_flexion_while_lying">Biceps flexion while lying</string>
+    <string name="squats_in_TRX">Squats in TRX</string>
+    <string name="romanian_deadlift">Romanian deadlift</string>
+    <string name="barbell_squat">Barbell squat</string>
+    <string name="lunges_standing">Lunges with dumbbells standing</string>
+    <string name="bridge">Bridge</string>
+    <string name="deadlift">Deadlift</string>
+    
+    //Press
+    <string name="press_in_trx_horizontally">Press in TRX horizontally</string>
+    <string name="book_press">Book press</string>
+    <string name="book_in_trx">Book press in TRX</string>
+    <string name="russian_twisting">Russian twisting</string>
+    
+    //Muscle groups
+    <string name="chest">Chest</string>
+    <string name="biceps">Biceps</string>
+    <string name="triceps">Triceps</string>
+    <string name="delta">Delta</string>
+    <string name="back">Back</string>
+    <string name="press">Press</string>
+    <string name="shrugs">Shrugs</string>
+    <string name="legs">Legs</string>
+    
+    
+    <plurals name="trainings">
+        <item quantity="one">%d workout</item>
+        <item quantity="many">%d workouts</item>
+        <item quantity="other">%d workouts</item>
+    </plurals>
+    
+    <plurals name="exercises">
+        <item quantity="one">%d exercise</item>
+        <item quantity="many">%d exercises</item>
+        <item quantity="other">%d exercises</item>
+    </plurals>
+    
+    <plurals name="seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="many">%d seconds</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
 </resources>

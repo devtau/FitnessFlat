@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     
     <application
         android:name=".IronHeroesApp"
@@ -21,22 +23,30 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         
-        <activity android:name=".ui.activities.launcher.LauncherActivity">
+        <activity android:name=".ui.activities.functions.FunctionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
     
-        <activity android:name=".ui.activities.DBViewerActivity"/>
         <activity android:name=".ui.activities.heroesList.HeroesActivity"/>
         <activity android:name=".ui.activities.heroDetails.HeroDetailsActivity"/>
-        <activity android:name=".ui.activities.trainingsList.TrainingsActivity"/>
+        <activity android:name="com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment"/>
         <activity android:name=".ui.activities.trainingDetails.TrainingDetailsActivity"/>
+        <activity android:name="com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment"/>
     
         <activity
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent"/>
+        
+        <service
+            android:name=".FirebaseReceiverService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <receiver android:name=".util.AlarmReceiver"/>
     </application>
 </manifest>

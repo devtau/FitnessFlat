@@ -1,7 +1,10 @@
 package com.devtau.ironHeroes.data.model
 
+import android.content.Context
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.devtau.ironHeroes.util.AppUtils
 import java.util.*
 
@@ -11,14 +14,15 @@ import java.util.*
     ignoredColumns = ["champion", "hero", "exercises"]
 )
 class Training(
-    id: Long?,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "trainingId")
+    var id: Long?,
     var championId: Long?,
     var champion: Hero?,
     var heroId: Long?,
     var hero: Hero?,
     var date: Long,
     var exercises: List<ExerciseInTraining>? = null
-): DataObject(id) {
+) {
 
     constructor(id: Long?, championId: Long?, heroId: Long?, date: Long):
             this(id, championId, null, heroId, null, date, null)
@@ -43,10 +47,10 @@ class Training(
         fun allObligatoryPartsPresent(championId: Long?, heroId: Long?, date: Long?) =
             championId != null && heroId != null && date != null
 
-        fun getMock(): List<Training> {
-            val roma = Hero.getMockChampions()[0]
-            val anton = Hero.getMockChampions()[1]
-            val denis = Hero.getMockHeroes()[0]
+        fun getMock(c: Context): List<Training> {
+            val roma = Hero.getMockChampions(c)[0]
+            val anton = Hero.getMockChampions(c)[1]
+            val denis = Hero.getMockHeroes(c)[0]
 
             return listOf(
                 Training(1, anton.id, denis.id, AppUtils.parseDateTime("8.10.2019 8:00").timeInMillis),
@@ -69,9 +73,17 @@ class Training(
                 Training(14, anton.id, denis.id, AppUtils.parseDateTime("05.11.2019 9:00").timeInMillis),
                 Training(15, roma.id, denis.id, AppUtils.parseDateTime("08.11.2019 9:00").timeInMillis),
 
+                Training(16, anton.id, denis.id, AppUtils.parseDateTime("11.11.2019 10:00").timeInMillis),
+                Training(17, roma.id, denis.id, AppUtils.parseDateTime("14.11.2019 9:00").timeInMillis),
+                Training(18, roma.id, denis.id, AppUtils.parseDateTime("15.11.2019 9:00").timeInMillis),
 
-                Training(101, roma.id, Hero.getMockHeroes()[1].id, AppUtils.parseDateTime("21.10.2019 9:30").timeInMillis),
-                Training(102, roma.id, Hero.getMockHeroes()[2].id, AppUtils.parseDateTime("21.10.2019 10:00").timeInMillis)
+                Training(19, anton.id, denis.id, AppUtils.parseDateTime("18.11.2019 9:00").timeInMillis),
+                Training(20, roma.id, denis.id, AppUtils.parseDateTime("21.11.2019 9:00").timeInMillis),
+                Training(21, anton.id, denis.id, AppUtils.parseDateTime("22.11.2019 9:00").timeInMillis),
+
+
+                Training(101, roma.id, Hero.getMockHeroes(c)[1].id, AppUtils.parseDateTime("21.10.2019 9:30").timeInMillis),
+                Training(102, roma.id, Hero.getMockHeroes(c)[2].id, AppUtils.parseDateTime("21.10.2019 10:00").timeInMillis)
             )
         }
     }

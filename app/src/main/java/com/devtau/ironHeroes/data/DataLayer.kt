@@ -9,11 +9,11 @@ interface DataLayer {
     fun deleteHeroes(list: List<Hero?>?)
 
     fun updateTrainings(list: List<Training?>?)
-    fun updateTraining(training: Training?): Long
+    fun updateTraining(training: Training?, listener: Consumer<Long>? = null)
     fun deleteTrainings(list: List<Training?>?)
 
-    fun updateExercises(list: List<Exercise?>?)
-    fun deleteExercises(list: List<Exercise?>?)
+    fun updateExercises(list: List<Exercise>)
+    fun deleteExercises(list: List<Exercise>?)
 
     fun updateExercisesInTraining(list: List<ExerciseInTraining?>?)
     fun deleteExercisesInTraining(list: List<ExerciseInTraining?>?)
@@ -36,6 +36,7 @@ interface DataLayer {
 
     fun getExerciseInTraining(id: Long, listener: Consumer<ExerciseInTraining?>): Disposable
     fun getExercisesInTraining(trainingId: Long, listener: Consumer<List<ExerciseInTraining>?>): Disposable
+    fun getAllExercisesInTrainings(heroId: Long, listener: Consumer<List<ExerciseInTraining>?>): Disposable
 
     fun getMuscleGroup(id: Long, listener: Consumer<MuscleGroup?>): Disposable
     fun getMuscleGroups(listener: Consumer<List<MuscleGroup>?>): Disposable
@@ -47,5 +48,6 @@ interface DataLayer {
     fun getExercisesAndClose(listener: Consumer<List<Exercise>?>)
     fun getExercisesInTrainingAndClose(trainingId: Long, listener: Consumer<List<ExerciseInTraining>?>)
     fun getExerciseInTrainingAndClose(id: Long, listener: Consumer<ExerciseInTraining?>)
-    fun getAllExercisesInTrainingsAndClose(heroId: Long, maxRelevantDate: Long, listener: Consumer<List<ExerciseInTraining>?>)
+    fun getAllExercisesInTrainingsAndClose(heroId: Long, maxRelevantDate: Long, sortAscending: Boolean, listener: Consumer<List<ExerciseInTraining>?>)
+    fun getAllTrainingsAndClose(listener: Consumer<List<Training>?>)
 }

@@ -18,6 +18,7 @@ import com.devtau.ironHeroes.enums.HumanType
     ExerciseInTraining::class
 ], version = SQLHelper.DB_VERSION)
 @TypeConverters(HumanType.Converter::class)
+
 abstract class DB: RoomDatabase() {
 
     abstract fun heroDao(): HeroDao

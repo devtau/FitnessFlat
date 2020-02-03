@@ -33,9 +33,8 @@ object Threading {
     fun asyncDelayed(block: Consumer<Long>, initDelayMS: Long): Disposable =
             Observable.timer(initDelayMS, TimeUnit.MILLISECONDS, Schedulers.io()).subscribe(block)
 
-    fun <T> async(task: Callable<T>): Disposable = async(task, null, null)
-    fun <T> async(task: Callable<T>, finished: Consumer<T>): Disposable = async(task, finished, null)
-    fun <T> async(task: Callable<T>, finished: Consumer<T>?, onError: Consumer<Throwable>?): Disposable =
+
+    fun <T> async(task: Callable<T>, finished: Consumer<T>? = null, onError: Consumer<Throwable>? = null): Disposable =
             Single.fromCallable(task)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

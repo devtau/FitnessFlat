@@ -2,25 +2,24 @@ package com.devtau.ironHeroes.ui.activities.trainingDetails
 
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.DataLayer
-import com.devtau.ironHeroes.data.model.*
-import com.devtau.ironHeroes.rest.NetworkLayer
+import com.devtau.ironHeroes.data.model.Exercise
+import com.devtau.ironHeroes.data.model.ExerciseInTraining
+import com.devtau.ironHeroes.data.model.Hero
+import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
-import com.devtau.ironHeroes.util.Threading
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
-import java.util.concurrent.Callable
 
 class TrainingDetailsPresenterImpl(
-    private val view: TrainingDetailsView,
+    private val view: TrainingDetailsContract.View,
     private val dataLayer: DataLayer,
-    private val networkLayer: NetworkLayer,
     private val prefs: PreferencesManager,
     private var trainingId: Long?
-): DBSubscriber(), TrainingDetailsPresenter {
+): DBSubscriber(), TrainingDetailsContract.Presenter {
 
     private var training: Training? = null
     private var champions: List<Hero>? = null
@@ -47,6 +46,7 @@ class TrainingDetailsPresenterImpl(
         val trainingId = trainingId
         if (trainingId != null) {
             disposeOnStop(dataLayer.getExercisesInTraining(trainingId, Consumer {
+                if (isOnlyOrderOfListChanged(exercisesInTraining, it)) return@Consumer
                 exercisesInTraining = it
                 publishDataToView()
             }))
@@ -60,18 +60,18 @@ class TrainingDetailsPresenterImpl(
     override fun updateTrainingData(championIndex: Int, heroIndex: Int, date: Calendar?) {
         val championId = champions?.get(championIndex)?.id
         val heroId = heroes?.get(heroIndex)?.id
-        val trainingDate = date?.timeInMillis ?: Calendar.getInstance().timeInMillis
+        val trainingDate = date?.timeInMillis ?: AppUtils.getRoundDate().timeInMillis
         val allPartsPresent = Training.allObligatoryPartsPresent(championId, heroId, trainingDate)
         val someFieldsChanged = training?.someFieldsChanged(championId, heroId, trainingDate) ?: true
         Logger.d(LOG_TAG, "updateTrainingData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
         if (allPartsPresent && someFieldsChanged) {
             training = Training(trainingId, championId!!, heroId!!, trainingDate)
-            Threading.async(Callable {
-                trainingId = dataLayer.updateTraining(training)
+            dataLayer.updateTraining(training, Consumer {
+                trainingId = it
                 if (training?.id == null) {
                     training?.id = trainingId
-                    disposeOnStop(dataLayer.getExercisesInTraining(trainingId!!, Consumer {
-                        exercisesInTraining = it
+                    disposeOnStop(dataLayer.getExercisesInTraining(trainingId!!, Consumer { exercises ->
+                        exercisesInTraining = exercises
                         publishDataToView()
                     }))
                 }
@@ -103,6 +103,7 @@ class TrainingDetailsPresenterImpl(
 
     override fun deleteTraining() {
         view.showMsg(R.string.confirm_delete, Action {
+            dataLayer.deleteExercisesInTraining(training?.exercises)
             dataLayer.deleteTrainings(listOf(training))
             view.closeScreen()
         })
@@ -110,9 +111,22 @@ class TrainingDetailsPresenterImpl(
 
     override fun provideExercises(): List<ExerciseInTraining>? = training?.exercises
     override fun provideTraining() = training
+
+    override fun onExerciseMoved(fromPosition: Int, toPosition: Int) {
+        val exercises = training?.exercises as ArrayList<ExerciseInTraining>?
+        if (exercises == null || exercises.isEmpty()) return
+        val item = exercises.removeAt(fromPosition)
+        exercises.add(toPosition, item)
+
+        for ((i, next) in exercises.withIndex()) next.position = i
+        dataLayer.updateExercisesInTraining(exercises)
+    }
+
+    override fun addExerciseClicked() = view.showNewExerciseDialog(getNextExercisePosition())
     //</editor-fold>
 
 
+    //<editor-fold desc="Private methods">
     private fun getSpinnerStrings(list: List<Hero>?): List<String> {
         val spinnerStrings = ArrayList<String>()
         if (list != null) for (next in list) spinnerStrings.add(next.getName())
@@ -121,8 +135,10 @@ class TrainingDetailsPresenterImpl(
 
     private fun getSelectedItemIndex(list: List<Hero>?, selectedId: Long?): Int {
         var index = 0
-        if (list != null) for (i in list.indices)
-            if (list[i].id == selectedId) index = i
+        if (list != null)
+            for ((i, next) in list.withIndex())
+                if (next.id == selectedId)
+                    index = i
         return index
     }
 
@@ -133,13 +149,16 @@ class TrainingDetailsPresenterImpl(
 
         val championId = training?.championId ?: prefs.favoriteChampionId
         val heroId = training?.heroId ?: prefs.favoriteHeroId
-        view.showChampions(getSpinnerStrings(champions), getSelectedItemIndex(champions, championId))
-        view.showHeroes(getSpinnerStrings(heroes), getSelectedItemIndex(heroes, heroId))
+        val championIndex = getSelectedItemIndex(champions, championId)
+        val heroIndex = getSelectedItemIndex(heroes, heroId)
+        view.showChampions(getSpinnerStrings(champions), championIndex)
+        view.showHeroes(getSpinnerStrings(heroes), heroIndex)
 
         if (trainingId == null) {
             view.showScreenTitle(true)
             view.showTrainingDate(AppUtils.getRoundDate())
             view.showDeleteTrainingBtn(false)
+            updateTrainingData(championIndex, heroIndex, null)
         } else {
             val exercises = exercises
             val exercisesInTraining = exercisesInTraining
@@ -161,6 +180,32 @@ class TrainingDetailsPresenterImpl(
                 "champions size=${champions?.size}, " +
                 "heroes size=${heroes?.size}")
     }
+
+    private fun isOnlyOrderOfListChanged(oldList: List<ExerciseInTraining>?, newList: List<ExerciseInTraining>?): Boolean {
+        when {
+            oldList == null || newList == null -> return false
+            oldList.size != newList.size -> return false
+            else -> {
+                for (nextOld in oldList) {
+                    var found = false
+                    for (nextNew in newList) if (nextNew == nextOld) found = true
+                    if (!found) return false
+                }
+                return true
+            }
+        }
+    }
+
+    private fun getNextExercisePosition(): Int {
+        val exercises = training?.exercises
+        return if (exercises == null || exercises.isEmpty()) 0
+        else {
+            var maxPosition = 0
+            for (next in exercises) if (next.position > maxPosition) maxPosition = next.position
+            maxPosition + 1
+        }
+    }
+    //</editor-fold>
 
 
     companion object {

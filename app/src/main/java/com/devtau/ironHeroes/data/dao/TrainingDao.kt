@@ -15,7 +15,7 @@ interface TrainingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(training: Training?): Long
 
-    @Query("SELECT * FROM Trainings WHERE id = :id")
+    @Query("SELECT * FROM Trainings WHERE trainingId = :id")
     fun getById(id: Long): Flowable<TrainingRelation>
 
     @Transaction

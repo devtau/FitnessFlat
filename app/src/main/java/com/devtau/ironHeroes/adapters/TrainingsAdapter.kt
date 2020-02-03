@@ -6,20 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.adapters.viewHolders.TrainingsViewHolder
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.util.Animator
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.Threading
 import io.reactivex.functions.Consumer
+import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.list_item_training.*
 
 class TrainingsAdapter(
     private var trainings: List<Training>?,
     private val listener: Consumer<Training>
-): RecyclerView.Adapter<TrainingsViewHolder>() {
+): RecyclerView.Adapter<TrainingsAdapter.TrainingsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrainingsViewHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.list_item_training, parent, false)
@@ -29,18 +31,22 @@ class TrainingsAdapter(
     override fun onBindViewHolder(holder: TrainingsViewHolder, position: Int) {
         val training = trainings?.get(position) ?: return
         Logger.v(LOG_TAG, "onBindViewHolder. training=$training")
-        Glide.with(holder.context).load(
+        Glide.with(holder.championImage).load(
             if (!TextUtils.isEmpty(training.champion?.avatarUrl)) training.champion?.avatarUrl
             else if (training.champion?.avatarId != null) training.champion?.avatarId
             else null)
-            .transition(DrawableTransitionOptions.withCrossFade()).into(holder.championImage)
+            .transform(CircleCrop())
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(holder.championImage)
         holder.date.text = AppUtils.formatDateTimeWithWeekDay(training.date)
-        Glide.with(holder.context).load(
+        Glide.with(holder.championImage).load(
             if (!TextUtils.isEmpty(training.hero?.avatarUrl)) training.hero?.avatarUrl
             else if (training.hero?.avatarId != null) training.hero?.avatarId
             else null)
-            .transition(DrawableTransitionOptions.withCrossFade()).into(holder.heroImage)
-        holder.root.setOnClickListener { listener.accept(training) }
+            .transform(CircleCrop())
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(holder.heroImage)
+        holder.containerView.setOnClickListener { listener.accept(training) }
     }
 
     override fun getItemCount(): Int = trainings?.size ?: 0
@@ -61,6 +67,10 @@ class TrainingsAdapter(
             notifyDataSetChanged()
         }
     }
+
+
+    class TrainingsViewHolder(override val containerView: View):
+        RecyclerView.ViewHolder(containerView), LayoutContainer
 
 
     companion object {
