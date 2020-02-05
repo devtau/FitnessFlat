@@ -3,19 +3,21 @@ package com.devtau.ironHeroes.ui.activities.heroDetails
 import android.app.DatePickerDialog
 import android.content.Context
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.DataLayer
+import com.devtau.ironHeroes.data.dao.HeroDao
 import com.devtau.ironHeroes.data.model.Hero
+import com.devtau.ironHeroes.data.subscribeDefault
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
+import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
 
 class HeroDetailsPresenterImpl(
     private val view: HeroDetailsContract.View,
-    private val dataLayer: DataLayer,
+    private val heroDao: HeroDao,
     private val heroId: Long?,
     private val humanType: HumanType
 ): DBSubscriber(), HeroDetailsContract.Presenter {
@@ -31,14 +33,17 @@ class HeroDetailsPresenterImpl(
             view.showDeleteHeroBtn(false)
             view.showHumanType(humanType)
         } else {
-            dataLayer.getHeroByIdAndClose(heroId, Consumer {
-                hero = it
-                val humanType = hero?.humanType ?: HumanType.HERO
-                view.showHeroDetails(hero)
-                view.showScreenTitle(hero == null, humanType)
-                view.showDeleteHeroBtn(hero != null)
-                view.showHumanType(humanType)
-            })
+            var disposable: Disposable? = null
+            disposable = heroDao.getById(heroId)
+                .subscribeDefault(Consumer {
+                    hero = it
+                    val humanType = hero?.humanType ?: HumanType.HERO
+                    view.showHeroDetails(hero)
+                    view.showScreenTitle(hero == null, humanType)
+                    view.showDeleteHeroBtn(hero != null)
+                    view.showHumanType(humanType)
+                    disposable?.dispose()
+                }, "heroDao.getById")
         }
     }
 
@@ -52,7 +57,7 @@ class HeroDetailsPresenterImpl(
         if (allPartsPresent && someFieldsChanged) {
             hero = Hero(heroId, humanType, firstName!!, secondName!!, phone!!, gender!!, vkId, email,
                 AppUtils.parseDate(birthDay).timeInMillis, avatarUrl, avatarId ?: hero?.avatarId)
-            dataLayer.updateHeroes(listOf(hero))
+            heroDao.insert(listOf(hero)).subscribeDefault("updateHeroes. inserted")
         }
     }
 
@@ -88,7 +93,7 @@ class HeroDetailsPresenterImpl(
 
     override fun deleteHero() {
         view.showMsg(R.string.confirm_delete, Action {
-            dataLayer.deleteHeroes(listOf(hero))
+            heroDao.delete(listOf(hero)).subscribeDefault("deleteHeroes. deleted")
             view.closeScreen()
         })
     }

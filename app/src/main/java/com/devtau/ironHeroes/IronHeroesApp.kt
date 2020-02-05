@@ -6,9 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
-import com.devtau.ironHeroes.data.DataLayerImpl
 import com.devtau.ironHeroes.enums.ChannelStats
-import com.devtau.ironHeroes.rest.NetworkLayerImpl
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
@@ -21,8 +19,6 @@ class IronHeroesApp: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        DataLayerImpl.init(this)
-        NetworkLayerImpl.init(this)
         PreferencesManager.init(this)
 
         FirebaseApp.initializeApp(this)

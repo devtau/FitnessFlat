@@ -17,19 +17,15 @@ interface ExerciseInTrainingDao {
 
     @Transaction
     @Query("SELECT * FROM ExercisesInTraining WHERE trainingId = :trainingId ORDER BY position ASC")
-    fun getList(trainingId: Long): Flowable<List<ExerciseInTrainingRelation>>
+    fun getListForTraining(trainingId: Long): Flowable<List<ExerciseInTrainingRelation>>
 
     @Transaction
-    @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.trainingId WHERE heroId = :heroId AND Trainings.date < :maxDate ORDER BY Trainings.date DESC")
-    fun getListForHeroDesc(heroId: Long, maxDate: Long): Flowable<List<ExerciseInTrainingRelation>>
-
-    @Transaction
-    @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.trainingId WHERE heroId = :heroId AND Trainings.date < :maxDate ORDER BY Trainings.date ASC")
-    fun getListForHeroAsc(heroId: Long, maxDate: Long): Flowable<List<ExerciseInTrainingRelation>>
+    @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.trainingId WHERE heroId = :heroId ORDER BY Trainings.date DESC")
+    fun getListForHeroDesc(heroId: Long): Flowable<List<ExerciseInTrainingRelation>>
 
     @Transaction
     @Query("SELECT * FROM ExercisesInTraining JOIN Trainings ON ExercisesInTraining.trainingId = Trainings.trainingId WHERE heroId = :heroId ORDER BY Trainings.date ASC")
-    fun getListAsc(heroId: Long): Flowable<List<ExerciseInTrainingRelation>>
+    fun getListForHeroAsc(heroId: Long): Flowable<List<ExerciseInTrainingRelation>>
 
     @Delete
     fun delete(list: List<ExerciseInTraining?>): Completable

@@ -27,18 +27,6 @@ class Hero(
     var avatarUrl: String?,
     var avatarId: Int?
 ) {
-    fun deepEquals(other: Hero?) =
-        id == other?.id
-                && humanType == other?.humanType
-                && firstName == other.firstName
-                && secondName == other.secondName
-                && phone == other.phone
-                && gender == other.gender
-                && vkId == other.vkId
-                && email == other.email
-                && birthDay == other.birthDay
-                && avatarUrl == other.avatarUrl
-                && avatarId == other.avatarId
 
     fun getName(): String = when {
         firstName.isNotEmpty() && secondName.isNotEmpty() -> "$firstName $secondName"
@@ -81,18 +69,10 @@ class Hero(
 
         fun getMockHeroes(c: Context): List<Hero> {
             val denisPhone = if (BuildConfig.DEBUG) "+79219781372" else "+79210000000"
-            val mashaPhone = if (BuildConfig.DEBUG) "+79210000000" else "+79210000000"
-            val eugenPhone = if (BuildConfig.DEBUG) "+79210000000" else "+79210000000"
             return listOf(
                 Hero(3, HumanType.HERO, c.getString(R.string.denis_first_name), c.getString(R.string.denis_last_name),
                     denisPhone, Gender.MALE.code, "devtau", "d29025@yandex.ru",
-                    AppUtils.parseDate("25.09.1983").timeInMillis, null, R.drawable.denis),
-                Hero(4, HumanType.HERO, c.getString(R.string.masha_first_name), c.getString(R.string.masha_last_name),
-                    mashaPhone, Gender.FEMALE.code, "iiaquamarieii", "d29026@yandex.ru",
-                    AppUtils.parseDate("26.05.1993").timeInMillis, null, R.drawable.masha),
-                Hero(5, HumanType.HERO, c.getString(R.string.eugen_first_name), c.getString(R.string.eugen_last_name),
-                    eugenPhone, Gender.MALE.code, "uginstarr", "d29027@yandex.ru",
-                    AppUtils.parseDate("25.10.1993").timeInMillis, null, R.drawable.evgen))
+                    AppUtils.parseDate("25.09.1983").timeInMillis, null, R.drawable.denis))
         }
 
 //        "https://yadi.sk/i/hZhu1zg73GNum4"
