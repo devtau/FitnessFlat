@@ -1,22 +1,31 @@
 package com.devtau.ironHeroes.ui.activities.trainingDetails
 
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.DataLayer
+import com.devtau.ironHeroes.data.dao.*
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
+import com.devtau.ironHeroes.data.relations.ExerciseInTrainingRelation
+import com.devtau.ironHeroes.data.relations.ExerciseRelation
+import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
+import com.devtau.ironHeroes.util.Threading
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
+import java.util.concurrent.Callable
 
 class TrainingDetailsPresenterImpl(
     private val view: TrainingDetailsContract.View,
-    private val dataLayer: DataLayer,
+    private val heroDao: HeroDao,
+    private val trainingDao: TrainingDao,
+    private val exerciseDao: ExerciseDao,
+    private val exerciseInTrainingDao: ExerciseInTrainingDao,
     private val prefs: PreferencesManager,
     private var trainingId: Long?
 ): DBSubscriber(), TrainingDetailsContract.Presenter {
@@ -30,30 +39,40 @@ class TrainingDetailsPresenterImpl(
 
     //<editor-fold desc="Presenter overrides">
     override fun restartLoaders() {
-        disposeOnStop(dataLayer.getExercises(Consumer {
-            exercises = it
-            publishDataToView()
-        }))
-        disposeOnStop(dataLayer.getChampions(Consumer {
-            champions = it
-            publishDataToView()
-        }))
-        disposeOnStop(dataLayer.getHeroes(Consumer {
-            heroes = it
-            publishDataToView()
-        }))
+        disposeOnStop(exerciseDao.getList()
+            .map { ExerciseRelation.convertList(it) }
+            .subscribeDefault(Consumer {
+                exercises = it
+                publishDataToView()
+            }, "exerciseDao.getList"))
 
-        val trainingId = trainingId
-        if (trainingId != null) {
-            disposeOnStop(dataLayer.getExercisesInTraining(trainingId, Consumer {
-                if (isOnlyOrderOfListChanged(exercisesInTraining, it)) return@Consumer
-                exercisesInTraining = it
+        disposeOnStop(heroDao.getList(HumanType.CHAMPION.ordinal)
+            .subscribeDefault(Consumer {
+                champions = it
                 publishDataToView()
-            }))
-            dataLayer.getTrainingByIdAndClose(trainingId, Consumer {
-                training = it
+            }, "heroDao.getList"))
+
+        disposeOnStop(heroDao.getList(HumanType.HERO.ordinal)
+            .subscribeDefault(Consumer {
+                heroes = it
                 publishDataToView()
-            })
+            }, "heroDao.getList"))
+
+        trainingId?.let {
+            disposeOnStop(exerciseInTrainingDao.getListForTraining(it)
+                .map { relations -> ExerciseInTrainingRelation.convertList(relations) }
+                .subscribeDefault(Consumer { exercises ->
+                    if (isOnlyOrderOfListChanged(exercisesInTraining, exercises)) return@Consumer
+                    exercisesInTraining = exercises
+                    publishDataToView()
+                }, "exerciseInTrainingDao.getById"))
+
+            disposeOnStop(trainingDao.getById(it)
+                .map { relation -> relation.convert() }
+                .subscribeDefault(Consumer { training ->
+                    this.training = training
+                    publishDataToView()
+                }, "exerciseInTrainingDao.getById"))
         }
     }
 
@@ -66,14 +85,17 @@ class TrainingDetailsPresenterImpl(
         Logger.d(LOG_TAG, "updateTrainingData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
         if (allPartsPresent && someFieldsChanged) {
             training = Training(trainingId, championId!!, heroId!!, trainingDate)
-            dataLayer.updateTraining(training, Consumer {
-                trainingId = it
+            Threading.async(Callable {
+                trainingId = trainingDao.insert(training)
                 if (training?.id == null) {
                     training?.id = trainingId
-                    disposeOnStop(dataLayer.getExercisesInTraining(trainingId!!, Consumer { exercises ->
-                        exercisesInTraining = exercises
-                        publishDataToView()
-                    }))
+                    disposeOnStop(exerciseInTrainingDao.getListForTraining(trainingId!!)
+                        .map { relations -> ExerciseInTrainingRelation.convertList(relations) }
+                        .subscribeDefault(Consumer { exercises ->
+//                            if (isOnlyOrderOfListChanged(exercisesInTraining, exercises)) return@Consumer
+                            exercisesInTraining = exercises
+                            publishDataToView()
+                        }, "exerciseInTrainingDao.getById"))
                 }
             })
         }
@@ -103,8 +125,10 @@ class TrainingDetailsPresenterImpl(
 
     override fun deleteTraining() {
         view.showMsg(R.string.confirm_delete, Action {
-            dataLayer.deleteExercisesInTraining(training?.exercises)
-            dataLayer.deleteTrainings(listOf(training))
+            training?.exercises?.let {
+                exerciseInTrainingDao.delete(it).subscribeDefault("deleteExercisesInTraining. deleted")
+            }
+            trainingDao.delete(listOf(training)).subscribeDefault("deleteTrainings. deleted")
             view.closeScreen()
         })
     }
@@ -119,7 +143,7 @@ class TrainingDetailsPresenterImpl(
         exercises.add(toPosition, item)
 
         for ((i, next) in exercises.withIndex()) next.position = i
-        dataLayer.updateExercisesInTraining(exercises)
+        exerciseInTrainingDao.insert(exercises).subscribeDefault("updateExercisesInTraining. inserted")
     }
 
     override fun addExerciseClicked() = view.showNewExerciseDialog(getNextExercisePosition())

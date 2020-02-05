@@ -1,8 +1,11 @@
 package com.devtau.ironHeroes.ui.fragments.trainingsList
 
-import com.devtau.ironHeroes.data.DataLayer
+import com.devtau.ironHeroes.data.dao.*
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
+import com.devtau.ironHeroes.data.relations.TrainingRelation
+import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
@@ -11,7 +14,8 @@ import io.reactivex.functions.Consumer
 
 class TrainingsPresenterImpl(
     private val view: TrainingsContract.View,
-    private val dataLayer: DataLayer,
+    private val heroDao: HeroDao,
+    private val trainingDao: TrainingDao,
     private val prefs: PreferencesManager
 ): DBSubscriber(), TrainingsContract.Presenter {
 
@@ -22,18 +26,24 @@ class TrainingsPresenterImpl(
 
     //<editor-fold desc="Presenter overrides">
     override fun restartLoaders() {
-        disposeOnStop(dataLayer.getTrainings(Consumer {
-            trainings = it
-            publishDataToView()
-        }))
-        disposeOnStop(dataLayer.getChampions(Consumer {
-            champions = it
-            publishDataToView()
-        }))
-        disposeOnStop(dataLayer.getHeroes(Consumer {
-            heroes = it
-            publishDataToView()
-        }))
+        disposeOnStop(trainingDao.getList()
+            .map { TrainingRelation.convertList(it) }
+            .subscribeDefault(Consumer {
+                trainings = it
+                publishDataToView()
+            }, "trainingDao.getList"))
+
+        disposeOnStop(heroDao.getList(HumanType.CHAMPION.ordinal)
+            .subscribeDefault(Consumer {
+                champions = it
+                publishDataToView()
+            }, "heroDao.getList"))
+
+        disposeOnStop(heroDao.getList(HumanType.HERO.ordinal)
+            .subscribeDefault(Consumer {
+                heroes = it
+                publishDataToView()
+            }, "heroDao.getList"))
     }
 
     override fun provideTrainings() = trainings
@@ -42,9 +52,16 @@ class TrainingsPresenterImpl(
         val championId = if (championIndex == 0) null else champions?.get(championIndex - 1)?.id
         val heroId = if (heroIndex == 0) null else heroes?.get(heroIndex - 1)?.id
 
+        if (prefs.favoriteChampionId == championId && prefs.favoriteHeroId == heroId) return
         prefs.favoriteChampionId = championId
         prefs.favoriteHeroId = heroId
         view.updateTrainings(filter(trainings, championId, heroId))
+        Logger.d(LOG_TAG, "filterAndUpdateList. " +
+                "trainings size=${trainings?.size}, " +
+                "champions size=${champions?.size}, " +
+                "heroes size=${heroes?.size}" +
+                "championId=$championId" +
+                "heroId=$heroId")
     }
 
     override fun isChampionFilterNeeded() = prefs.showChampionFilter

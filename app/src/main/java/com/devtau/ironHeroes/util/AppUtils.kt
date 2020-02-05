@@ -97,6 +97,8 @@ object AppUtils {
         return formatAnyDate(date, SHORT_DATE_FORMATTER)
     }
 
+    fun formatShortDate(date: Calendar): String = formatAnyDate(date, SHORT_DATE_FORMATTER)
+
     private fun formatAnyDate(cal: Calendar, formatter: String): String =
         SimpleDateFormat(formatter, Locale.getDefault()).format(cal.time)
 
@@ -325,3 +327,9 @@ fun Context?.toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).
 
 fun Context?.toastLong(@StringRes msgId: Int) { this?.toastLong(this.getString(msgId)) }
 fun Context?.toastLong(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+
+fun <T>List<T>.print(logTag: String): String {
+    val string = this.joinToString("\n", "[\n", "\n]\n")
+    Logger.d(logTag, string)
+    return string
+}

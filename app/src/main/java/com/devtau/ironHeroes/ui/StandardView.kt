@@ -9,4 +9,5 @@ interface StandardView {
     fun showMsg(msg: String, confirmedListener: Action? = null, cancelledListener: Action? = null)
     fun resolveString(@StringRes stringId: Int): String
     fun resolveColor(@ColorRes colorId: Int): Int
+    fun isOnline(): Boolean
 }

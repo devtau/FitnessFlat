@@ -39,6 +39,7 @@ abstract class ViewSubscriberDialog: DialogFragment(), StandardView {
         val context = context ?: return -1
         return ContextCompat.getColor(context, colorId)
     }
+    override fun isOnline(): Boolean = AppUtils.checkConnection(context)
 
 
     //использование этого слоя не обязательно, но subscribeField следует вызывать в onStart, если слой нужен

@@ -34,6 +34,7 @@ abstract class ViewSubscriberActivity: AppCompatActivity(), StandardView {
             = AppUtils.alertD(getLogTag(), msg, this, confirmedListener, cancelledListener)
     override fun resolveString(@StringRes stringId: Int): String = getString(stringId)
     override fun resolveColor(@ColorRes colorId: Int): Int = ContextCompat.getColor(this, colorId)
+    override fun isOnline(): Boolean = AppUtils.checkConnection(this)
 
     //использование этого слоя не обязательно, но subscribeField следует вызывать в onStart, если слой нужен
     fun subscribeField(field: EditText?, onNext: Consumer<String>) {

@@ -3,10 +3,15 @@ package com.devtau.ironHeroes.ui.fragments.statistics
 import android.util.LongSparseArray
 import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.DataLayer
+import com.devtau.ironHeroes.data.dao.ExerciseDao
+import com.devtau.ironHeroes.data.dao.ExerciseInTrainingDao
+import com.devtau.ironHeroes.data.dao.MuscleGroupDao
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.MuscleGroup
+import com.devtau.ironHeroes.data.relations.ExerciseInTrainingRelation
+import com.devtau.ironHeroes.data.relations.ExerciseRelation
+import com.devtau.ironHeroes.data.subscribeDefault
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.EntriesWrapper
@@ -18,44 +23,57 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import io.reactivex.functions.Consumer
 import java.util.*
+import kotlin.collections.ArrayList
 
 class StatisticsPresenterImpl(
     private val view: StatisticsContract.View,
-    private val dataLayer: DataLayer,
+    private val exerciseDao: ExerciseDao,
+    private val exerciseInTrainingDao: ExerciseInTrainingDao,
+    private val muscleGroupDao: MuscleGroupDao,
     private val prefs: PreferencesManager,
     private val heroId: Long
 ): DBSubscriber(), StatisticsContract.Presenter {
 
-    private var muscleGroups: List<MuscleGroup>? = null
-
-    private var exercises: List<Exercise>? = null
-    private var exercisesFiltered: List<Exercise>? = null
-
-    private var exercisesInTrainings: List<ExerciseInTraining>? = null
-    private var exercisesInTrainingsFiltered: List<ExerciseInTraining>? = null
+    private var muscleGroups = ArrayList<MuscleGroup>()
+    private var exercises = ArrayList<Exercise>()
+    private var exercisesFiltered = ArrayList<Exercise>()
+    private var exercisesInTrainings = ArrayList<ExerciseInTraining>()
+    private var exercisesInTrainingsFiltered = ArrayList<ExerciseInTraining>()
 
 
     //<editor-fold desc="Presenter overrides">
     override fun restartLoaders() {
-        disposeOnStop(dataLayer.getMuscleGroups(Consumer {
-            muscleGroups = it
-            prepareAndPublishDataToView()
-        }))
-        disposeOnStop(dataLayer.getExercises(Consumer {
-            exercises = it
-            prepareAndPublishDataToView()
-        }))
-        dataLayer.getAllExercisesInTrainings(heroId, Consumer {
-            exercisesInTrainings = it
-            prepareAndPublishDataToView()
-        })
+        disposeOnStop(muscleGroupDao.getList()
+            .subscribeDefault(Consumer {
+                muscleGroups.clear()
+                muscleGroups.addAll(it)
+                prepareAndPublishDataToView()
+            }, "muscleGroupDao.getList"))
+
+        disposeOnStop(exerciseDao.getList()
+            .map { relation -> ExerciseRelation.convertList(relation) }
+            .subscribeDefault(Consumer {
+                exercises.clear()
+                exercises.addAll(it)
+                prepareAndPublishDataToView()
+            }, "exerciseDao.getList"))
+
+        disposeOnStop(exerciseInTrainingDao.getListForHeroAsc(heroId)
+            .map { relation -> ExerciseInTrainingRelation.convertList(relation) }
+            .subscribeDefault(Consumer {
+                exercisesInTrainings.clear()
+                exercisesInTrainings.addAll(it)
+                prepareAndPublishDataToView()
+            }, "exerciseInTrainingDao.getListForHeroAsc"))
     }
 
     override fun filterAndUpdateChart(muscleGroupIndex: Int, exerciseIndex: Int) {
-        val muscleGroupId = muscleGroups?.get(muscleGroupIndex)?.id
+        val muscleGroupId = muscleGroups[muscleGroupIndex].id
         exercisesInTrainingsFiltered = filterExercisesInTrainings(exercisesInTrainings, muscleGroupId)
-        view.showStatisticsData(convertToDataSets(exercisesInTrainingsFiltered,
-            parseTrainingDates(exercisesInTrainingsFiltered), R.color.colorAccent))
+        val dates = parseTrainingDates(exercisesInTrainingsFiltered)
+        val dataSets = convertToDataSets(exercisesInTrainingsFiltered, dates, R.color.colorAccent)
+        val xLabelsCount = if (dates.size > X_LABELS_MAX_COUNT) X_LABELS_MAX_COUNT else dates.size
+        view.showStatisticsData(dataSets, dates, xLabelsCount)
         exercisesFiltered = filterExercises(exercises, muscleGroupId)
         view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered, true), 0)
     }
@@ -64,7 +82,6 @@ class StatisticsPresenterImpl(
         if (prefs.openEditDialogFromStatistics)
             view.showExerciseDetails(heroId, trainingId, exerciseInTrainingId)
     }
-
     //</editor-fold>
 
 
@@ -77,7 +94,7 @@ class StatisticsPresenterImpl(
         filterAndUpdateChart(0, 0)
     }
 
-    private fun filterExercisesInTrainings(list: List<ExerciseInTraining>?, muscleGroupId: Long?): List<ExerciseInTraining>? {
+    private fun filterExercisesInTrainings(list: List<ExerciseInTraining>?, muscleGroupId: Long?): ArrayList<ExerciseInTraining> {
         val filtered = ArrayList<ExerciseInTraining>()
         if (list != null) for (next in list)
             if (muscleGroupId == null || next.exercise?.muscleGroupId == muscleGroupId) filtered.add(next)
@@ -85,7 +102,7 @@ class StatisticsPresenterImpl(
         return filtered
     }
 
-    private fun filterExercises(list: List<Exercise>?, muscleGroupId: Long?): List<Exercise> {
+    private fun filterExercises(list: List<Exercise>?, muscleGroupId: Long?): ArrayList<Exercise> {
         val filtered = ArrayList<Exercise>()
         if (list != null) for (next in list)
             if (muscleGroupId == null || next.muscleGroupId == muscleGroupId) filtered.add(next)
@@ -102,7 +119,7 @@ class StatisticsPresenterImpl(
                 val date = next.training?.date
                 if (next.exerciseId == exerciseId && date != null) {
                     val tag = Tag(markerColorId, Tag.getTitle(next), next.trainingId, next.training?.date, next.id)
-                    values.add(Entry(date.toFloat(), next.calculateWork().toFloat(), tag))
+                    values.add(Entry(getDateIndex(date, dates), next.calculateWork().toFloat(), tag))
                     label = next.exercise?.name ?: ""
                 }
             }
@@ -110,17 +127,17 @@ class StatisticsPresenterImpl(
         return EntriesWrapper(values, label)
     }
 
-    private fun getDateIndex(trainingDate: Long?, list: List<Calendar>?): Int? {
+    private fun getDateIndex(trainingDate: Long?, list: List<Calendar>?): Float {
         if (trainingDate != null && list != null && list.isNotEmpty()) {
             for ((i, dateStart) in list.withIndex()) {
                 val dateEnd = Calendar.getInstance()
                 dateEnd.timeInMillis = dateStart.timeInMillis
                 dateEnd.add(Calendar.DAY_OF_MONTH, 1)
 
-                if (dateStart.timeInMillis <= trainingDate && trainingDate < dateEnd.timeInMillis) return i
+                if (dateStart.timeInMillis <= trainingDate && trainingDate < dateEnd.timeInMillis) return i.toFloat()
             }
         }
-        return null
+        return 0f
     }
 
     private fun parseTrainingDates(list: List<ExerciseInTraining>?): List<Calendar> {
@@ -179,9 +196,7 @@ class StatisticsPresenterImpl(
 
     private fun convertToDataSets(exercises: List<ExerciseInTraining>?, dates: List<Calendar>?, markerColorId: Int): LineData? {
         val valuesMap = LongSparseArray<ArrayList<Entry>>()
-        if (exercises != null && exercises.isNotEmpty()) for (next in exercises) {
-            if (valuesMap[next.exerciseId!!] == null) valuesMap.put(next.exerciseId!!, arrayListOf())
-        }
+        if (exercises != null) for (next in exercises) valuesMap.put(next.exerciseId!!, arrayListOf())
         val dataSets = ArrayList<ILineDataSet>()
 
         for (i in 0 until valuesMap.size()) {
@@ -207,30 +222,6 @@ class StatisticsPresenterImpl(
         8 -> R.color.lineColor8
         9 -> R.color.lineColor9
         else -> R.color.lineColor1
-    }
-
-    private fun generateMockDataSets(xCount: Int, rangeMin: Int, rangeMax: Int): LineData? {
-        val dataSets = ArrayList<ILineDataSet>()
-
-        val lineColor = R.color.colorAccent
-        val lineDataSet = generateMockChartData(view.resolveString(R.string.trainings), lineColor,
-            xCount, rangeMin, rangeMax)
-        dataSets.add(formatLine(lineDataSet, view.resolveColor(lineColor)))
-
-        val data = LineData(dataSets)
-        data.isHighlightEnabled = true
-        return data
-    }
-
-    private fun generateMockChartData(label: String, markerColorId: Int, xCount: Int,
-                                      rangeMin: Int, rangeMax: Int): LineDataSet {
-        val values = ArrayList<Entry>()
-        val random = Random()
-        for (i in 1..xCount) {
-            val value = random.nextInt(rangeMax - rangeMin) + rangeMin
-            values.add(Entry(i.toFloat(), value.toFloat(), markerColorId))
-        }
-        return LineDataSet(values, label)
     }
 
     private fun formatLine(line: LineDataSet, lineColor: Int): LineDataSet {
@@ -260,5 +251,6 @@ class StatisticsPresenterImpl(
 
     companion object {
         private const val LOG_TAG = "StatisticsPresenterImpl"
+        private const val X_LABELS_MAX_COUNT = 8
     }
 }

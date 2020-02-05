@@ -14,12 +14,12 @@ class ExerciseInTrainingRelation {
     @Relation(parentColumn = "trainingId", entityColumn = "trainingId")
     lateinit var training: Training
 
-    @Relation(parentColumn = "exerciseId", entityColumn = "exerciseId")
-    lateinit var exercise: Exercise
+    @Relation(parentColumn = "exerciseId", entityColumn = "exerciseId", entity = Exercise::class)
+    lateinit var exercise: ExerciseRelation
 
     fun convert(): ExerciseInTraining {
         exerciseInTraining.training = training
-        exerciseInTraining.exercise = exercise
+        exerciseInTraining.exercise = exercise.convert()
         return exerciseInTraining
     }
 
