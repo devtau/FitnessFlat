@@ -60,220 +60,43 @@ class ExerciseInTraining(
         const val DEFAULT_COUNT = 15.toString()
         const val MAX_POSITION = 100
 
-        fun allObligatoryPartsPresent(trainingId: Long?, exerciseId: Long?, weight: Int?, repeats: Int?, count: Int?) =
-            trainingId != null && exerciseId != null && weight != null
-                    && repeats != null && repeats != INTEGER_NOT_PARSED
-                    && count != null && count != INTEGER_NOT_PARSED
+        fun allObligatoryPartsPresent(trainingId: Long?, exerciseId: Long?, repeats: Int, count: Int) =
+            trainingId != null && exerciseId != null && repeats != INTEGER_NOT_PARSED && count != INTEGER_NOT_PARSED
 
-        fun getMock(c: Context): List<ExerciseInTraining> {
-            var trainingId = Training.getMock(c)[0].id
+        fun getMock(c: Context, localeIsRu: Boolean): List<ExerciseInTraining> {
             val list = ArrayList<ExerciseInTraining>()
-            //08.10
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 41, 0, 3, 20, 0),
-                ExerciseInTraining(null, trainingId, 44, 30, 4, 12, 1),
-                ExerciseInTraining(null, trainingId, 2, 50, 3, 10, 2),
-                ExerciseInTraining(null, trainingId, 29, 6, 3, 20, 3),
-                ExerciseInTraining(null, trainingId, 32, 0, 3, 20, 4)))
+            val firstMockExerciseId = if (localeIsRu) 12L else 52L
+            val secondMockExerciseId = if (localeIsRu) 2L else 29L
+            val thirdMockExerciseId = if (localeIsRu) 10L else 30L
+            val fourthMockExerciseId = if (localeIsRu) 16L else 19L
+            val fifthMockExerciseId = if (localeIsRu) 48L else 20L
 
-            //09.10
+            //27.01
+            var trainingId = Training.getMock(c)[0].id
+            list.addAll(listOf(
+                ExerciseInTraining(null, trainingId, firstMockExerciseId, 90, 3, 20, 0),
+                ExerciseInTraining(null, trainingId, secondMockExerciseId, 80, 4, 12, 1),
+                ExerciseInTraining(null, trainingId, thirdMockExerciseId, 40, 4, 12, 2),
+                ExerciseInTraining(null, trainingId, fourthMockExerciseId, 50, 3, 8, 3),
+                ExerciseInTraining(null, trainingId, fifthMockExerciseId, 40, 3, 8, 4)))
+
+            //29.01
             trainingId = Training.getMock(c)[1].id
             list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 2, 55, 3, 15, 0),
-                ExerciseInTraining(null, trainingId, 30, 6, 3, 15, 1),
-                ExerciseInTraining(null, trainingId, 10, 10, 3, 15, 2),
-                ExerciseInTraining(null, trainingId, 29, 6, 3, 15, 3),
-                ExerciseInTraining(null, trainingId, 39, 0, 3, 40, 4),
-                ExerciseInTraining(null, trainingId, 40, 3, 3, 15, 5)))
+                ExerciseInTraining(null, trainingId, firstMockExerciseId, 90, 3, 20, 0),
+                ExerciseInTraining(null, trainingId, secondMockExerciseId, 86, 4, 12, 1),
+                ExerciseInTraining(null, trainingId, thirdMockExerciseId, 44, 4, 12, 2),
+                ExerciseInTraining(null, trainingId, fourthMockExerciseId, 56, 3, 8, 3),
+                ExerciseInTraining(null, trainingId, fifthMockExerciseId, 44, 3, 8, 4)))
 
-            //11.10
+            //31.01
             trainingId = Training.getMock(c)[2].id
             list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 15, 7, 4, 20, 0),
-                ExerciseInTraining(null, trainingId, 18, 10, 4, 20, 1),
-                ExerciseInTraining(null, trainingId, 20, 4, 4, 20, 2),
-                ExerciseInTraining(null, trainingId, 26, 4, 4, 20, 3),
-                ExerciseInTraining(null, trainingId, 43, 7, 4, 20, 4)))
-
-            //--------------------------------------------------------------------------------------
-            //14.10
-            trainingId = Training.getMock(c)[3].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 46, 24, 4, 15, 0),
-                ExerciseInTraining(null, trainingId, 44, 32, 4, 15, 1),
-                ExerciseInTraining(null, trainingId, 37, 5, 4, 15, 2),
-                ExerciseInTraining(null, trainingId, 38, 14, 4, 20, 3),
-                ExerciseInTraining(null, trainingId, 32, 0, 4, 15, 4)))
-
-            //15.10
-            trainingId = Training.getMock(c)[4].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 29, 7, 4, 15, 0),
-                ExerciseInTraining(null, trainingId, 36, 27, 4, 15, 1),
-                ExerciseInTraining(null, trainingId, 21, 10, 4, 15, 2),
-                ExerciseInTraining(null, trainingId, 31, 12, 4, 15, 3),
-                ExerciseInTraining(null, trainingId, 58, 7, 4, 15, 4),
-                ExerciseInTraining(null, trainingId, 22, 2, 4, 15, 5),
-                ExerciseInTraining(null, trainingId, 30, 6, 3, 15, 6),
-                ExerciseInTraining(null, trainingId, 47, 4, 3, 15, 7)))
-
-            //17.10
-            trainingId = Training.getMock(c)[5].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 8, 7, 4, 12, 0),
-                ExerciseInTraining(null, trainingId, 9, 10, 3, 15, 1),
-                ExerciseInTraining(null, trainingId, 15, 7, 4, 18, 2),
-                ExerciseInTraining(null, trainingId, 31, 12, 4, 18, 3),
-                ExerciseInTraining(null, trainingId, 26, 2, 4, 18, 4),
-                ExerciseInTraining(null, trainingId, 28, 5, 4, 18, 5)))
-
-            //--------------------------------------------------------------------------------------
-            //21.10
-            trainingId = Training.getMock(c)[6].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 40, 4, 4, 20, 0),
-                ExerciseInTraining(null, trainingId, 37, 6, 4, 20, 1),
-                ExerciseInTraining(null, trainingId, 38, 0, 4, 20, 2),
-                ExerciseInTraining(null, trainingId, 39, 4, 3, 40, 3),
-                ExerciseInTraining(null, trainingId, 41, 0, 4, 20, 4),
-                ExerciseInTraining(null, trainingId, 32, 0, 5, 20, 5)))
-
-            //22.10
-            trainingId = Training.getMock(c)[7].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 29, 7, 4, 15, 0),
-                ExerciseInTraining(null, trainingId, 19, 40, 4, 15, 1),
-                ExerciseInTraining(null, trainingId, 35, 30, 4, 15, 2),
-                ExerciseInTraining(null, trainingId, 30, 6, 4, 15, 3),
-                ExerciseInTraining(null, trainingId, 27, 2, 4, 15, 4),
-                ExerciseInTraining(null, trainingId, 20, 4, 4, 15, 5)))
-
-            //25.10
-            trainingId = Training.getMock(c)[8].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 13, 0, 4, 10, 0),
-                ExerciseInTraining(null, trainingId, 1, 40, 4, 15, 1),
-                ExerciseInTraining(null, trainingId, 8, 6, 4, 15, 2),
-                ExerciseInTraining(null, trainingId, 17, 22, 4, 12, 3),
-                ExerciseInTraining(null, trainingId, 24, 10, 5, 8, 4)))
-
-            //--------------------------------------------------------------------------------------
-            //28.10
-            trainingId = Training.getMock(c)[9].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 37, 6, 4, 20, 0),
-                ExerciseInTraining(null, trainingId, 38, 0, 4, 20, 1),
-                ExerciseInTraining(null, trainingId, 39, 4, 3, 40, 2),
-                ExerciseInTraining(null, trainingId, 40, 3, 4, 20, 3),
-                ExerciseInTraining(null, trainingId, 41, 0, 4, 20, 4),
-                ExerciseInTraining(null, trainingId, 32, 0, 4, 20, 5)))
-
-            //29.10
-            trainingId = Training.getMock(c)[10].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 29, 7, 4, 15, 0, "5-6-7-8 разными хватами"),
-                ExerciseInTraining(null, trainingId, 20, 3, 4, 15, 1),
-                ExerciseInTraining(null, trainingId, 30, 7, 4, 15, 2, "5-6-7-8"),
-                ExerciseInTraining(null, trainingId, 22, 4, 4, 15, 3, "3-4 разными хватами"),
-                ExerciseInTraining(null, trainingId, 31, 12, 4, 15, 4),
-                ExerciseInTraining(null, trainingId, 35, 40, 4, 15, 5)))
-
-            //1.11
-            trainingId = Training.getMock(c)[11].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 2, 60, 4, 8, 0),
-                ExerciseInTraining(null, trainingId, 42, 28, 3, 27, 1),
-                ExerciseInTraining(null, trainingId, 8, 5, 3, 12, 2),
-                ExerciseInTraining(null, trainingId, 16, 20, 4, 13, 3),
-                ExerciseInTraining(null, trainingId, 23, 10, 3, 10, 4)))
-
-            //--------------------------------------------------------------------------------------
-            //4.11
-            trainingId = Training.getMock(c)[12].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 41, 0, 4, 20, 0),
-                ExerciseInTraining(null, trainingId, 45, 10, 4, 12, 1),
-                ExerciseInTraining(null, trainingId, 37, 8, 4, 20, 2),
-                ExerciseInTraining(null, trainingId, 49, 7, 4, 20, 3),
-                ExerciseInTraining(null, trainingId, 32, 0, 4, 20, 4)))
-
-            //5.11
-            trainingId = Training.getMock(c)[13].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 29, 7, 4, 15, 0),
-                ExerciseInTraining(null, trainingId, 50, 75, 4, 12, 1, "2 резинки"),
-                ExerciseInTraining(null, trainingId, 31, 12, 4, 15, 2),
-                ExerciseInTraining(null, trainingId, 20, 4, 4, 15, 4)))
-
-            //8.11
-            trainingId = Training.getMock(c)[14].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 7, 20, 3, 15, 0, "17-20-22 кг * 15-12-10"),
-                ExerciseInTraining(null, trainingId, 16, 12, 3, 15, 1, "15-12-10"),
-                ExerciseInTraining(null, trainingId, 9, 12, 3, 15, 2, "10-12-15 кг * 15-12-10"),
-                ExerciseInTraining(null, trainingId, 26, 4, 3, 15, 3, "2-4-7 кг * 15-12-10"),
-                ExerciseInTraining(null, trainingId, 2, 40, 3, 15, 4, "30-40-50 кг * 15-12-7"),
-                ExerciseInTraining(null, trainingId, 48, 20, 3, 15, 5, "10-12-12")))
-
-            //--------------------------------------------------------------------------------------
-            //11.11
-            trainingId = Training.getMock(c)[15].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 52, 5, 3, 17, 0),
-                ExerciseInTraining(null, trainingId, 45, 40, 3, 15, 1),
-                ExerciseInTraining(null, trainingId, 46, 17, 4, 15, 2),
-                ExerciseInTraining(null, trainingId, 44, 40, 4, 15, 3),
-                ExerciseInTraining(null, trainingId, 53, 0, 3, 20, 4)))
-
-            //14.11
-            trainingId = Training.getMock(c)[16].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 52, 5, 3, 17, 0),
-                ExerciseInTraining(null, trainingId, 50, 75, 3, 12, 1, "2 резинки"),
-                ExerciseInTraining(null, trainingId, 54, 15, 3, 12, 2),
-                ExerciseInTraining(null, trainingId, 19, 40, 2, 12, 3, "+50*6 и 2 с помощью"),
-                ExerciseInTraining(null, trainingId, 35, 20, 3, 12, 4),
-                ExerciseInTraining(null, trainingId, 22, 3, 3, 12, 5),
-                ExerciseInTraining(null, trainingId, 30, 4, 3, 12, 6, "широким")))
-
-            //15.11
-            trainingId = Training.getMock(c)[17].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 1, 50, 3, 10, 0, "третий 8"),
-                ExerciseInTraining(null, trainingId, 15, 15, 3, 15, 1),
-                ExerciseInTraining(null, trainingId, 9, 12, 3, 15, 2),
-                ExerciseInTraining(null, trainingId, 55, 10, 3, 15, 3),
-                ExerciseInTraining(null, trainingId, 12, 4, 3, 11, 4, "13-11-9")))
-
-            //--------------------------------------------------------------------------------------
-            //18.11
-            trainingId = Training.getMock(c)[18].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 52, 5, 3, 17, 0),
-                ExerciseInTraining(null, trainingId, 46, 34, 4, 15, 1),
-                ExerciseInTraining(null, trainingId, 45, 50, 4, 10, 2),
-                ExerciseInTraining(null, trainingId, 56, 60, 4, 10, 3),
-                ExerciseInTraining(null, trainingId, 32, 20, 4, 20, 4)))
-
-            //21.11
-            trainingId = Training.getMock(c)[19].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, 52, 5, 3, 17, 0),
-                ExerciseInTraining(null, trainingId, 50, 75, 3, 15, 1, "2 резинки"),
-                ExerciseInTraining(null, trainingId, 19, 45, 3, 12, 2, "15-12-10"),
-                ExerciseInTraining(null, trainingId, 30, 12, 3, 12, 3),
-                ExerciseInTraining(null, trainingId, 27, 4, 3, 12, 4),
-                ExerciseInTraining(null, trainingId, 54, 15, 3, 12, 5)))
-
-            //22.11
-            trainingId = Training.getMock(c)[20].id
-            list.addAll(listOf(
-                ExerciseInTraining(null, trainingId, exerciseId = 52, weight = 10, repeats = 3, count = 17, position = 0),
-                ExerciseInTraining(null, trainingId, exerciseId = 2, weight = 60, repeats = 4, count = 8, position = 1),
-                ExerciseInTraining(null, trainingId, exerciseId = 7, weight = 14, repeats = 4, count = 10, position = 2),
-                ExerciseInTraining(null, trainingId, exerciseId = 8, weight = 6, repeats = 3, count = 15, position = 3),
-                ExerciseInTraining(null, trainingId, exerciseId = 18, weight = 14, repeats = 4, count = 12, position = 4),
-                ExerciseInTraining(null, trainingId, exerciseId = 17, weight = 30, repeats = 4, count = 10, position = 5)))
+                ExerciseInTraining(null, trainingId, firstMockExerciseId, 90, 3, 20, 0),
+                ExerciseInTraining(null, trainingId, secondMockExerciseId, 90, 4, 12, 1),
+                ExerciseInTraining(null, trainingId, thirdMockExerciseId, 48, 4, 12, 2),
+                ExerciseInTraining(null, trainingId, fourthMockExerciseId, 60, 3, 8, 3),
+                ExerciseInTraining(null, trainingId, fifthMockExerciseId, 48, 3, 8, 4)))
 
             return list
         }

@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import io.reactivex.functions.Consumer
+import java.util.*
 
 class StatisticsFragment: ViewSubscriberFragment(),
     StatisticsContract.View {
@@ -84,9 +85,9 @@ class StatisticsFragment: ViewSubscriberFragment(),
     override fun showExercises(list: List<String>?, selectedIndex: Int) =
         AppUtils.initSpinner(exercise, list, selectedIndex, context)
 
-    override fun showStatisticsData(lineData: LineData?) {
+    override fun showStatisticsData(lineData: LineData?, xLabels: List<Calendar>, xLabelsCount: Int) {
         Logger.d(LOG_TAG, "showStatisticsData. lineData=$lineData")
-        initChart(lineData)
+        initChart(lineData, xLabels, xLabelsCount)
     }
 
     override fun showExerciseDetails(heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?) {
@@ -112,7 +113,7 @@ class StatisticsFragment: ViewSubscriberFragment(),
         exercise = root?.findViewById(R.id.exercise)
     }
 
-    private fun initChart(lineData: LineData?) {
+    private fun initChart(lineData: LineData?, xLabels: List<Calendar>, xLabelsCount: Int) {
         val context = context ?: return
         val chart = chart ?: return
 //        chart.setViewPortOffsets(0f, 0f, 0f, 0f)
@@ -145,7 +146,7 @@ class StatisticsFragment: ViewSubscriberFragment(),
             }
         })
 
-        tuneXAxis(chart, X_LABELS_COUNT, resolveColor(R.color.colorBlack))
+        tuneXAxis(chart, xLabels, xLabelsCount, resolveColor(R.color.colorBlack))
         tuneYAxis(chart, resolveColor(R.color.colorBlack), Y_AXIS_MINIMUM)
         chart.extraBottomOffset = chart.rendererXAxis.paintAxisLabels.textSize
         chart.axisRight?.isEnabled = false
@@ -154,17 +155,17 @@ class StatisticsFragment: ViewSubscriberFragment(),
         chart.invalidate()
     }
 
-    private fun tuneXAxis(chart: LineChart, labelsCount: Int, axisTextColor: Int) {
+    private fun tuneXAxis(chart: LineChart, xLabels: List<Calendar>, xLabelsCount: Int, axisTextColor: Int) {
         val xAxis = chart.xAxis
         xAxis.isEnabled = true
-        xAxis.labelCount = labelsCount
+        xAxis.labelCount = xLabelsCount
         xAxis.textColor = axisTextColor
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.isGranularityEnabled = true
         xAxis.granularity = 1.0f
         xAxis.setDrawGridLines(true)
 
-        chart.setXAxisRenderer(CustomXAxisRenderer(chart.viewPortHandler, xAxis, chart.getTransformer(YAxis.AxisDependency.LEFT)))
+        chart.setXAxisRenderer(CustomXAxisRenderer(chart.viewPortHandler, xAxis, chart.getTransformer(YAxis.AxisDependency.LEFT), xLabels))
 //        xAxis.axisLineColor = Color.TRANSPARENT
 //        xAxis.axisMinimum = -1f
 //        xAxis.axisMaximum = labelsCount.toFloat()
@@ -204,7 +205,6 @@ class StatisticsFragment: ViewSubscriberFragment(),
 
     companion object {
         private const val LOG_TAG = "StatisticsFragment"
-        private const val X_LABELS_COUNT = 8
         private const val Y_LABELS_COUNT = 5
         private const val Y_AXIS_MINIMUM = 0
     }

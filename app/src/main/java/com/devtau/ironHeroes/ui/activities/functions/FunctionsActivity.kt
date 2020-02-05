@@ -14,6 +14,7 @@ import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment
 import com.devtau.ironHeroes.util.Logger
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_functions.*
+import java.util.*
 
 class FunctionsActivity: ViewSubscriberActivity(), FunctionsContract.View, SettingsFragment.Listener {
 
@@ -71,7 +72,7 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsContract.View, Setti
     override fun provideMockExercises() = Exercise.getMock(this)
     override fun provideMockMuscleGroups() = MuscleGroup.getMock(this)
     override fun provideMockTrainings() = Training.getMock(this)
-    override fun provideMockExercisesInTrainings() = ExerciseInTraining.getMock(this)
+    override fun provideMockExercisesInTrainings() = ExerciseInTraining.getMock(this, Locale.getDefault() == Locale("ru","RU"))
 
     override fun updateSpinnersVisibility() = (adapter?.getItem(0) as TrainingsFragment).updateSpinnersVisibility()
     //</editor-fold>

@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.devtau.ironHeroes.R
+import java.util.*
 
 @Entity(tableName = "MuscleGroups")
 class MuscleGroup(
@@ -12,6 +13,14 @@ class MuscleGroup(
     var id: Long?,
     var name: String
 ) {
+
+    override fun equals(other: Any?): Boolean = when {
+        other !is MuscleGroup -> false
+        other.id != this.id -> false
+        else -> true
+    }
+
+    override fun hashCode(): Int = Objects.hash(id)
 
     override fun toString(): String = name
 

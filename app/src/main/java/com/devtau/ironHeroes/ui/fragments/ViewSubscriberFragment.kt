@@ -38,6 +38,7 @@ abstract class ViewSubscriberFragment: Fragment(), StandardView {
         return if (context != null) ContextCompat.getColor(context, colorId)
         else 0
     }
+    override fun isOnline(): Boolean = AppUtils.checkConnection(context)
 
     //использование этого слоя не обязательно, но subscribeField следует вызывать в onStart, если слой нужен
     fun subscribeField(field: EditText?, onNext: Consumer<String>) {

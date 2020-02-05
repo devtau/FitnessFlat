@@ -1,18 +1,23 @@
 package com.devtau.ironHeroes.ui.fragments.other
 
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.DataLayer
+import com.devtau.ironHeroes.data.dao.*
+import com.devtau.ironHeroes.data.relations.ExerciseInTrainingRelation
+import com.devtau.ironHeroes.data.relations.TrainingRelation
+import com.devtau.ironHeroes.data.subscribeDefault
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.FileUtils
 import com.devtau.ironHeroes.util.Threading
+import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
-import java.util.*
 
 class OtherPresenterImpl(
     private val view: OtherContract.View,
-    private val dataLayer: DataLayer
+    private val heroDao: HeroDao,
+    private val trainingDao: TrainingDao,
+    private val exerciseInTrainingDao: ExerciseInTrainingDao
 ): DBSubscriber(), OtherContract.Presenter {
 
     private val exchangeDirName = view.resolveString(R.string.app_name)
@@ -30,30 +35,39 @@ class OtherPresenterImpl(
             if (trainingsCount > 0 && exercisesCount > 0) view.showExported(trainingsCount, exercisesCount)
         }
 
-        dataLayer.getAllTrainingsAndClose(Consumer {
-            FileUtils.exportToJSON(it, exchangeDirName, Constants.TRAININGS_FILE_NAME, Consumer { count ->
-                Threading.dispatchMain(Action {
-                    if (count == null) {
-                        view.showMsg(R.string.export_error)
-                    } else {
-                        trainingsCount = count
-                        showExported()
-                    }
+        var trainingsDisposable: Disposable? = null
+        trainingsDisposable = trainingDao.getList()
+            .map { TrainingRelation.convertList(it) }
+            .subscribeDefault(Consumer {
+                FileUtils.exportToJSON(it, exchangeDirName, Constants.TRAININGS_FILE_NAME, Consumer { count ->
+                    Threading.dispatchMain(Action {
+                        if (count == null) {
+                            view.showMsg(R.string.export_error)
+                        } else {
+                            trainingsCount = count
+                            showExported()
+                        }
+                    })
                 })
-            })
-        })
-        dataLayer.getAllExercisesInTrainingsAndClose(heroId, Calendar.getInstance().timeInMillis, false, Consumer {
-            FileUtils.exportToJSON(it, exchangeDirName, Constants.EXERCISES_FILE_NAME, Consumer { count ->
-                Threading.dispatchMain(Action {
-                    if (count == null) {
-                        view.showMsg(R.string.export_error)
-                    } else {
-                        exercisesCount = count
-                        showExported()
-                    }
+                trainingsDisposable?.dispose()
+            }, "trainingDao.getList")
+
+        var exercisesDisposable: Disposable? = null
+        exercisesDisposable = exerciseInTrainingDao.getListForHeroAsc(heroId)
+            .map { relation -> ExerciseInTrainingRelation.convertList(relation) }
+            .subscribeDefault(Consumer {
+                FileUtils.exportToJSON(it, exchangeDirName, Constants.EXERCISES_FILE_NAME, Consumer { count ->
+                    Threading.dispatchMain(Action {
+                        if (count == null) {
+                            view.showMsg(R.string.export_error)
+                        } else {
+                            exercisesCount = count
+                            showExported()
+                        }
+                    })
+                    exercisesDisposable?.dispose()
                 })
-            })
-        })
+            }, "exerciseInTrainingDao.getListForHeroAsc")
     }
 
     override fun importFromFile() {
@@ -64,14 +78,14 @@ class OtherPresenterImpl(
         }
         val exchangeDirName = view.resolveString(R.string.app_name)
         FileUtils.readTrainingsJSON(exchangeDirName, Constants.TRAININGS_FILE_NAME, Consumer {
-            dataLayer.updateTrainings(it)
+            trainingDao.insert(it).subscribeDefault("updateTrainings. inserted")
             Threading.dispatchMain(Action {
                 trainingsCount = it.size
                 showReadFromFile()
             })
         })
         FileUtils.readExercisesJSON(exchangeDirName, Constants.EXERCISES_FILE_NAME, Consumer {
-            dataLayer.updateExercisesInTraining(it)
+            exerciseInTrainingDao.insert(it).subscribeDefault("updateExercisesInTraining. inserted")
             Threading.dispatchMain(Action {
                 exercisesCount = it.size
                 showReadFromFile()
@@ -79,7 +93,11 @@ class OtherPresenterImpl(
         })
     }
 
-    override fun clearDB() = dataLayer.clearDB()
+    override fun clearDB() {
+        heroDao.delete().subscribeDefault("clearDB. heroes & champions deleted")
+        trainingDao.delete().subscribeDefault("clearDB. trainings deleted")
+        exerciseInTrainingDao.delete().subscribeDefault("clearDB. exercises in trainings deleted")
+    }
     //</editor-fold>
 
     //<editor-fold desc="Private methods">

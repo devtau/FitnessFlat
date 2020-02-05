@@ -123,16 +123,7 @@ class ExerciseDialog: ViewSubscriberDialog(),
             commentInput?.text?.toString())
     }
 
-    private fun parseRecreationTime(): Int {
-        val delayText = recreationInput?.text?.toString()
-        var delaySeconds = 90
-        try {
-            if (delayText != null) delaySeconds = delayText.toInt()
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG, "recreationInput parse error. $e")
-        }
-        return delaySeconds
-    }
+    private fun parseRecreationTime(): Int = recreationInput?.text?.toString()?.toIntOrNull() ?: 90
 
     private fun startRecreationTimer(restTimeSeconds: Int) {
         val futureMs = SystemClock.elapsedRealtime() + restTimeSeconds * 1000
