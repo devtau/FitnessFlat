@@ -2,13 +2,12 @@ package com.devtau.ironHeroes.ui.fragments.statistics
 
 import android.content.Context
 import android.graphics.PorterDuff
-import android.view.View
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.devtau.ironHeroes.R
 import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.highlight.Highlight
+import kotlinx.android.synthetic.main.custom_marker_view.view.*
 
 //Entry should contain Object tag of type Integer with background color
 
@@ -16,9 +15,6 @@ class CustomMarkerView(context: Context, layoutResource: Int) :
     MarkerView(context, layoutResource) {
 
     constructor(context: Context): this(context, R.layout.custom_marker_view)
-
-    private val container: View = findViewById(R.id.container)
-    private val content: TextView = findViewById(R.id.content)
 
 
     init {

@@ -15,7 +15,7 @@ object FileUtils {
     private const val LOG_TAG = "FileUtils"
 
 
-    fun exportToJSON(list: List<*>?, exchangeDirName: String, fileName: String, listener: Consumer<Int?>? = null) {
+    fun exportToJSON(list: List<*>, exchangeDirName: String, fileName: String, listener: Consumer<Int?>? = null) {
         Threading.async(Callable {
             val downloadsDir =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -35,7 +35,7 @@ object FileUtils {
                 writer = FileWriter(file)
                 writer.write(json)
                 Logger.d(LOG_TAG, "exportToJSON. exported")
-                listener?.accept(list?.size)
+                listener?.accept(list.size)
             } catch (e: Exception) {
                 Logger.e(LOG_TAG, "exportToJSON. error ${e.message}\n$e")
                 listener?.accept(null)

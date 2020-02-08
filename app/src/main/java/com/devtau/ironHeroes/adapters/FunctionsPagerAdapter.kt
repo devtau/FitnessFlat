@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.devtau.ironHeroes.Coordinator
-import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.util.Logger
 import java.lang.ref.WeakReference
 import java.util.*
@@ -33,7 +32,7 @@ class FunctionsPagerAdapter(fragmentManager: FragmentManager, val coordinator: C
         Logger.d(LOG_TAG, "getItem. position=$position")
         return pages[position]?.get() ?: when (position) {
             0 -> coordinator.newTrainingsFragmentInstance()
-            1 -> coordinator.newStatisticsFragmentInstance(3L)
+            1 -> coordinator.newStatisticsFragmentInstance()
             2 -> coordinator.newSettingsFragmentInstance()
             3 -> coordinator.newOtherFragmentInstance()
             else -> coordinator.newOtherFragmentInstance()

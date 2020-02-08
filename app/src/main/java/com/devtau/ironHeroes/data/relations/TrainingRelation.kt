@@ -21,13 +21,4 @@ class TrainingRelation {
         training.hero = hero
         return training
     }
-
-
-    companion object {
-        fun convertList(list: List<TrainingRelation>): List<Training> {
-            val trainings = ArrayList<Training>()
-            for (next in list) trainings.add(next.convert())
-            return trainings
-        }
-    }
 }

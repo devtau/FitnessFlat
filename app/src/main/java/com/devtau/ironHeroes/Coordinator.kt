@@ -18,6 +18,6 @@ interface Coordinator {
 
     fun newOtherFragmentInstance(): OtherFragment
     fun newSettingsFragmentInstance(): SettingsFragment
-    fun newStatisticsFragmentInstance(heroId: Long): StatisticsFragment
+    fun newStatisticsFragmentInstance(): StatisticsFragment
     fun newTrainingsFragmentInstance(): TrainingsFragment
 }

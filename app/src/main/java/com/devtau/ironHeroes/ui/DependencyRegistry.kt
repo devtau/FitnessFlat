@@ -95,8 +95,7 @@ object DependencyRegistry {
     fun inject(fragment: StatisticsFragment) {
         val context = fragment.context ?: return
         val db = DB.getInstance(context)
-        val heroId = heroIdFromBundleOrThrow(fragment.arguments)
-        val presenter = StatisticsPresenterImpl(fragment, db.exerciseDao(), db.exerciseInTrainingDao(), db.muscleGroupDao(), prefs, heroId)
+        val presenter = StatisticsPresenterImpl(fragment, db.heroDao(), db.exerciseDao(), db.exerciseInTrainingDao(), db.muscleGroupDao(), prefs)
         fragment.configureWith(presenter, coordinator)
     }
 

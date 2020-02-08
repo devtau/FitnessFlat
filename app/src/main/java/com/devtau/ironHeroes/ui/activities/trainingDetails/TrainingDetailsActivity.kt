@@ -16,6 +16,7 @@ import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
+import com.devtau.ironHeroes.util.SpinnerUtils
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_training_details.*
@@ -74,7 +75,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     //</editor-fold>
 
 
-    //<editor-fold desc="View overrides">
+    //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
     override fun showScreenTitle(newTraining: Boolean) {
         val toolbarTitle = if (newTraining) R.string.training_add else R.string.training_edit
@@ -85,9 +86,15 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
         trainingDate = date
         dateText?.text = AppUtils.formatDateTimeWithWeekDay(date)
     }
-    override fun showExercises(list: List<ExerciseInTraining>?) = exercisesAdapter?.setList(list, listView)
-    override fun showChampions(list: List<String>?, selectedIndex: Int) = AppUtils.initSpinner(champion, list, selectedIndex, this)
-    override fun showHeroes(list: List<String>?, selectedIndex: Int) = AppUtils.initSpinner(hero, list, selectedIndex, this)
+
+    override fun showExercises(list: List<ExerciseInTraining>?) =
+        exercisesAdapter?.setList(list, listView)
+
+    override fun showChampions(list: List<String>?, selectedIndex: Int) =
+        SpinnerUtils.initSpinner(champion, list, selectedIndex, this)
+
+    override fun showHeroes(list: List<String>?, selectedIndex: Int) =
+        SpinnerUtils.initSpinner(hero, list, selectedIndex, this)
 
     override fun showDateDialog(date: Calendar, minDate: Calendar, maxDate: Calendar) {
         trainingDate = date

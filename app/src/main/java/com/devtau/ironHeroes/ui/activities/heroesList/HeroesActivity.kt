@@ -47,7 +47,7 @@ class HeroesActivity: ViewSubscriberActivity(), HeroesContract.View {
     //</editor-fold>
 
 
-    //<editor-fold desc="View overrides">
+    //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
     override fun updateHeroes(list: List<Hero>?) = adapter?.setList(list)
     //</editor-fold>

@@ -20,7 +20,8 @@ class CustomXAxisRenderer(
 
     override fun drawLabel(c: Canvas, formattedLabel: String, x: Float, y: Float, anchor: MPPointF, angleDegrees: Float) {
         Logger.d("CustomXAxisRenderer", "drawLabel. formattedLabel=$formattedLabel, x=$x, y=$y")
-        val formattedDate = AppUtils.formatShortDate(xLabels[formattedLabel.toInt()])
+        val index = formattedLabel.toInt()
+        val formattedDate = if (index in xLabels.indices) AppUtils.formatShortDate(xLabels[index]) else ""
         Utils.drawXAxisValue(c, formattedDate, x, y, mAxisLabelPaint, anchor, angleDegrees)
     }
 }

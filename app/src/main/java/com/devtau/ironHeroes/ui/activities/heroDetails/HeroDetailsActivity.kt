@@ -86,7 +86,7 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
     //</editor-fold>
 
 
-    //<editor-fold desc="View overrides">
+    //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
     override fun showScreenTitle(newHero: Boolean, humanType: HumanType) {
         this.newHero = newHero
@@ -155,7 +155,7 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
         AppUtils.initPhoneRMR(phoneInput)
         vkText?.setOnClickListener { openVk(vkIdInput?.text?.toString()) }
         emailText?.setOnClickListener { composeEmail(emailInput?.text?.toString()) }
-        birthdayInput?.setOnClickListener { presenter.showBirthDayDialog(this, birthdayText?.text?.toString()) }
+        birthdayText?.setOnClickListener { presenter.showBirthDayDialog(this, birthdayText?.text?.toString()) }
         useVkAvatar?.setOnClickListener { IronHeroesApp.loginVK(this) }
         isChampion?.setOnCheckedChangeListener { _, isChecked ->
             updateHeroData("isChampion", isChecked.toString())

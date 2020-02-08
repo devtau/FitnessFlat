@@ -76,13 +76,7 @@ object CoordinatorImpl: Coordinator {
 
     override fun newSettingsFragmentInstance() = SettingsFragment()
 
-    override fun newStatisticsFragmentInstance(heroId: Long): StatisticsFragment {
-        val fragment = StatisticsFragment()
-        val args = Bundle()
-        args.putLong(Constants.HERO_ID, heroId)
-        fragment.arguments = args
-        return fragment
-    }
+    override fun newStatisticsFragmentInstance(): StatisticsFragment = StatisticsFragment()
 
     override fun newTrainingsFragmentInstance() = TrainingsFragment()
     //</editor-fold>

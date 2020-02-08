@@ -8,13 +8,12 @@ import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.MuscleGroup
 import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.data.relations.ExerciseInTrainingRelation
-import com.devtau.ironHeroes.data.relations.ExerciseRelation
 import com.devtau.ironHeroes.data.subscribeDefault
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.INTEGER_NOT_PARSED
 import com.devtau.ironHeroes.util.Logger
+import com.devtau.ironHeroes.util.SpinnerUtils
 import com.devtau.ironHeroes.util.print
 import io.reactivex.functions.Consumer
 import java.util.*
@@ -39,7 +38,7 @@ class ExercisePresenterImpl(
     private var exercisesInTrainings = mutableListOf<ExerciseInTraining>()
 
 
-    //<editor-fold desc="Presenter overrides">
+    //<editor-fold desc="Interface overrides">
     override fun onStop() {
         muscleGroups.clear()
         exercises.clear()
@@ -56,7 +55,7 @@ class ExercisePresenterImpl(
             }, "muscleGroupDao.getList"))
 
         disposeOnStop(exerciseDao.getList()
-            .map { relation -> ExerciseRelation.convertList(relation) }
+            .map { relation -> relation.map { it.convert() } }
             .subscribeDefault(Consumer {
                 exercises.clear()
                 exercises.addAll(it)
@@ -64,7 +63,7 @@ class ExercisePresenterImpl(
             }, "exerciseDao.getList"))
 
         disposeOnStop(exerciseInTrainingDao.getListForHeroDesc(heroId)
-            .map { relation -> ExerciseInTrainingRelation.convertList(relation) }
+            .map { relation -> relation.map { it.convert() } }
             .subscribeDefault(Consumer { exercises ->
                 exercisesInTrainings = exercises as MutableList
                 prepareAndPublishDataToView()
@@ -95,7 +94,7 @@ class ExercisePresenterImpl(
         if (ExerciseInTraining.allObligatoryPartsPresent(trainingId, exerciseInTrainingId, repeatsInt, countInt)) {
             if (exerciseInTraining == null && position != null) {
                 exerciseInTraining = ExerciseInTraining(null, trainingId!!, exerciseInTrainingId!!,
-                    weightInt, repeatsInt, countInt, position!!, comment)
+                    weightInt, repeatsInt, countInt, position, comment)
             } else if (exerciseInTraining?.someFieldsChanged(exerciseInTrainingId, weightInt, countInt, repeatsInt, comment) == true) {
                 exerciseInTraining?.exerciseId = exerciseInTrainingId
                 exerciseInTraining?.weight = weightInt
@@ -104,12 +103,14 @@ class ExercisePresenterImpl(
                 exerciseInTraining?.comment = comment
             }
 
-            exerciseInTrainingDao.insert(listOf(exerciseInTraining)).subscribeDefault("updateExercisesInTraining. inserted")
+            exerciseInTrainingDao.insert(listOf(exerciseInTraining))
+                .subscribeDefault("exerciseInTrainingDao.insert")
         }
     }
 
     override fun deleteExercise() {
-        exerciseInTrainingDao.delete(listOf(exerciseInTraining)).subscribeDefault("deleteExercisesInTraining. deleted")
+        exerciseInTrainingDao.delete(listOf(exerciseInTraining))
+            .subscribeDefault("exerciseInTrainingDao.delete")
     }
 
     override fun provideExercises(): List<Exercise>? = exercises
@@ -117,8 +118,8 @@ class ExercisePresenterImpl(
         val muscleGroupId = muscleGroups[muscleGroupIndex].id
         exercisesFiltered = filterExercisesByMuscleGroup(exercises, muscleGroupId)
         val selectedExerciseIndex = if (exerciseInTraining == null) 0
-        else AppUtils.getSelectedExerciseIndex(exercisesFiltered, exerciseInTraining?.exerciseId)
-        view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered), selectedExerciseIndex)
+        else SpinnerUtils.getSelectedExerciseIndex(exercisesFiltered, exerciseInTraining?.exerciseId)
+        view.showExercises(SpinnerUtils.getExercisesSpinnerStrings(exercisesFiltered), selectedExerciseIndex)
     }
 
     override fun updatePreviousExerciseData(exerciseIndex: Int) {
@@ -139,14 +140,14 @@ class ExercisePresenterImpl(
         }
 
         val exerciseInTraining = exerciseInTraining
-        if (AppUtils.isEmpty(muscleGroups) || AppUtils.isEmpty(exercises) ||
+        if (muscleGroups.isEmpty() || exercises.isEmpty() ||
             (exerciseInTrainingId != null && exerciseInTraining == null) ||
             (trainingId != null && training == null)) return
 
         if (exerciseInTraining == null) {
-            view.showMuscleGroups(AppUtils.getMuscleGroupsSpinnerStrings(muscleGroups), 0)
+            view.showMuscleGroups(SpinnerUtils.getMuscleGroupsSpinnerStrings(muscleGroups), 0)
             exercisesFiltered = filterExercisesByMuscleGroup(exercises, muscleGroups[0].id)
-            view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered), 0)
+            view.showExercises(SpinnerUtils.getExercisesSpinnerStrings(exercisesFiltered), 0)
 
             val previous = if (exercisesFiltered.isEmpty()) null else getPreviousExerciseData(exercisesFiltered[0].id, training)
             view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.repeats, previous?.count)
@@ -155,12 +156,12 @@ class ExercisePresenterImpl(
             applyMuscleGroupDetails(exerciseInTraining)
 
             val selectedMuscleGroupId = exerciseInTraining.exercise?.muscleGroupId
-            val selectedMuscleGroupIndex = AppUtils.getSelectedMuscleGroupIndex(muscleGroups, selectedMuscleGroupId)
-            view.showMuscleGroups(AppUtils.getMuscleGroupsSpinnerStrings(muscleGroups), selectedMuscleGroupIndex)
+            val selectedMuscleGroupIndex = SpinnerUtils.getSelectedMuscleGroupIndex(muscleGroups, selectedMuscleGroupId)
+            view.showMuscleGroups(SpinnerUtils.getMuscleGroupsSpinnerStrings(muscleGroups), selectedMuscleGroupIndex)
 
             exercisesFiltered = filterExercisesByMuscleGroup(exercises, selectedMuscleGroupId)
-            val selectedExerciseIndex = AppUtils.getSelectedExerciseIndex(exercisesFiltered, exerciseInTraining.exerciseId)
-            view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered), selectedExerciseIndex)
+            val selectedExerciseIndex = SpinnerUtils.getSelectedExerciseIndex(exercisesFiltered, exerciseInTraining.exerciseId)
+            view.showExercises(SpinnerUtils.getExercisesSpinnerStrings(exercisesFiltered), selectedExerciseIndex)
 
             val previous = getPreviousExerciseData(exerciseInTraining.exercise?.id, training)
             view.showPreviousExerciseData(previous?.training?.date, previous?.weight, previous?.repeats, previous?.count)

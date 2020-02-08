@@ -23,32 +23,54 @@ class FunctionsPresenterImpl(
         disposeOnStop(heroDao.getList(HumanType.HERO.ordinal)
             .subscribeDefault(Consumer { heroes ->
                 if (prefs.firstLaunch && (heroes == null || heroes.isEmpty())) {
-                    view.showMsg(R.string.load_demo_configuration, Action {
-                        prefs.firstLaunch = false
-                        loadDemoConfig()
-                    }, Action {
-                        prefs.firstLaunch = false
-                    })
+                    createMuscleGroupsAndExercises()
+                    showDemoConfigDialog()
                 }
             }, "getList"))
     }
 
 
-    //<editor-fold desc="Presenter overrides">
+    //<editor-fold desc="Interface overrides">
     override fun restartLoaders() {
 
     }
     //</editor-fold>
 
 
+    private fun createMuscleGroupsAndExercises() {
+        muscleGroupDao.insert(view.provideMockMuscleGroups())
+            .subscribeDefault("muscleGroupDao.insert")
+        exerciseDao.insert(view.provideMockExercises())
+            .subscribeDefault("exerciseDao.insert")
+    }
+
+    private fun showDemoConfigDialog() {
+        view.showMsg(R.string.load_demo_configuration, Action {
+            prefs.firstLaunch = false
+            loadDemoConfig()
+        }, Action {
+            showCreateHeroesDialog()
+        })
+    }
+
+    private fun showCreateHeroesDialog() {
+        view.showMsg(R.string.create_heroes, Action {
+            prefs.firstLaunch = false
+            view.turnPage(3)
+        }, Action {
+            prefs.firstLaunch = false
+        })
+    }
+
     private fun loadDemoConfig() {
-        muscleGroupDao.insert(view.provideMockMuscleGroups()).subscribeDefault("updateMuscleGroups. inserted")
-        exerciseDao.insert(view.provideMockExercises()).subscribeDefault("updateExercises. inserted")
-        heroDao.insert(view.provideMockHeroes()).subscribeDefault("heroes. inserted")
-        heroDao.insert(view.provideMockChampions()).subscribeDefault("champions. inserted")
-        heroDao.insert(view.provideMockChampions()).subscribeDefault("champions. inserted")
-        trainingDao.insert(view.provideMockTrainings()).subscribeDefault("updateTrainings. inserted")
-        exerciseInTrainingDao.insert(view.provideMockExercisesInTrainings()).subscribeDefault("updateExercisesInTraining. inserted")
+        heroDao.insert(view.provideMockHeroes())
+            .subscribeDefault("heroDao.insert heroes")
+        heroDao.insert(view.provideMockChampions())
+            .subscribeDefault("heroDao.insert champions")
+        trainingDao.insert(view.provideMockTrainings())
+            .subscribeDefault("trainingDao.insert")
+        exerciseInTrainingDao.insert(view.provideMockExercisesInTrainings())
+            .subscribeDefault("exerciseInTrainingDao.insert")
     }
 
 

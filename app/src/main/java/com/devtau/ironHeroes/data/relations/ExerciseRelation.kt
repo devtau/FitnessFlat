@@ -17,13 +17,4 @@ class ExerciseRelation {
         exercise.muscleGroup = muscleGroup
         return exercise
     }
-
-
-    companion object {
-        fun convertList(list: List<ExerciseRelation>): List<Exercise> {
-            val exercises = ArrayList<Exercise>()
-            for (next in list) exercises.add(next.convert())
-            return exercises
-        }
-    }
 }

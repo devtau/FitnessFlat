@@ -21,6 +21,7 @@
     <string name="trainings">Workouts</string>
     <string name="statistics">Statistics</string>
     <string name="database">Database</string>
+    <string name="no_exercises_or_trainings_found">No exercises or trainings found</string>
     <string name="export_to_file">Export to file</string>
     <string name="import_from_file">Import from file</string>
     <string name="export_error">Error while saving file</string>
@@ -35,13 +36,13 @@
     <string name="training_add">Add workout</string>
     <string name="exercise_add">Add exercise</string>
     <string name="wait_for_sms">Expect SMS with verification code</string>
-    <string name="name">Name</string>
-    <string name="surname">Surname</string>
-    <string name="phone">Phone</string>
+    <string name="name">Name *</string>
+    <string name="surname">Surname *</string>
+    <string name="phone">Phone *</string>
     <string name="email">Email</string>
     <string name="birthday">Birthday</string>
     <string name="date">Date</string>
-    <string name="gender">Gender</string>
+    <string name="gender">Gender *</string>
     <string name="is_champion">Is champion</string>
     <string name="use_vk_avatar">Use avatar Vkontakte</string>
     <string name="vk_id">ID Vkontakte</string>
@@ -88,9 +89,10 @@
     <string name="show_champion_filter">Show champion filter</string>
     <string name="show_hero_filter">Show hero filter</string>
     <string name="show_edit_dialog_at_statistics_screen">Show edit dialog at statistics screen on balloon click</string>
-    <string name="selected">Selected:</string>
+    <string name="selected_formatter" formatted="false">Selected: %s</string>
     <string name="no_exercise_data">You have not done this exercise yet</string>
     <string name="load_demo_configuration">Load demo configuration?</string>
+    <string name="create_heroes">Add new trainees and trainers?</string>
     <string name="clear_db">Clear database</string>
     <string name="clear_db_confirm">You are about to remove all workouts, exercises in these workouts, heroes and champions. Proceed?</string>
     <string name="next_set">Next set</string>

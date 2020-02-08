@@ -21,7 +21,7 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsContract.View, Setti
     private lateinit var presenter: FunctionsContract.Presenter
     private lateinit var coordinator: Coordinator
     private var pageIndex: Int = 0
-    private var adapter: FunctionsPagerAdapter? = null
+    private var pagerAdapter: FunctionsPagerAdapter? = null
 
 
     //<editor-fold desc="Framework overrides">
@@ -52,7 +52,7 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsContract.View, Setti
     //</editor-fold>
 
 
-    //<editor-fold desc="View overrides">
+    //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
 
     override fun showExported(trainingsCount: Int, exercisesCount: Int) {
@@ -74,7 +74,14 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsContract.View, Setti
     override fun provideMockTrainings() = Training.getMock(this)
     override fun provideMockExercisesInTrainings() = ExerciseInTraining.getMock(this, Locale.getDefault() == Locale("ru","RU"))
 
-    override fun updateSpinnersVisibility() = (adapter?.getItem(0) as TrainingsFragment).updateSpinnersVisibility()
+    override fun turnPage(pageIndex: Int) {
+        Logger.d(LOG_TAG, "turnPage. pageIndex=$pageIndex")
+        this.pageIndex = pageIndex
+        applyPageIndicatorState(pageIndex)
+        functionsPager?.currentItem = pageIndex
+    }
+
+    override fun updateSpinnersVisibility() = (pagerAdapter?.getItem(0) as TrainingsFragment).updateSpinnersVisibility()
     //</editor-fold>
 
 
@@ -93,21 +100,14 @@ class FunctionsActivity: ViewSubscriberActivity(), FunctionsContract.View, Setti
     }
 
     private fun initPager() {
-        adapter = FunctionsPagerAdapter(supportFragmentManager, coordinator)
-        functionsPager?.adapter = adapter
+        pagerAdapter = FunctionsPagerAdapter(supportFragmentManager, coordinator)
+        functionsPager?.adapter = pagerAdapter
         functionsPager?.offscreenPageLimit = 3
         functionsPager?.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
             override fun onPageSelected(position: Int) = turnPage(position)
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageScrollStateChanged(state: Int) {}
         })
-    }
-
-    private fun turnPage(pageIndex: Int) {
-        Logger.d(LOG_TAG, "turnPage. pageIndex=$pageIndex")
-        this.pageIndex = pageIndex
-        applyPageIndicatorState(pageIndex)
-        functionsPager?.currentItem = pageIndex
     }
 
     private fun applyPageIndicatorState(pageIndex: Int) {

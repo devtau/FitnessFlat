@@ -4,15 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Spinner
-import android.widget.TextView
 import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
-import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.toast
+import com.devtau.ironHeroes.util.SpinnerUtils
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
@@ -21,6 +18,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import io.reactivex.functions.Consumer
+import kotlinx.android.synthetic.main.fragment_statistics.*
 import java.util.*
 
 class StatisticsFragment: ViewSubscriberFragment(),
@@ -29,12 +27,6 @@ class StatisticsFragment: ViewSubscriberFragment(),
     private lateinit var presenter: StatisticsContract.Presenter
     private lateinit var coordinator: Coordinator
 
-    private var selectedContainer: View? = null
-    private var selected: TextView? = null
-    private var chart: LineChart? = null
-    private var muscleGroup: Spinner? = null
-    private var exercise: Spinner? = null
-
 
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,33 +34,15 @@ class StatisticsFragment: ViewSubscriberFragment(),
         DependencyRegistry.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_statistics, container, false)
-        initUI(root)
-        return root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_statistics, container, false)
 
     override fun onStart() {
         super.onStart()
         presenter.restartLoaders()
-        subscribeField(muscleGroup, Consumer { applyFilter(muscleGroup?.selectedItemPosition ?: 0, 0) })
-        subscribeField(exercise, Consumer { selectedExerciseIndex ->
-            val dataSets = chart?.lineData?.dataSets
-            val selectedExerciseName = exercise?.getItemAtPosition(selectedExerciseIndex) as String
-            var exerciseFound = false
-            if (dataSets != null && dataSets.isNotEmpty()) {
-                val showAll = selectedExerciseIndex == 0
-                for (next in dataSets) {
-                    val isCurrentExerciseSelected = next.label == selectedExerciseName
-                    next.isVisible = showAll || isCurrentExerciseSelected
-                    next.isHighlightEnabled = showAll || isCurrentExerciseSelected
-                    if (!exerciseFound) exerciseFound = showAll || isCurrentExerciseSelected
-                }
-            }
-            closeHighlight()
-            chart?.invalidate()
-            if (!exerciseFound) context?.toast(R.string.no_exercise_data)
-        })
+        subscribeField(muscleGroup, Consumer { applyFilter() })
+        subscribeField(exercise, Consumer { applyFilter() })
+        subscribeField(hero, Consumer { applyFilter() })
     }
 
     override fun onStop() {
@@ -78,12 +52,17 @@ class StatisticsFragment: ViewSubscriberFragment(),
     //</editor-fold>
 
 
-    //<editor-fold desc="View overrides">
+    //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
+
+    override fun showHeroes(list: List<String>?, selectedIndex: Int) =
+        SpinnerUtils.initSpinner(hero, list, selectedIndex, context)
+
     override fun showMuscleGroups(list: List<String>?, selectedIndex: Int) =
-        AppUtils.initSpinner(muscleGroup, list, selectedIndex, context)
+        SpinnerUtils.initSpinner(muscleGroup, list, selectedIndex, context)
+
     override fun showExercises(list: List<String>?, selectedIndex: Int) =
-        AppUtils.initSpinner(exercise, list, selectedIndex, context)
+        SpinnerUtils.initSpinner(exercise, list, selectedIndex, context)
 
     override fun showStatisticsData(lineData: LineData?, xLabels: List<Calendar>, xLabelsCount: Int) {
         Logger.d(LOG_TAG, "showStatisticsData. lineData=$lineData")
@@ -104,15 +83,6 @@ class StatisticsFragment: ViewSubscriberFragment(),
 
 
     //<editor-fold desc="Private methods">
-
-    private fun initUI(root: View?) {
-        selectedContainer = root?.findViewById(R.id.selectedContainer)
-        selected = root?.findViewById(R.id.selected)
-        chart = root?.findViewById(R.id.chart)
-        muscleGroup = root?.findViewById(R.id.muscleGroup)
-        exercise = root?.findViewById(R.id.exercise)
-    }
-
     private fun initChart(lineData: LineData?, xLabels: List<Calendar>, xLabelsCount: Int) {
         val context = context ?: return
         val chart = chart ?: return
@@ -136,8 +106,9 @@ class StatisticsFragment: ViewSubscriberFragment(),
                 val tag = e?.data as Tag?
                 trainingId = tag?.trainingId
                 exerciseId = tag?.exerciseInTrainingId
-                selectedContainer?.visibility = View.VISIBLE
-                selected?.text = tag?.title?.replace("\n", " ")
+                selected?.visibility = View.VISIBLE
+                val exerciseName = tag?.title?.replace("\n", " ")
+                selected?.text = String.format(getString(R.string.selected_formatter, exerciseName))
                 Logger.d(LOG_TAG, "onValueSelected. trainingId=$trainingId, exerciseId=$exerciseId")
             }
             override fun onNothingSelected() {
@@ -190,14 +161,17 @@ class StatisticsFragment: ViewSubscriberFragment(),
 //        yAxis.typeface = someTypeface
     }
 
-    private fun applyFilter(muscleGroupIndex: Int, exerciseIndex: Int) {
-        Logger.d(LOG_TAG, "applyFilter. muscleGroupIndex=$muscleGroupIndex, exerciseIndex=$exerciseIndex")
-        presenter.filterAndUpdateChart(muscleGroupIndex, exerciseIndex)
+    private fun applyFilter() {
+        val muscleGroupIndex = muscleGroup?.selectedItemPosition ?: 0
+        val exerciseIndex = exercise?.selectedItemPosition ?: 0
+        val heroIndex = hero?.selectedItemPosition ?: 0
+        Logger.d(LOG_TAG, "applyFilter. muscleGroupIndex=$muscleGroupIndex, exerciseIndex=$exerciseIndex, heroIndex=$heroIndex")
+        presenter.filterAndUpdateChart(muscleGroupIndex, exerciseIndex, heroIndex)
     }
 
     private fun closeHighlight() {
         chart?.highlightValues(null)
-        selectedContainer?.visibility = View.INVISIBLE
+        selected?.visibility = View.INVISIBLE
         selected?.text = ""
     }
     //</editor-fold>

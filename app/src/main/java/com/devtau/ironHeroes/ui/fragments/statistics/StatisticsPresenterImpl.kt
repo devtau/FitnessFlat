@@ -5,18 +5,16 @@ import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.dao.ExerciseDao
 import com.devtau.ironHeroes.data.dao.ExerciseInTrainingDao
+import com.devtau.ironHeroes.data.dao.HeroDao
 import com.devtau.ironHeroes.data.dao.MuscleGroupDao
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
+import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.MuscleGroup
-import com.devtau.ironHeroes.data.relations.ExerciseInTrainingRelation
-import com.devtau.ironHeroes.data.relations.ExerciseRelation
 import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
-import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.EntriesWrapper
-import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.PreferencesManager
+import com.devtau.ironHeroes.util.*
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -27,55 +25,74 @@ import kotlin.collections.ArrayList
 
 class StatisticsPresenterImpl(
     private val view: StatisticsContract.View,
+    private val heroDao: HeroDao,
     private val exerciseDao: ExerciseDao,
     private val exerciseInTrainingDao: ExerciseInTrainingDao,
     private val muscleGroupDao: MuscleGroupDao,
-    private val prefs: PreferencesManager,
-    private val heroId: Long
+    private val prefs: PreferencesManager
 ): DBSubscriber(), StatisticsContract.Presenter {
 
+    private var heroes = ArrayList<Hero>()
     private var muscleGroups = ArrayList<MuscleGroup>()
     private var exercises = ArrayList<Exercise>()
     private var exercisesFiltered = ArrayList<Exercise>()
     private var exercisesInTrainings = ArrayList<ExerciseInTraining>()
     private var exercisesInTrainingsFiltered = ArrayList<ExerciseInTraining>()
+    private var heroId: Long? = 3L
 
 
-    //<editor-fold desc="Presenter overrides">
+    //<editor-fold desc="Interface overrides">
     override fun restartLoaders() {
+        disposeOnStop(heroDao.getList(HumanType.HERO.ordinal)
+            .subscribeDefault(Consumer {
+                Logger.d(LOG_TAG, "got new heroes list with size=${it.size}")
+                heroes.clear()
+                heroes.addAll(it)
+                prepareAndPublishDataToView()
+            }, "heroDao.getList"))
+
         disposeOnStop(muscleGroupDao.getList()
             .subscribeDefault(Consumer {
+                Logger.d(LOG_TAG, "got new muscleGroups list with size=${it.size}")
                 muscleGroups.clear()
                 muscleGroups.addAll(it)
                 prepareAndPublishDataToView()
             }, "muscleGroupDao.getList"))
 
         disposeOnStop(exerciseDao.getList()
-            .map { relation -> ExerciseRelation.convertList(relation) }
+            .map { relation -> relation.map { it.convert() } }
             .subscribeDefault(Consumer {
+                Logger.d(LOG_TAG, "got new exercises list with size=${it.size}")
                 exercises.clear()
                 exercises.addAll(it)
                 prepareAndPublishDataToView()
             }, "exerciseDao.getList"))
 
-        disposeOnStop(exerciseInTrainingDao.getListForHeroAsc(heroId)
-            .map { relation -> ExerciseInTrainingRelation.convertList(relation) }
+        disposeOnStop(exerciseInTrainingDao.getList()
+            .map { relation -> relation.map { it.convert() } }
             .subscribeDefault(Consumer {
+                Logger.d(LOG_TAG, "got new exercisesInTrainings list with size=${it.size}")
                 exercisesInTrainings.clear()
                 exercisesInTrainings.addAll(it)
                 prepareAndPublishDataToView()
             }, "exerciseInTrainingDao.getListForHeroAsc"))
     }
 
-    override fun filterAndUpdateChart(muscleGroupIndex: Int, exerciseIndex: Int) {
+    override fun filterAndUpdateChart(muscleGroupIndex: Int, exerciseIndex: Int, heroIndex: Int) {
+        if (!muscleGroups.inBounds(muscleGroupIndex) || !exercisesInTrainings.inBounds(exerciseIndex) || !heroes.inBounds(heroIndex)) {
+            Logger.w(LOG_TAG, "filterAndUpdateChart. data lists are not ready. aborting")
+            return
+        }
         val muscleGroupId = muscleGroups[muscleGroupIndex].id
-        exercisesInTrainingsFiltered = filterExercisesInTrainings(exercisesInTrainings, muscleGroupId)
+        heroId = heroes[heroIndex].id
+        exercisesInTrainingsFiltered = filterExercisesInTrainings(exercisesInTrainings, muscleGroupId, heroId)
         val dates = parseTrainingDates(exercisesInTrainingsFiltered)
         val dataSets = convertToDataSets(exercisesInTrainingsFiltered, dates, R.color.colorAccent)
         val xLabelsCount = if (dates.size > X_LABELS_MAX_COUNT) X_LABELS_MAX_COUNT else dates.size
         view.showStatisticsData(dataSets, dates, xLabelsCount)
-        exercisesFiltered = filterExercises(exercises, muscleGroupId)
-        view.showExercises(AppUtils.getExercisesSpinnerStrings(exercisesFiltered, true), 0)
+
+        exercisesFiltered = filterExercises(exercises, muscleGroupId, exercisesInTrainingsFiltered)
+        view.showExercises(SpinnerUtils.getExercisesSpinnerStrings(exercisesFiltered, true), exerciseIndex)
     }
 
     override fun onBalloonClicked(trainingId: Long?, exerciseInTrainingId: Long?) {
@@ -87,28 +104,32 @@ class StatisticsPresenterImpl(
 
     //<editor-fold desc="Private methods">
     private fun prepareAndPublishDataToView() {
-        if (AppUtils.isEmpty(muscleGroups) || AppUtils.isEmpty(exercises) || AppUtils.isEmpty(exercisesInTrainings)) return
+        if (heroes.isEmpty() || muscleGroups.isEmpty() || exercises.isEmpty() || exercisesInTrainings.isEmpty()) return
 
-        view.showMuscleGroups(AppUtils.getMuscleGroupsSpinnerStrings(muscleGroups), 0)
-        view.showExercises(AppUtils.getExercisesSpinnerStrings(exercises, true), 0)
-        filterAndUpdateChart(0, 0)
+        view.showHeroes(SpinnerUtils.getHeroesSpinnerStrings(heroes), 0)
+        view.showMuscleGroups(SpinnerUtils.getMuscleGroupsSpinnerStrings(muscleGroups), 0)
+        view.showExercises(SpinnerUtils.getExercisesSpinnerStrings(exercises, true), 0)
+        filterAndUpdateChart(0, 0, 0)
     }
 
-    private fun filterExercisesInTrainings(list: List<ExerciseInTraining>?, muscleGroupId: Long?): ArrayList<ExerciseInTraining> {
-        val filtered = ArrayList<ExerciseInTraining>()
-        if (list != null) for (next in list)
-            if (muscleGroupId == null || next.exercise?.muscleGroupId == muscleGroupId) filtered.add(next)
-        Logger.d(LOG_TAG, "filterExercisesInTrainings. list size=${list?.size}, muscleGroupId=$muscleGroupId, filtered size=${filtered.size}")
-        return filtered
-    }
+    private fun filterExercisesInTrainings(
+        list: List<ExerciseInTraining>,
+        muscleGroupId: Long?,
+        heroId: Long?
+    ) = list.filter {
+        (muscleGroupId == null || it.exercise?.muscleGroupId == muscleGroupId) && it.training?.heroId == heroId
+    } as ArrayList
 
-    private fun filterExercises(list: List<Exercise>?, muscleGroupId: Long?): ArrayList<Exercise> {
-        val filtered = ArrayList<Exercise>()
-        if (list != null) for (next in list)
-            if (muscleGroupId == null || next.muscleGroupId == muscleGroupId) filtered.add(next)
-        Logger.d(LOG_TAG, "filterExercises. list size=${list?.size}, muscleGroupId=$muscleGroupId, filtered size=${filtered.size}")
-        return filtered
-    }
+    private fun filterExercises(
+        exercises: List<Exercise>,
+        muscleGroupId: Long?,
+        exercisesInTrainings: List<ExerciseInTraining>
+    ) = exercises.filter {
+        (muscleGroupId == null || it.muscleGroupId == muscleGroupId) && exerciseBeenUsed(exercisesInTrainings, it.id)
+    } as ArrayList
+
+    private fun exerciseBeenUsed(exercisesInTrainings: List<ExerciseInTraining>, exerciseId: Long?): Boolean =
+        exercisesInTrainings.any { it.exerciseId == exerciseId }
 
     private fun parseLine(exerciseId: Long?, exercises: List<ExerciseInTraining>?, dates: List<Calendar>?,
                           markerColorId: Int): EntriesWrapper {

@@ -23,7 +23,7 @@ class NetworkLayerImpl(val view: StandardView): NetworkLayer {
     private var httpClientNotLogging = buildClient(false)
 
 
-    //<editor-fold desc="interface overrides">
+    //<editor-fold desc="Interface overrides">
     override fun validatePhone(phone: String) {
         if (!view.isOnline()) return
         getBackendApiClient(true).validatePhone(phone)
@@ -60,7 +60,7 @@ class NetworkLayerImpl(val view: StandardView): NetworkLayer {
     //</editor-fold>
 
 
-    //<editor-fold desc="private methods">
+    //<editor-fold desc="Private methods">
     private fun getBackendApiClient(loggerNeeded: Boolean): BackendAPI = Retrofit.Builder()
         .baseUrl(BuildConfig.SERVER)
         .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))

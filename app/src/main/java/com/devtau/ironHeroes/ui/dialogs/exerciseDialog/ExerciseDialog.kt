@@ -1,27 +1,24 @@
 package com.devtau.ironHeroes.ui.dialogs.exerciseDialog
 
 import android.app.AlarmManager
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.SystemClock
 import android.view.*
+import androidx.core.app.NotificationCompat
+import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
+import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.dialogs.ViewSubscriberDialog
-import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.*
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.dialog_exercise.*
-import android.app.Notification
-import android.graphics.BitmapFactory
-import androidx.core.app.NotificationCompat
-import com.devtau.ironHeroes.enums.ChannelStats
-import com.devtau.ironHeroes.util.AlarmReceiver
-import com.devtau.ironHeroes.util.Logger
-import android.os.CountDownTimer
-import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.util.Animator
 
 class ExerciseDialog: ViewSubscriberDialog(),
     ExerciseContract.View {
@@ -69,13 +66,13 @@ class ExerciseDialog: ViewSubscriberDialog(),
     //</editor-fold>
 
 
-    //<editor-fold desc="View overrides">
+    //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
     override fun showMuscleGroups(list: List<String>?, selectedIndex: Int) =
-        AppUtils.initSpinner(muscleGroup, list, selectedIndex, context)
+        SpinnerUtils.initSpinner(muscleGroup, list, selectedIndex, context)
 
     override fun showExercises(list: List<String>?, selectedIndex: Int) =
-        AppUtils.initSpinner(exercise, list, selectedIndex, context)
+        SpinnerUtils.initSpinner(exercise, list, selectedIndex, context)
 
     override fun showExerciseDetails(weight: Int?, repeats: Int?, count: Int?, comment: String?) {
         AppUtils.updateInputField(weightInput, weight?.toString())

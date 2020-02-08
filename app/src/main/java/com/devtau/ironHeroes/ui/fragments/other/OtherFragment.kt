@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.Hero
@@ -14,6 +13,7 @@ import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.PermissionHelperImpl
 import io.reactivex.functions.Action
+import kotlinx.android.synthetic.main.fragment_other.*
 
 class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
 
@@ -28,10 +28,17 @@ class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
         DependencyRegistry.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_other, container, false)
-        initUi(root)
-        return root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_other, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initUi()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        presenter.restartLoaders()
     }
 
     override fun onStop() {
@@ -49,7 +56,7 @@ class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
     //</editor-fold>
 
 
-    //<editor-fold desc="View overrides">
+    //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
 
     override fun showExported(trainingsCount: Int, exercisesCount: Int) {
@@ -78,14 +85,14 @@ class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
 
 
     //<editor-fold desc="Private methods">
-    private fun initUi(root: View) {
-        root.findViewById<View>(R.id.heroes)?.setOnClickListener {
+    private fun initUi() {
+        heroes?.setOnClickListener {
             coordinator.launchHeroesActivity(context, HumanType.HERO)
         }
-        root.findViewById<View>(R.id.champions)?.setOnClickListener {
+        champions?.setOnClickListener {
             coordinator.launchHeroesActivity(context, HumanType.CHAMPION)
         }
-        root.findViewById<View>(R.id.exportToFile)?.setOnClickListener {
+        exportToFile?.setOnClickListener {
             val context = context ?: return@setOnClickListener
             val permissionHelper = PermissionHelperImpl()
             if (!permissionHelper.checkStoragePermission(context)) {
@@ -95,7 +102,7 @@ class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
             }
             presenter.exportToFile()
         }
-        root.findViewById<View>(R.id.importFromFile)?.setOnClickListener {
+        importFromFile?.setOnClickListener {
             val context = context ?: return@setOnClickListener
             val permissionHelper = PermissionHelperImpl()
             if (!permissionHelper.checkStoragePermission(context)) {
@@ -105,7 +112,7 @@ class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
             }
             presenter.importFromFile()
         }
-        root.findViewById<View>(R.id.clearDB)?.setOnClickListener {
+        clearDB?.setOnClickListener {
             showMsg(R.string.clear_db_confirm, Action { presenter.clearDB() }, Action {  })
         }
     }

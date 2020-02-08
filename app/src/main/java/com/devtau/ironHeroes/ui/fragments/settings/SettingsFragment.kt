@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
+import androidx.databinding.DataBindingUtil
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.databinding.FragmentSettingsBinding
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.util.PreferencesManager
 
 class SettingsFragment: ViewSubscriberFragment(), SettingsContract.View {
 
@@ -23,9 +25,10 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsContract.View {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_settings, container, false)
-        initUi(root)
-        return root
+        val binding = DataBindingUtil.inflate<FragmentSettingsBinding>(inflater, R.layout.fragment_settings, container, false)
+        binding.model = PreferencesManager
+        binding.initUi()
+        return binding.root
     }
 
     override fun onAttach(context: Context) {
@@ -39,6 +42,11 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsContract.View {
         super.onDetach()
     }
 
+    override fun onStart() {
+        super.onStart()
+        presenter.restartLoaders()
+    }
+
     override fun onStop() {
         super.onStop()
         presenter.onStop()
@@ -46,7 +54,7 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsContract.View {
     //</editor-fold>
 
 
-    //<editor-fold desc="View overrides">
+    //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
     //</editor-fold>
 
@@ -57,24 +65,22 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsContract.View {
 
 
     //<editor-fold desc="Private methods">
-    private fun initUi(root: View) {
-        val showChampionFilter = root.findViewById<CheckBox>(R.id.showChampionFilter)
-        showChampionFilter?.isChecked = presenter.isChampionFilterNeeded()
+    private fun FragmentSettingsBinding.initUi() = apply {
+        showChampionFilter.isChecked = presenter.isChampionFilterNeeded()
         showChampionFilter?.setOnCheckedChangeListener { _, isChecked ->
             presenter.showChampionFilterClicked(isChecked)
             listener?.updateSpinnersVisibility()
         }
-        val showHeroFilter = root.findViewById<CheckBox>(R.id.showHeroFilter)
-        showHeroFilter?.isChecked = presenter.isHeroFilterNeeded()
+        showHeroFilter.isChecked = presenter.isHeroFilterNeeded()
         showHeroFilter?.setOnCheckedChangeListener { _, isChecked ->
             presenter.showHeroFilterClicked(isChecked)
             listener?.updateSpinnersVisibility()
         }
-        val openEditDialogFromStatistics = root.findViewById<CheckBox>(R.id.openEditDialogFromStatistics)
-        openEditDialogFromStatistics?.isChecked = presenter.isEditDialogNeeded()
+        openEditDialogFromStatistics.isChecked = presenter.isEditDialogNeeded()
         openEditDialogFromStatistics?.setOnCheckedChangeListener { _, isChecked ->
             presenter.openEditDialogFromStatisticsClicked(isChecked)
         }
+//        invalidateAll()
     }
     //</editor-fold>
 

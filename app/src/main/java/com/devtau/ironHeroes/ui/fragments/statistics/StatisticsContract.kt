@@ -8,11 +8,12 @@ interface StatisticsContract {
     interface Presenter {
         fun onStop()
         fun restartLoaders()
-        fun filterAndUpdateChart(muscleGroupIndex: Int, exerciseIndex: Int)
+        fun filterAndUpdateChart(muscleGroupIndex: Int, exerciseIndex: Int, heroIndex: Int)
         fun onBalloonClicked(trainingId: Long?, exerciseInTrainingId: Long?)
     }
 
     interface View: StandardView {
+        fun showHeroes(list: List<String>?, selectedIndex: Int)
         fun showMuscleGroups(list: List<String>?, selectedIndex: Int)
         fun showExercises(list: List<String>?, selectedIndex: Int)
         fun showStatisticsData(lineData: LineData?, xLabels: List<Calendar>, xLabelsCount: Int)

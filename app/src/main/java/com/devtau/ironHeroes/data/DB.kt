@@ -1,9 +1,9 @@
 package com.devtau.ironHeroes.data
 
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import android.content.Context
 import androidx.room.TypeConverters
 import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.data.dao.*
@@ -56,12 +56,15 @@ fun <T> Flowable<T>.subscribeDefault(onNext: Consumer<T>, methodName: String): D
             Logger.e(DB.LOG_TAG, "Error in $methodName: ${it.message}")
         })
 
-fun Completable.subscribeDefault(msg: String?) {
+fun Completable.subscribeDefault(methodName: String) {
     var disposable: Disposable? = null
     disposable = subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe {
-            Logger.d(DB.LOG_TAG, msg)
+        .subscribe({
+            Logger.d(DB.LOG_TAG, "Success in $methodName")
             disposable?.dispose()
-        }
+        }, {
+            Logger.e(DB.LOG_TAG, "Error in $methodName: ${it.message}")
+            disposable?.dispose()
+        })
 }

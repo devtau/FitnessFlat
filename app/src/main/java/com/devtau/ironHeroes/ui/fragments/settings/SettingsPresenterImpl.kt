@@ -9,7 +9,7 @@ class SettingsPresenterImpl(
 ): DBSubscriber(), SettingsContract.Presenter {
 
 
-    //<editor-fold desc="Presenter overrides">
+    //<editor-fold desc="Interface overrides">
     override fun restartLoaders() {
 
     }

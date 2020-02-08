@@ -22,13 +22,4 @@ class ExerciseInTrainingRelation {
         exerciseInTraining.exercise = exercise.convert()
         return exerciseInTraining
     }
-
-
-    companion object {
-        fun convertList(list: List<ExerciseInTrainingRelation>): List<ExerciseInTraining> {
-            val exercises = ArrayList<ExerciseInTraining>()
-            for (next in list) exercises.add(next.convert())
-            return exercises
-        }
-    }
 }

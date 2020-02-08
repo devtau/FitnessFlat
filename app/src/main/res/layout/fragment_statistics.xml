@@ -8,26 +8,30 @@
     tools:context=".ui.fragments.statistics.StatisticsFragment">
     
     <LinearLayout
-        android:id="@+id/selectedContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/marginNormal"
-        android:paddingRight="@dimen/marginNormal"
-        android:visibility="invisible">
-        
-        <TextView
-            android:text="@string/selected"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/marginHalf"
-            android:paddingBottom="@dimen/marginHalf"/>
-        
+        android:paddingRight="@dimen/marginNormal">
+    
         <TextView
             android:id="@+id/selected"
-            android:layout_width="match_parent"
+            tools:text="@string/selected_formatter"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginLeft="@dimen/marginHalf"
-            android:minHeight="56dp"/>
+            android:minHeight="72dp"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+        
+        <Spinner
+            android:id="@+id/hero"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="@dimen/marginHalf"
+            android:paddingBottom="@dimen/marginHalf"
+            android:minHeight="48dp"/>
     </LinearLayout>
     
     

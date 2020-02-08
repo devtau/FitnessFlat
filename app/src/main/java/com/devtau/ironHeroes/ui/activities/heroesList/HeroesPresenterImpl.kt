@@ -16,7 +16,7 @@ class HeroesPresenterImpl(
     var heroes = arrayListOf<Hero>()
 
 
-    //<editor-fold desc="Presenter overrides">
+    //<editor-fold desc="Interface overrides">
     override fun restartLoaders() {
         disposeOnStop(heroDao.getList(humanType.ordinal)
             .subscribeDefault(Consumer {

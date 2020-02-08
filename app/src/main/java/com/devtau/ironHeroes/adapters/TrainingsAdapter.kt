@@ -19,9 +19,11 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.list_item_training.*
 
 class TrainingsAdapter(
-    private var trainings: List<Training>?,
     private val listener: Consumer<Training>
 ): RecyclerView.Adapter<TrainingsAdapter.TrainingsViewHolder>() {
+
+    private var trainings: MutableList<Training> = mutableListOf()
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrainingsViewHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.list_item_training, parent, false)
@@ -29,7 +31,7 @@ class TrainingsAdapter(
     }
 
     override fun onBindViewHolder(holder: TrainingsViewHolder, position: Int) {
-        val training = trainings?.get(position) ?: return
+        val training = trainings[position]
         Logger.v(LOG_TAG, "onBindViewHolder. training=$training")
         Glide.with(holder.championImage).load(
             if (!TextUtils.isEmpty(training.champion?.avatarUrl)) training.champion?.avatarUrl
@@ -49,21 +51,23 @@ class TrainingsAdapter(
         holder.containerView.setOnClickListener { listener.accept(training) }
     }
 
-    override fun getItemCount(): Int = trainings?.size ?: 0
+    override fun getItemCount(): Int = trainings.size
 
 
-    fun setList(list: List<Training>?, listView: RecyclerView?) {
+    fun setList(list: List<Training>, listView: RecyclerView?) {
         if (itemCount == 0) {
             Threading.dispatchMainDelayed(Consumer {
                 listView?.visibility = View.INVISIBLE
-                this.trainings = list
+                trainings.clear()
+                trainings.addAll(list)
                 notifyDataSetChanged()
                 val unbounded = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
                 listView?.measure(unbounded, unbounded)
                 Animator.animateDropdownSlide(listView, listView?.measuredHeight, Animator.ANIMATION_LENGTH_MED, true)
             }, Animator.ANIMATION_LENGTH_MED)
         } else {
-            this.trainings = list
+            trainings.clear()
+            trainings.addAll(list)
             notifyDataSetChanged()
         }
     }

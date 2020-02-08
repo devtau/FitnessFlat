@@ -1,20 +1,18 @@
 package com.devtau.ironHeroes.ui.activities.trainingDetails
 
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.dao.*
+import com.devtau.ironHeroes.data.dao.ExerciseDao
+import com.devtau.ironHeroes.data.dao.ExerciseInTrainingDao
+import com.devtau.ironHeroes.data.dao.HeroDao
+import com.devtau.ironHeroes.data.dao.TrainingDao
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.data.relations.ExerciseInTrainingRelation
-import com.devtau.ironHeroes.data.relations.ExerciseRelation
 import com.devtau.ironHeroes.data.subscribeDefault
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
-import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.PreferencesManager
-import com.devtau.ironHeroes.util.Threading
+import com.devtau.ironHeroes.util.*
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.*
@@ -31,39 +29,43 @@ class TrainingDetailsPresenterImpl(
 ): DBSubscriber(), TrainingDetailsContract.Presenter {
 
     private var training: Training? = null
-    private var champions: List<Hero>? = null
-    private var heroes: List<Hero>? = null
-    private var exercises: List<Exercise>? = null
-    private var exercisesInTraining: List<ExerciseInTraining>? = null
+    private var champions = mutableListOf<Hero>()
+    private var heroes = mutableListOf<Hero>()
+    private var exercises = mutableListOf<Exercise>()
+    private var exercisesInTraining = mutableListOf<ExerciseInTraining>()
 
 
-    //<editor-fold desc="Presenter overrides">
+    //<editor-fold desc="Interface overrides">
     override fun restartLoaders() {
         disposeOnStop(exerciseDao.getList()
-            .map { ExerciseRelation.convertList(it) }
+            .map { relation -> relation.map { it.convert() } }
             .subscribeDefault(Consumer {
-                exercises = it
+                exercises.clear()
+                exercises.addAll(it)
                 publishDataToView()
             }, "exerciseDao.getList"))
 
         disposeOnStop(heroDao.getList(HumanType.CHAMPION.ordinal)
             .subscribeDefault(Consumer {
-                champions = it
+                champions.clear()
+                champions.addAll(it)
                 publishDataToView()
             }, "heroDao.getList"))
 
         disposeOnStop(heroDao.getList(HumanType.HERO.ordinal)
             .subscribeDefault(Consumer {
-                heroes = it
+                heroes.clear()
+                heroes.addAll(it)
                 publishDataToView()
             }, "heroDao.getList"))
 
         trainingId?.let {
             disposeOnStop(exerciseInTrainingDao.getListForTraining(it)
-                .map { relations -> ExerciseInTrainingRelation.convertList(relations) }
+                .map { relation -> relation.map { it.convert() } }
                 .subscribeDefault(Consumer { exercises ->
                     if (isOnlyOrderOfListChanged(exercisesInTraining, exercises)) return@Consumer
-                    exercisesInTraining = exercises
+                    exercisesInTraining.clear()
+                    exercisesInTraining.addAll(exercises)
                     publishDataToView()
                 }, "exerciseInTrainingDao.getById"))
 
@@ -77,8 +79,8 @@ class TrainingDetailsPresenterImpl(
     }
 
     override fun updateTrainingData(championIndex: Int, heroIndex: Int, date: Calendar?) {
-        val championId = champions?.get(championIndex)?.id
-        val heroId = heroes?.get(heroIndex)?.id
+        val championId = champions[championIndex].id
+        val heroId = heroes[heroIndex].id
         val trainingDate = date?.timeInMillis ?: AppUtils.getRoundDate().timeInMillis
         val allPartsPresent = Training.allObligatoryPartsPresent(championId, heroId, trainingDate)
         val someFieldsChanged = training?.someFieldsChanged(championId, heroId, trainingDate) ?: true
@@ -90,10 +92,10 @@ class TrainingDetailsPresenterImpl(
                 if (training?.id == null) {
                     training?.id = trainingId
                     disposeOnStop(exerciseInTrainingDao.getListForTraining(trainingId!!)
-                        .map { relations -> ExerciseInTrainingRelation.convertList(relations) }
+                        .map { relation -> relation.map { it.convert() } }
                         .subscribeDefault(Consumer { exercises ->
-//                            if (isOnlyOrderOfListChanged(exercisesInTraining, exercises)) return@Consumer
-                            exercisesInTraining = exercises
+                            exercisesInTraining.clear()
+                            exercisesInTraining.addAll(exercises)
                             publishDataToView()
                         }, "exerciseInTrainingDao.getById"))
                 }
@@ -126,9 +128,11 @@ class TrainingDetailsPresenterImpl(
     override fun deleteTraining() {
         view.showMsg(R.string.confirm_delete, Action {
             training?.exercises?.let {
-                exerciseInTrainingDao.delete(it).subscribeDefault("deleteExercisesInTraining. deleted")
+                exerciseInTrainingDao.delete(it)
+                    .subscribeDefault("exerciseInTrainingDao.delete")
             }
-            trainingDao.delete(listOf(training)).subscribeDefault("deleteTrainings. deleted")
+            trainingDao.delete(listOf(training))
+                .subscribeDefault("trainingDao.delete")
             view.closeScreen()
         })
     }
@@ -143,7 +147,8 @@ class TrainingDetailsPresenterImpl(
         exercises.add(toPosition, item)
 
         for ((i, next) in exercises.withIndex()) next.position = i
-        exerciseInTrainingDao.insert(exercises).subscribeDefault("updateExercisesInTraining. inserted")
+        exerciseInTrainingDao.insert(exercises)
+            .subscribeDefault("exerciseInTrainingDao.insert")
     }
 
     override fun addExerciseClicked() = view.showNewExerciseDialog(getNextExercisePosition())
@@ -151,32 +156,16 @@ class TrainingDetailsPresenterImpl(
 
 
     //<editor-fold desc="Private methods">
-    private fun getSpinnerStrings(list: List<Hero>?): List<String> {
-        val spinnerStrings = ArrayList<String>()
-        if (list != null) for (next in list) spinnerStrings.add(next.getName())
-        return spinnerStrings
-    }
-
-    private fun getSelectedItemIndex(list: List<Hero>?, selectedId: Long?): Int {
-        var index = 0
-        if (list != null)
-            for ((i, next) in list.withIndex())
-                if (next.id == selectedId)
-                    index = i
-        return index
-    }
-
     private fun publishDataToView() {
-        val training = training
-        if (AppUtils.isEmpty(exercises) || AppUtils.isEmpty(champions) || AppUtils.isEmpty(heroes)
-            || (trainingId != null && (training == null || exercisesInTraining == null))) return
+        if (exercises.isEmpty() || champions.isEmpty() || heroes.isEmpty()
+            || (trainingId != null && training == null)) return
 
         val championId = training?.championId ?: prefs.favoriteChampionId
         val heroId = training?.heroId ?: prefs.favoriteHeroId
-        val championIndex = getSelectedItemIndex(champions, championId)
-        val heroIndex = getSelectedItemIndex(heroes, heroId)
-        view.showChampions(getSpinnerStrings(champions), championIndex)
-        view.showHeroes(getSpinnerStrings(heroes), heroIndex)
+        val championIndex = SpinnerUtils.getSelectedHeroIndex(champions, championId)
+        val heroIndex = SpinnerUtils.getSelectedHeroIndex(heroes, heroId)
+        view.showChampions(SpinnerUtils.getHeroesSpinnerStrings(champions), championIndex)
+        view.showHeroes(SpinnerUtils.getHeroesSpinnerStrings(heroes), heroIndex)
 
         if (trainingId == null) {
             view.showScreenTitle(true)
@@ -184,25 +173,22 @@ class TrainingDetailsPresenterImpl(
             view.showDeleteTrainingBtn(false)
             updateTrainingData(championIndex, heroIndex, null)
         } else {
-            val exercises = exercises
-            val exercisesInTraining = exercisesInTraining
-            if (exercisesInTraining != null && exercises != null)
-                for (nextTraining in exercisesInTraining)
-                    for (nextExercise in exercises)
-                        if (nextTraining.exerciseId == nextExercise.id)
-                            nextTraining.exercise = nextExercise
+            for (nextTraining in exercisesInTraining)
+                for (nextExercise in exercises)
+                    if (nextTraining.exerciseId == nextExercise.id)
+                        nextTraining.exercise = nextExercise
             training?.exercises = exercisesInTraining
             view.showExercises(training!!.exercises)
 
             view.showScreenTitle(false)
-            view.showTrainingDate(training.getDateCal())
+            view.showTrainingDate(training!!.getDateCal())
             view.showDeleteTrainingBtn(true)
         }
 
         Logger.d(LOG_TAG, "publishDataToView. " +
                 "training=$training, " +
-                "champions size=${champions?.size}, " +
-                "heroes size=${heroes?.size}")
+                "champions size=${champions.size}, " +
+                "heroes size=${heroes.size}")
     }
 
     private fun isOnlyOrderOfListChanged(oldList: List<ExerciseInTraining>?, newList: List<ExerciseInTraining>?): Boolean {

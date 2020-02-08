@@ -9,6 +9,7 @@
 	<string name="trainings">Тренировки</string>
 	<string name="statistics">Статистика</string>
 	<string name="database">База данных</string>
+	<string name="no_exercises_or_trainings_found">Не найдено упражнений или тренировок</string>
 	<string name="export_to_file">Экспортировать в файл</string>
 	<string name="import_from_file">Импортировать из файла</string>
 	<string name="export_error">Ошибка при сохранении в файл</string>
@@ -23,13 +24,13 @@
 	<string name="training_add">Добавить тренировку</string>
 	<string name="exercise_add">Добавить упражнение</string>
 	<string name="wait_for_sms">Ожидайте СМС с кодом подтверждения</string>
-	<string name="name">Имя</string>
-	<string name="surname">Фамилия</string>
-	<string name="phone">Телефон</string>
+	<string name="name">Имя *</string>
+	<string name="surname">Фамилия *</string>
+	<string name="phone">Телефон *</string>
 	<string name="email">Email</string>
 	<string name="birthday">День рождения</string>
 	<string name="date">Дата</string>
-	<string name="gender">Пол</string>
+	<string name="gender">Пол *</string>
 	<string name="is_champion">Это тренер</string>
 	<string name="use_vk_avatar">Использовать аватар ВК</string>
 	<string name="vk_id">ID Вконтакте</string>
@@ -76,9 +77,10 @@
 	<string name="show_champion_filter">Показывать фильтр по чемпиону</string>
 	<string name="show_hero_filter">Показывать фильтр по герою</string>
 	<string name="show_edit_dialog_at_statistics_screen">Диалог при клике на балун на экране статистики</string>
-	<string name="selected">Выбрано:</string>
+	<string name="selected_formatter" formatted="false">Выбрано: %s</string>
 	<string name="no_exercise_data">Вы еще не выполняли это упражнение</string>
 	<string name="load_demo_configuration">Загрузить демонстрационную конфигурацию?</string>
+	<string name="create_heroes">Создать новых тренирующихся и тренеров?</string>
 	<string name="clear_db">Очистить базу данных</string>
 	<string name="clear_db_confirm">Вы собираетесь удалить все тренировки, упражнения в этих тренировках, героев и чемпионов. Продолжить?</string>
 	<string name="next_set">Следующий подход</string>

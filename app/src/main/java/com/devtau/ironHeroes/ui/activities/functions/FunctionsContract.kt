@@ -18,5 +18,6 @@ interface FunctionsContract {
         fun provideMockMuscleGroups(): List<MuscleGroup>
         fun provideMockTrainings(): List<Training>
         fun provideMockExercisesInTrainings(): List<ExerciseInTraining>
+        fun turnPage(pageIndex: Int)
     }
 }

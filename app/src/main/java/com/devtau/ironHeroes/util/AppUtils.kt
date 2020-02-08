@@ -6,19 +6,18 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.net.ConnectivityManager
 import android.os.Build
-import android.os.Looper
 import android.telephony.PhoneNumberUtils
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.HourMinute
-import com.devtau.ironHeroes.data.model.MuscleGroup
 import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
 import com.devtau.ironHeroes.util.Constants.DATE_TIME_FORMATTER
@@ -29,23 +28,12 @@ import com.devtau.ironHeroes.util.Constants.SHORT_DATE_FORMATTER
 import com.devtau.ironHeroes.util.Constants.STANDARD_DELAY_MS
 import com.redmadrobot.inputmask.MaskedTextChangedListener
 import io.reactivex.functions.Action
-import org.jetbrains.annotations.Contract
 import java.text.SimpleDateFormat
 import java.util.*
 
 object AppUtils {
 
     private const val LOG_TAG = "AppUtils"
-
-
-    @Contract("null -> true")
-    fun isEmpty(list: List<*>?): Boolean = list == null || list.isEmpty()
-    @Contract("null -> true")
-    fun isEmpty(map: Map<*, *>?): Boolean = map == null || map.isEmpty()
-    @Contract("null -> false")
-    fun notEmpty(list: List<*>?): Boolean = !isEmpty(list)
-    @Contract("null -> false")
-    fun notEmpty(map: Map<*, *>?): Boolean = !isEmpty(map)
 
 
     fun checkConnection(context: Context?): Boolean {
@@ -211,24 +199,6 @@ object AppUtils {
         }
     }
 
-    fun initSpinner(spinner: Spinner?, spinnerStrings: List<String>?, selectedIndex: Int, context: Context?) {
-        if (spinner == null || spinnerStrings == null || context == null) {
-            Logger.e(LOG_TAG, "initSpinner. bad data. aborting")
-            return
-        }
-        var adapter = spinner.adapter as ArrayAdapter<String>?
-        if (adapter == null) {
-            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, spinnerStrings)
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter
-        } else {
-            adapter.clear()
-            adapter.addAll(spinnerStrings)
-            adapter.notifyDataSetChanged()
-        }
-        spinner.setSelection(selectedIndex)
-    }
-
     fun updateInputField(input: TextView?, value: String?) {
         if (input != null && input.text?.toString() != value) {
             input.setText(value)
@@ -260,42 +230,6 @@ object AppUtils {
         date.set(Calendar.MINUTE, hourMinute.minute)
         date.set(Calendar.SECOND, 0)
         return date
-    }
-
-    fun getMuscleGroupsSpinnerStrings(list: List<MuscleGroup>?): List<String> {
-        val spinnerStrings = ArrayList<String>()
-        if (list != null) for (next in list) spinnerStrings.add(next.name)
-        return spinnerStrings
-    }
-
-    fun getExercisesSpinnerStrings(list: List<Exercise>?, withEmptyString: Boolean = false): List<String> {
-        val spinnerStrings = ArrayList<String>()
-        if (withEmptyString) spinnerStrings.add("- -")
-        if (list != null) for (next in list) spinnerStrings.add(next.name)
-        return spinnerStrings
-    }
-
-    fun getSelectedExerciseIndex(list: List<Exercise>?, selectedId: Long?): Int {
-        var index = 0
-        if (list != null)
-            for ((i, next) in list.withIndex())
-                if (next.id == selectedId)
-                    index = i
-        return index
-    }
-
-    fun getSelectedMuscleGroupIndex(list: List<MuscleGroup>?, selectedId: Long?): Int {
-        var index = 0
-        if (list != null)
-            for ((i, next) in list.withIndex())
-                if (next.id == selectedId)
-                    index = i
-        return index
-    }
-
-    fun checkNotMainThread() {
-        if (Looper.getMainLooper().thread == Thread.currentThread())
-            throw RuntimeException("method should not be called from UI thread")
     }
 
     fun createChannelIfNeeded(notificationManager: NotificationManager?, channelStats: ChannelStats) {
@@ -333,3 +267,5 @@ fun <T>List<T>.print(logTag: String): String {
     Logger.d(logTag, string)
     return string
 }
+
+fun <T>List<T>.inBounds(index: Int): Boolean = size > index

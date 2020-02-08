@@ -10,7 +10,7 @@ object Serializer {
 
     private const val LOG_TAG = "Serializer"
 
-    fun serializeList(list: List<*>?): String? = if (AppUtils.isEmpty(list)) null else Gson().toJson(list)
+    fun serializeList(list: List<*>): String? = Gson().toJson(list)
 
 
     fun deserializeListOfLongs(string: String?): List<Long>? =

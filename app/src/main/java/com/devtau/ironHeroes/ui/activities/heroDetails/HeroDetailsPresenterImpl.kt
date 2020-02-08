@@ -25,7 +25,7 @@ class HeroDetailsPresenterImpl(
     private var hero: Hero? = null
 
 
-    //<editor-fold desc="Presenter overrides">
+    //<editor-fold desc="Interface overrides">
     override fun restartLoaders() {
         if (heroId == null) {
             view.showScreenTitle(true, humanType)
@@ -57,7 +57,8 @@ class HeroDetailsPresenterImpl(
         if (allPartsPresent && someFieldsChanged) {
             hero = Hero(heroId, humanType, firstName!!, secondName!!, phone!!, gender!!, vkId, email,
                 AppUtils.parseDate(birthDay).timeInMillis, avatarUrl, avatarId ?: hero?.avatarId)
-            heroDao.insert(listOf(hero)).subscribeDefault("updateHeroes. inserted")
+            heroDao.insert(listOf(hero))
+                .subscribeDefault("heroDao.insert")
         }
     }
 
@@ -93,7 +94,8 @@ class HeroDetailsPresenterImpl(
 
     override fun deleteHero() {
         view.showMsg(R.string.confirm_delete, Action {
-            heroDao.delete(listOf(hero)).subscribeDefault("deleteHeroes. deleted")
+            heroDao.delete(listOf(hero))
+                .subscribeDefault("heroDao.delete")
             view.closeScreen()
         })
     }
