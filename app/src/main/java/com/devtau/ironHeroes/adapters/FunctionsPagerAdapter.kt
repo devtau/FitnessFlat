@@ -5,7 +5,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import com.devtau.ironHeroes.Coordinator
+import com.devtau.ironHeroes.ui.Coordinator
+import com.devtau.ironHeroes.ui.fragments.other.OtherFragment
+import com.devtau.ironHeroes.ui.fragments.settings.SettingsFragment
+import com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment
+import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment
 import com.devtau.ironHeroes.util.Logger
 import java.lang.ref.WeakReference
 import java.util.*
@@ -31,11 +35,11 @@ class FunctionsPagerAdapter(fragmentManager: FragmentManager, val coordinator: C
     override fun getItem(position: Int): Fragment {
         Logger.d(LOG_TAG, "getItem. position=$position")
         return pages[position]?.get() ?: when (position) {
-            0 -> coordinator.newTrainingsFragmentInstance()
-            1 -> coordinator.newStatisticsFragmentInstance()
-            2 -> coordinator.newSettingsFragmentInstance()
-            3 -> coordinator.newOtherFragmentInstance()
-            else -> coordinator.newOtherFragmentInstance()
+            0 -> TrainingsFragment()
+            1 -> StatisticsFragment()
+            2 -> SettingsFragment()
+            3 -> OtherFragment()
+            else -> OtherFragment()
         }
     }
 

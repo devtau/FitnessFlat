@@ -56,6 +56,7 @@ class SettingsFragment: ViewSubscriberFragment(), SettingsContract.View {
 
     //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
+    override fun initActionbar() = false
     //</editor-fold>
 
 

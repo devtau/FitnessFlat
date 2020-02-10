@@ -1,20 +1,23 @@
-package com.devtau.ironHeroes.ui.activities.heroesList
+package com.devtau.ironHeroes.ui.fragments.heroesList
 
 import android.os.Bundle
-import com.devtau.ironHeroes.Coordinator
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.HeroesAdapter
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
+import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
-import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.ui.fragments.initActionBar
 import com.devtau.ironHeroes.util.Constants
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.activity_heroes.*
+import kotlinx.android.synthetic.main.fragment_heroes.*
 
-class HeroesActivity: ViewSubscriberActivity(), HeroesContract.View {
+class HeroesFragment: ViewSubscriberFragment(), HeroesContract.View {
 
     private lateinit var presenter: HeroesContract.Presenter
     private lateinit var coordinator: Coordinator
@@ -24,13 +27,14 @@ class HeroesActivity: ViewSubscriberActivity(), HeroesContract.View {
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_heroes)
         DependencyRegistry.inject(this)
-        val toolbarTitle = when (presenter.provideHumanType()) {
-            HumanType.HERO -> R.string.trainees
-            HumanType.CHAMPION -> R.string.trainers
-        }
-        AppUtils.initToolbar(this, toolbarTitle, true)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_heroes, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initUi()
         initList()
     }
@@ -49,6 +53,12 @@ class HeroesActivity: ViewSubscriberActivity(), HeroesContract.View {
 
     //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
+
+    override fun initActionbar() = activity?.initActionBar(when (presenter.provideHumanType()) {
+        HumanType.HERO -> R.string.trainees
+        HumanType.CHAMPION -> R.string.trainers
+    })
+
     override fun updateHeroes(list: List<Hero>?) = adapter?.setList(list)
     //</editor-fold>
 
@@ -62,14 +72,15 @@ class HeroesActivity: ViewSubscriberActivity(), HeroesContract.View {
     //<editor-fold desc="Private methods">
     private fun initUi() {
         listView?.postDelayed({ fab.show() }, Constants.STANDARD_DELAY_MS)
-        fab.setOnClickListener { coordinator.launchHeroDetailsActivity(this, null, presenter.provideHumanType()) }
+        fab.setOnClickListener { coordinator.launchHeroDetails(it, null, presenter.provideHumanType()) }
     }
 
     private fun initList() {
+        val context = context ?: return
         adapter = HeroesAdapter(null, Consumer {
-            coordinator.launchHeroDetailsActivity(this, it.id, presenter.provideHumanType())
+            coordinator.launchHeroDetails(listView, it.id, presenter.provideHumanType())
         })
-        listView?.layoutManager = CustomLinearLayoutManager(this)
+        listView?.layoutManager = CustomLinearLayoutManager(context)
         listView?.adapter = adapter
     }
     //</editor-fold>

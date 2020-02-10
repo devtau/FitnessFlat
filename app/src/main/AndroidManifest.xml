@@ -23,18 +23,13 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         
-        <activity android:name=".ui.activities.functions.FunctionsActivity">
+        <activity android:name=".ui.activities.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
     
-        <activity android:name=".ui.activities.heroesList.HeroesActivity"/>
-        <activity android:name=".ui.activities.heroDetails.HeroDetailsActivity"/>
-        <activity android:name="com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment"/>
-        <activity android:name=".ui.activities.trainingDetails.TrainingDetailsActivity"/>
-        <activity android:name="com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment"/>
     
         <activity
             android:name="com.vk.sdk.VKServiceActivity"

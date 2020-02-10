@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.Logger
@@ -54,6 +54,7 @@ class StatisticsFragment: ViewSubscriberFragment(),
 
     //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
+    override fun initActionbar() = false
 
     override fun showHeroes(list: List<String>?, selectedIndex: Int) =
         SpinnerUtils.initSpinner(hero, list, selectedIndex, context)
@@ -71,7 +72,7 @@ class StatisticsFragment: ViewSubscriberFragment(),
 
     override fun showExerciseDetails(heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?) {
         Logger.d(LOG_TAG, "showExerciseDetails. heroId=$heroId, trainingId=$trainingId, exerciseInTrainingId=$exerciseInTrainingId")
-        coordinator.showExerciseDialog(childFragmentManager, heroId, trainingId, exerciseInTrainingId)
+        coordinator.showExercise(view, heroId, trainingId, exerciseInTrainingId)
     }
     //</editor-fold>
 

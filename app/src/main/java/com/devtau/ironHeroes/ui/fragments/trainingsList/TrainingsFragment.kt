@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.TrainingsAdapter
 import com.devtau.ironHeroes.data.model.Training
+import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.Constants
@@ -54,6 +54,8 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsContract.View {
 
     //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
+    override fun initActionbar() = false
+
     override fun updateTrainings(list: List<Training>) {
         adapter?.setList(list, listView)
     }
@@ -80,14 +82,14 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsContract.View {
     //<editor-fold desc="Private methods">
     private fun initUi() {
         listView?.postDelayed({ fab?.show() }, Constants.STANDARD_DELAY_MS)
-        fab?.setOnClickListener { coordinator.launchTrainingDetailsActivity(context, null) }
+        fab?.setOnClickListener { coordinator.launchTrainingDetails(fab, null) }
         updateSpinnersVisibility()
     }
 
     private fun initList() {
         val context = context ?: return
         adapter = TrainingsAdapter(Consumer {
-            coordinator.launchTrainingDetailsActivity(context, it.id)
+            coordinator.launchTrainingDetails(listView, it.id)
         })
         listView?.layoutManager = CustomLinearLayoutManager(context)
         listView?.adapter = adapter

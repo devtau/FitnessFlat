@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
+import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
 import com.devtau.ironHeroes.util.PermissionHelperImpl
@@ -58,6 +58,7 @@ class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
 
     //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
+    override fun initActionbar() = false
 
     override fun showExported(trainingsCount: Int, exercisesCount: Int) {
         val trainings = resources.getQuantityString(R.plurals.trainings, trainingsCount, trainingsCount)
@@ -86,12 +87,8 @@ class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
 
     //<editor-fold desc="Private methods">
     private fun initUi() {
-        heroes?.setOnClickListener {
-            coordinator.launchHeroesActivity(context, HumanType.HERO)
-        }
-        champions?.setOnClickListener {
-            coordinator.launchHeroesActivity(context, HumanType.CHAMPION)
-        }
+        heroes?.setOnClickListener { coordinator.launchHeroes(it, HumanType.HERO) }
+        champions?.setOnClickListener { coordinator.launchHeroes(it, HumanType.CHAMPION) }
         exportToFile?.setOnClickListener {
             val context = context ?: return@setOnClickListener
             val permissionHelper = PermissionHelperImpl()

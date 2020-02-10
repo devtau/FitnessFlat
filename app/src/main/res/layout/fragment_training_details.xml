@@ -4,9 +4,7 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical"
-	tools:context=".ui.activities.trainingDetails.TrainingDetailsActivity">
-	
-	<include layout="@layout/toolbar"/>
+	tools:context=".ui.fragments.trainingDetails.TrainingDetailsFragment">
 	
 	<TableLayout
 		android:layout_width="match_parent"

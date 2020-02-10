@@ -1,44 +1,58 @@
-package com.devtau.ironHeroes.ui.activities.heroDetails
+package com.devtau.ironHeroes.ui.fragments.heroDetails
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.Navigation
 import com.devtau.ironHeroes.IronHeroesApp
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.Gender
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
+import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.ui.fragments.initActionBar
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PermissionHelperImpl
-import com.vk.sdk.VKSdk
-import com.vk.sdk.api.VKApiConst
-import com.vk.sdk.api.VKParameters
-import com.vk.sdk.api.VKRequest
-import com.vk.sdk.api.VKResponse
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.activity_hero_details.*
+import kotlinx.android.synthetic.main.fragment_hero_details.*
 import java.util.*
 
-class HeroDetailsActivity: ViewSubscriberActivity(),
+class HeroDetailsFragment: ViewSubscriberFragment(),
     HeroDetailsContract.View {
 
     private lateinit var presenter: HeroDetailsContract.Presenter
     private var newHero: Boolean = false
-    private var avatarUrl: String? = null
+    private var listener: Listener? = null
 
 
     //<editor-fold desc="Framework overrides">
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is Listener) listener = context
+        else throw RuntimeException("$context must implement $LOG_TAG Listener")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_hero_details)
         DependencyRegistry.inject(this)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_hero_details, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initUi()
     }
 
@@ -60,41 +74,19 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
             callHero()
         }
     }
-
-    override fun onBackPressed() {
-        presenter.onBackPressed(Action { super.onBackPressed() })
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        val authListener = IronHeroesApp.getVKAuthListener(this)
-        if (VKSdk.onActivityResult(requestCode, resultCode, intent, authListener)) {
-            val params = VKParameters()
-            params[VKApiConst.FIELDS] = "photo_max_orig"
-
-            val request = VKRequest("users.get", params)
-            request.executeWithListener(object: VKRequest.VKRequestListener() {
-                override fun onComplete(response: VKResponse?) {
-                    super.onComplete(response)
-                    val resp = response?.json?.getJSONArray("response")
-                    val user = resp?.getJSONObject(0)
-                    avatarUrl = user?.getString("photo_max_orig")
-                    updateHeroData("avatar", avatarUrl)
-                }
-            })
-        } else super.onActivityResult(requestCode, resultCode, intent)
-    }
     //</editor-fold>
 
 
     //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
+    override fun initActionbar() = false
+
     override fun showScreenTitle(newHero: Boolean, humanType: HumanType) {
         this.newHero = newHero
-        val toolbarTitle = when (humanType) {
+        activity?.initActionBar(when (humanType) {
             HumanType.HERO -> if (newHero) R.string.hero_add else R.string.hero_edit
             HumanType.CHAMPION -> if (newHero) R.string.champion_add else R.string.champion_edit
-        }
-        AppUtils.initToolbar(this, toolbarTitle, true)
+        })
     }
 
     override fun showBirthdayNA() {
@@ -130,7 +122,37 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
         isChampion?.isChecked = humanType == HumanType.CHAMPION
     }
 
-    override fun closeScreen() = finish()
+    override fun closeScreen() {
+        view?.let {
+            val controller = Navigation.findNavController(it)
+            controller.popBackStack(R.id.heroesFragment, false)
+        }
+    }
+
+    override fun onBackPressed(action: Action) = presenter.onBackPressed(action)
+
+    override fun updateHeroData(field: String, value: String?) {
+        Logger.d(LOG_TAG, "updateHeroData. new data in $field detected. value=$value")
+        val humanType = if (isChampion?.isChecked == true) HumanType.CHAMPION else HumanType.HERO
+        val gender = when {
+            genderFemale?.isChecked == true -> Gender.FEMALE.code
+            genderMale?.isChecked == true -> Gender.MALE.code
+            else -> null
+        }
+        presenter.updateHeroData(
+            humanType,
+            firstName = firstNameInput?.text?.toString(),
+            secondName = secondNameInput?.text?.toString(),
+            phone = AppUtils.clearPhoneFromMask(phoneInput?.text?.toString()),
+            gender = gender,
+
+            vkId = vkIdInput?.text?.toString(),
+            email = emailInput?.text?.toString(),
+            birthDay = birthdayText?.text?.toString(),
+            avatarUrl = listener?.provideAvatarUrl(),
+            avatarId = null
+        )
+    }
     //</editor-fold>
 
 
@@ -155,8 +177,11 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
         AppUtils.initPhoneRMR(phoneInput)
         vkText?.setOnClickListener { openVk(vkIdInput?.text?.toString()) }
         emailText?.setOnClickListener { composeEmail(emailInput?.text?.toString()) }
-        birthdayText?.setOnClickListener { presenter.showBirthDayDialog(this, birthdayText?.text?.toString()) }
-        useVkAvatar?.setOnClickListener { IronHeroesApp.loginVK(this) }
+        birthdayText?.setOnClickListener { presenter.showBirthDayDialog(context, birthdayText?.text?.toString()) }
+        useVkAvatar?.setOnClickListener {
+            val activity = activity as AppCompatActivity? ?: return@setOnClickListener
+            IronHeroesApp.loginVK(activity)
+        }
         isChampion?.setOnCheckedChangeListener { _, isChecked ->
             updateHeroData("isChampion", isChecked.toString())
             showScreenTitle(newHero, if (isChecked) HumanType.CHAMPION else HumanType.HERO)
@@ -171,29 +196,6 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
         subscribeField(emailInput, Consumer { updateHeroData("emailInput", it) })
     }
 
-    private fun updateHeroData(field: String, value: String?) {
-        Logger.d(LOG_TAG, "updateHeroData. new data in $field detected. value=$value")
-        val humanType = if (isChampion?.isChecked == true) HumanType.CHAMPION else HumanType.HERO
-        val gender = when {
-            genderFemale?.isChecked == true -> Gender.FEMALE.code
-            genderMale?.isChecked == true -> Gender.MALE.code
-            else -> null
-        }
-        presenter.updateHeroData(
-            humanType,
-            firstName = firstNameInput?.text?.toString(),
-            secondName = secondNameInput?.text?.toString(),
-            phone = AppUtils.clearPhoneFromMask(phoneInput?.text?.toString()),
-            gender = gender,
-
-            vkId = vkIdInput?.text?.toString(),
-            email = emailInput?.text?.toString(),
-            birthDay = birthdayText?.text?.toString(),
-            avatarUrl = avatarUrl,
-            avatarId = null
-        )
-    }
-
     private fun callHero() {
         val clearedPhone = AppUtils.clearPhoneFromMask(phoneInput?.text?.toString())
         if (TextUtils.isEmpty(clearedPhone) || clearedPhone.length != Constants.UNMASKED_PHONE_LENGTH) {
@@ -204,7 +206,8 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
         val intent = Intent(Intent.ACTION_CALL)
         intent.data = Uri.parse("tel:$clearedPhone")
         val permissionHelper = PermissionHelperImpl()
-        if (!permissionHelper.checkCallPermission(this)) {
+        val activity = activity as AppCompatActivity? ?: return
+        if (!permissionHelper.checkCallPermission(activity)) {
             permissionHelper.requestCallPermission(this)
             return
         }
@@ -231,6 +234,11 @@ class HeroDetailsActivity: ViewSubscriberActivity(),
         startActivity(Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", emailAddress, null)))
     }
     //</editor-fold>
+
+
+    interface Listener {
+        fun provideAvatarUrl(): String?
+    }
 
 
     companion object {

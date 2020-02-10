@@ -1,45 +1,49 @@
-package com.devtau.ironHeroes.ui.activities.trainingDetails
+package com.devtau.ironHeroes.ui.fragments.trainingDetails
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.*
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.devtau.ironHeroes.Coordinator
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.ExercisesInTrainingAdapter
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
+import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.activities.ViewSubscriberActivity
+import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.ui.fragments.initActionBar
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.SpinnerUtils
-import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
-import kotlinx.android.synthetic.main.activity_training_details.*
+import kotlinx.android.synthetic.main.fragment_training_details.*
 import java.util.*
 
-class TrainingDetailsActivity: ViewSubscriberActivity(),
+class TrainingDetailsFragment: ViewSubscriberFragment(),
     TrainingDetailsContract.View {
 
     private lateinit var presenter: TrainingDetailsContract.Presenter
     private lateinit var coordinator: Coordinator
     private var exercisesAdapter: ExercisesInTrainingAdapter? = null
-    private var deleteTrainingBtn: MenuItem? = null
-    private var deleteTrainingBtnVisibility: Boolean = true
     private var trainingDate: Calendar? = null
 
 
     //<editor-fold desc="Framework overrides">
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_training_details)
         DependencyRegistry.inject(this)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_training_details, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initUi()
         initList()
+        setHasOptionsMenu(true)
     }
 
     override fun onStart() {
@@ -54,15 +58,9 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
         presenter.onStop()
     }
 
-    override fun onBackPressed() {
-        presenter.onBackPressed(Action { super.onBackPressed() })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_training_details, menu)
-        deleteTrainingBtn = menu.getItem(0)
-        deleteTrainingBtn?.isVisible = deleteTrainingBtnVisibility
-        return true
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_training_details, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -72,14 +70,19 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+    //using navigation as menu action
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean
+//            = NavigationUI.onNavDestinationSelected(item, view!!.findNavController())
+//            || super.onOptionsItemSelected(item)
     //</editor-fold>
 
 
     //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
+    override fun initActionbar() = false
     override fun showScreenTitle(newTraining: Boolean) {
-        val toolbarTitle = if (newTraining) R.string.training_add else R.string.training_edit
-        AppUtils.initToolbar(this, toolbarTitle, true)
+        activity?.initActionBar(if (newTraining) R.string.training_add else R.string.training_edit)
     }
 
     override fun showTrainingDate(date: Calendar) {
@@ -91,14 +94,15 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
         exercisesAdapter?.setList(list, listView)
 
     override fun showChampions(list: List<String>?, selectedIndex: Int) =
-        SpinnerUtils.initSpinner(champion, list, selectedIndex, this)
+        SpinnerUtils.initSpinner(champion, list, selectedIndex, context)
 
     override fun showHeroes(list: List<String>?, selectedIndex: Int) =
-        SpinnerUtils.initSpinner(hero, list, selectedIndex, this)
+        SpinnerUtils.initSpinner(hero, list, selectedIndex, context)
 
     override fun showDateDialog(date: Calendar, minDate: Calendar, maxDate: Calendar) {
+        val context = context ?: return
         trainingDate = date
-        val dialog = DatePickerDialog(this,
+        val dialog = DatePickerDialog(context,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(date, year, month, dayOfMonth) },
             date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
         dialog.datePicker.minDate = minDate.timeInMillis
@@ -106,15 +110,10 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
         dialog.show()
     }
 
-    override fun showDeleteTrainingBtn(show: Boolean) {
-        deleteTrainingBtnVisibility = show
-        deleteTrainingBtn?.isVisible = deleteTrainingBtnVisibility
-    }
-
-    override fun closeScreen() = finish()
+    override fun closeScreen() = activity?.onBackPressed()
 
     override fun showNewExerciseDialog(position: Int) =
-        coordinator.showExerciseDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
+        coordinator.showExercise(view, presenter.provideTraining()?.heroId,
             presenter.provideTraining()?.id, null, position)
     //</editor-fold>
 
@@ -139,11 +138,12 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     }
 
     private fun initList() {
+        val context = context ?: return
         exercisesAdapter = ExercisesInTrainingAdapter(presenter.provideExercises(), Consumer {
-            coordinator.showExerciseDialog(supportFragmentManager, presenter.provideTraining()?.heroId,
+            coordinator.showExercise(view, presenter.provideTraining()?.heroId,
                 presenter.provideTraining()?.id, it.id, it.position)
         })
-        listView?.layoutManager = CustomLinearLayoutManager(this)
+        listView?.layoutManager = CustomLinearLayoutManager(context)
         listView?.adapter = exercisesAdapter
 
         val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {
@@ -175,7 +175,7 @@ class TrainingDetailsActivity: ViewSubscriberActivity(),
     }
 
     private fun onDateSet(date: Calendar, year: Int, month: Int, dayOfMonth: Int) {
-        val dialog = TimePickerDialog(this,
+        val dialog = TimePickerDialog(context,
             TimePickerDialog.OnTimeSetListener { _, hour, minute -> onTimeSet(year, month, dayOfMonth, hour, minute) },
             date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE), true)
         dialog.show()

@@ -1,11 +1,16 @@
 package com.devtau.ironHeroes.ui.fragments
 
+import android.os.Bundle
+import android.view.View
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import com.devtau.ironHeroes.ui.StandardView
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.CLICKS_DEBOUNCE_RATE_MS
@@ -22,6 +27,12 @@ abstract class ViewSubscriberFragment: Fragment(), StandardView {
     private val compositeUiDisposable = CompositeDisposable()
 
     abstract fun getLogTag(): String
+    abstract fun initActionbar(): Boolean?
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initActionbar()
+    }
 
     override fun onStop() {
         compositeUiDisposable.clear()
@@ -58,4 +69,15 @@ abstract class ViewSubscriberFragment: Fragment(), StandardView {
             .skip(1)
             .subscribe(onNext))
     }
+}
+
+fun FragmentManager.getCurrentNavigationFragment(): Fragment? =
+    primaryNavigationFragment?.childFragmentManager?.fragments?.first()
+
+fun FragmentActivity?.initActionBar(titleId: Int?, show: Boolean = true): Boolean {
+    val actionbar = (this as AppCompatActivity?)?.supportActionBar
+    if (this == null || actionbar == null) return false
+    if (show) actionbar.show() else actionbar.hide()
+    actionbar.title = if (titleId == null) "" else this.getString(titleId)
+    return true
 }

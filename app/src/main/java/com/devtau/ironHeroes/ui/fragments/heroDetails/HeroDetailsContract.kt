@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.heroDetails
+package com.devtau.ironHeroes.ui.fragments.heroDetails
 
 import android.content.Context
 import com.devtau.ironHeroes.data.model.Hero
@@ -13,7 +13,7 @@ interface HeroDetailsContract {
         fun restartLoaders()
         fun updateHeroData(humanType: HumanType, firstName: String?, secondName: String?, phone: String?, gender: String?,
                            vkId: String?, email: String?, birthDay: String?, avatarUrl: String?, avatarId: Int?)
-        fun showBirthDayDialog(context: Context, selectedBirthday: String?)
+        fun showBirthDayDialog(context: Context?, selectedBirthday: String?)
         fun onBackPressed(action: Action)
         fun deleteHero()
     }
@@ -26,5 +26,7 @@ interface HeroDetailsContract {
         fun showDeleteHeroBtn(show: Boolean)
         fun showHumanType(humanType: HumanType)
         fun closeScreen()
+        fun onBackPressed(action: Action)
+        fun updateHeroData(field: String, value: String?)
     }
 }

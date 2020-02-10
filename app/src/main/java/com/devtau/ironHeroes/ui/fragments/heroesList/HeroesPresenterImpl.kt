@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.heroesList
+package com.devtau.ironHeroes.ui.fragments.heroesList
 
 import com.devtau.ironHeroes.data.dao.HeroDao
 import com.devtau.ironHeroes.data.model.Hero

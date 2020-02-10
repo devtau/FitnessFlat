@@ -15,8 +15,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.HourMinute
 import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.util.Constants.DATE_FORMATTER
@@ -112,16 +110,6 @@ object AppUtils {
         return calendar
     }
 
-    fun initToolbar(activity: AppCompatActivity, titleId: Int, backArrowNeeded: Boolean) {
-        activity.findViewById<TextView>(R.id.toolbarTitle).text = activity.getString(titleId)
-        val toolbar = activity.findViewById<Toolbar>(R.id.toolbar)
-        activity.setSupportActionBar(toolbar)
-        val actionBar = activity.supportActionBar ?: return
-        actionBar.setDisplayShowTitleEnabled(false)
-        actionBar.setDisplayHomeAsUpEnabled(backArrowNeeded)
-        toolbar.setNavigationOnClickListener { activity.onBackPressed() }
-    }
-
     fun toggleSoftInput(show: Boolean, field: EditText?, activity: AppCompatActivity?) {
         Logger.d(LOG_TAG, "toggleSoftInput. " + (if (show) "show" else "hide")
                 + ", field " + (if (field == null) "is null" else "ok")
@@ -142,7 +130,8 @@ object AppUtils {
         }
     }
 
-    fun alert(logTag: String?, msg: String, context: Context) {
+    fun alert(logTag: String?, msg: String, context: Context?) {
+        context ?: return
         try {
             AlertDialog.Builder(context)
                 .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }

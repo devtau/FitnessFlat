@@ -10,7 +10,7 @@ import io.reactivex.Flowable
 interface TrainingDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(list: List<Training?>): Completable
+    fun insert(list: List<Training?>?): Completable
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(training: Training?): Long

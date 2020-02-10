@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.trainingDetails
+package com.devtau.ironHeroes.ui.fragments.trainingDetails
 
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.dao.ExerciseDao
@@ -170,7 +170,6 @@ class TrainingDetailsPresenterImpl(
         if (trainingId == null) {
             view.showScreenTitle(true)
             view.showTrainingDate(AppUtils.getRoundDate())
-            view.showDeleteTrainingBtn(false)
             updateTrainingData(championIndex, heroIndex, null)
         } else {
             for (nextTraining in exercisesInTraining)
@@ -182,7 +181,6 @@ class TrainingDetailsPresenterImpl(
 
             view.showScreenTitle(false)
             view.showTrainingDate(training!!.getDateCal())
-            view.showDeleteTrainingBtn(true)
         }
 
         Logger.d(LOG_TAG, "publishDataToView. " +

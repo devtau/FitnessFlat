@@ -1,11 +1,13 @@
-package com.devtau.ironHeroes.ui.activities.functions
+package com.devtau.ironHeroes.ui.fragments.functions
 
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.dao.*
 import com.devtau.ironHeroes.data.subscribeDefault
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
+import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.PreferencesManager
+import com.google.firebase.firestore.FirebaseFirestore
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 
@@ -37,11 +39,16 @@ class FunctionsPresenterImpl(
     //</editor-fold>
 
 
+    //<editor-fold desc="Private methods">
     private fun createMuscleGroupsAndExercises() {
-        muscleGroupDao.insert(view.provideMockMuscleGroups())
-            .subscribeDefault("muscleGroupDao.insert")
-        exerciseDao.insert(view.provideMockExercises())
-            .subscribeDefault("exerciseDao.insert")
+        view.provideMockMuscleGroups()?.let {
+            muscleGroupDao.insert(it)
+                .subscribeDefault("muscleGroupDao.insert")
+        }
+        view.provideMockExercises()?.let {
+            exerciseDao.insert(it)
+                .subscribeDefault("exerciseDao.insert")
+        }
     }
 
     private fun showDemoConfigDialog() {
@@ -72,6 +79,30 @@ class FunctionsPresenterImpl(
         exerciseInTrainingDao.insert(view.provideMockExercisesInTrainings())
             .subscribeDefault("exerciseInTrainingDao.insert")
     }
+
+
+    private fun sendTestToFireStore() {
+        val db = FirebaseFirestore.getInstance()
+        val exerciseInTraining = hashMapOf(
+            "id" to 1,
+            "trainingId" to 1,
+            "exerciseId" to 41,
+            "weight" to 0,
+            "repeats" to 3,
+            "count" to 20,
+            "comment" to ""
+        )
+
+        db.collection("ExerciseInTraining")
+            .add(exerciseInTraining)
+            .addOnSuccessListener { documentReference ->
+                Logger.d(LOG_TAG, "document added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Logger.w(LOG_TAG, "Error adding document $e")
+            }
+    }
+    //</editor-fold>
 
 
     companion object {

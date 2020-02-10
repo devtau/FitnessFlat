@@ -1,4 +1,4 @@
-package com.devtau.ironHeroes.ui.activities.heroDetails
+package com.devtau.ironHeroes.ui.fragments.heroDetails
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -62,7 +62,8 @@ class HeroDetailsPresenterImpl(
         }
     }
 
-    override fun showBirthDayDialog(context: Context, selectedBirthday: String?) {
+    override fun showBirthDayDialog(context: Context?, selectedBirthday: String?) {
+        context ?: return
         val nowMinusCentury = Calendar.getInstance()
         nowMinusCentury.add(Calendar.YEAR, -100)
         val heroBirthDay = hero?.birthDay

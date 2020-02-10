@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".ui.fragments.heroDetails.HeroDetailsFragment">
+	
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		
+		<TableLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:descendantFocusability="beforeDescendants"
+			android:focusableInTouchMode="true"
+			android:orientation="vertical">
+			
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:layout_marginRight="@dimen/marginNormal"
+				android:orientation="horizontal">
+				
+				<TextView
+					style="@style/Widget.AppCompat.Button.Borderless"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:clickable="false"
+					android:focusable="false"
+					android:gravity="center_vertical"
+					android:text="@string/name" />
+				
+				<EditText
+					android:id="@+id/firstNameInput"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:inputType="textPersonName|textMultiLine"
+					android:maxLines="3" />
+			</TableRow>
+			
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:layout_marginRight="@dimen/marginNormal"
+				android:orientation="horizontal">
+				
+				<Button
+					style="@style/Widget.AppCompat.Button.Borderless"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:clickable="false"
+					android:focusable="false"
+					android:gravity="center_vertical"
+					android:text="@string/surname" />
+				
+				<EditText
+					android:id="@+id/secondNameInput"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:inputType="textPersonName|textMultiLine"
+					android:maxLines="3" />
+			</TableRow>
+			
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:layout_marginRight="@dimen/marginNormal"
+				android:orientation="horizontal">
+				
+				<Button
+					android:id="@+id/phoneText"
+					style="@style/Widget.AppCompat.Button.Colored"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="center_vertical"
+					android:text="@string/phone" />
+				
+				<EditText
+					android:id="@+id/phoneInput"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:inputType="phone|textMultiLine"
+					android:maxLines="3" />
+			</TableRow>
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center_vertical"
+				android:orientation="horizontal"
+				android:paddingLeft="@dimen/marginNormalPlus"
+				android:paddingRight="@dimen/marginNormal">
+				
+				<TextView
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="@string/gender" />
+				
+				<ToggleButton
+					android:id="@+id/genderFemale"
+					android:layout_width="80dp"
+					android:layout_height="wrap_content"
+					android:drawableTop="@drawable/ic_gender_female"
+					android:textOff=""
+					android:textOn=""
+					android:textSize="0sp" />
+				
+				<ToggleButton
+					android:id="@+id/genderMale"
+					android:layout_width="80dp"
+					android:layout_height="wrap_content"
+					android:drawableTop="@drawable/ic_gender_male"
+					android:textOff=""
+					android:textOn=""
+					android:textSize="0sp" />
+			</LinearLayout>
+			
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:layout_marginRight="@dimen/marginNormal"
+				android:orientation="horizontal">
+				
+				<Button
+					android:id="@+id/vkText"
+					style="@style/Widget.AppCompat.Button.Colored"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="center_vertical"
+					android:text="@string/vk_id_base" />
+				
+				<EditText
+					android:id="@+id/vkIdInput"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:inputType="text|textMultiLine"
+					android:maxLines="3" />
+			</TableRow>
+			
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:layout_marginRight="@dimen/marginNormal"
+				android:orientation="horizontal">
+				
+				<Button
+					android:id="@+id/emailText"
+					style="@style/Widget.AppCompat.Button.Colored"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="center_vertical"
+					android:text="@string/email" />
+				
+				<EditText
+					android:id="@+id/emailInput"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:inputType="textEmailAddress|textMultiLine"
+					android:maxLines="3" />
+			</TableRow>
+			
+			<TableRow
+				android:id="@+id/birthdayInput"
+				style="@style/SelectableItemBackground"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center_vertical"
+				android:orientation="horizontal"
+				android:paddingLeft="@dimen/marginNormalPlus"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingRight="@dimen/marginNormalPlus"
+				android:paddingBottom="@dimen/marginHalf">
+				
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/birthday" />
+				
+				<TextView
+					android:id="@+id/birthdayText"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:gravity="end"
+					tools:text="04.09.2017" />
+			</TableRow>
+			
+			<Switch
+				android:id="@+id/isChampion"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:paddingLeft="@dimen/marginNormalPlus"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingRight="@dimen/marginNormalPlus"
+				android:paddingBottom="@dimen/marginHalf"
+				android:text="@string/is_champion" />
+			
+			<Button
+				android:id="@+id/useVkAvatar"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="@dimen/marginNormal"
+				android:layout_marginRight="@dimen/marginNormal"
+				android:paddingTop="@dimen/marginNormal"
+				android:paddingBottom="@dimen/marginNormal"
+				android:text="@string/use_vk_avatar" />
+		</TableLayout>
+	</ScrollView>
+	
+	<com.google.android.material.floatingactionbutton.FloatingActionButton
+		android:id="@+id/fab"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="bottom|end"
+		android:layout_margin="@dimen/marginNormal"
+		android:visibility="invisible"
+		app:srcCompat="@drawable/ic_delete" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

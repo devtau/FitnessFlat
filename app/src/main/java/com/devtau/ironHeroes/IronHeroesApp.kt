@@ -55,18 +55,20 @@ class IronHeroesApp: Application() {
         const val LOGOUT = "com.devtau.ironHeroes.action.LOGOUT"
         private const val LOG_TAG = "AppApplication"
 
-        fun getVKAuthListener(activity: AppCompatActivity) = object: VKCallback<VKAccessToken> {
+        fun getVKAuthListener(activity: AppCompatActivity?) = object: VKCallback<VKAccessToken> {
             override fun onResult(token: VKAccessToken) {
                 PreferencesManager.vkToken = token.accessToken
             }
             override fun onError(error: VKError?) {
+                activity ?: return
                 val msg = String.format(activity.getString(R.string.error_formatter), error)
                 AppUtils.alert(LOG_TAG, msg, activity)
                 if (error?.errorCode != VKError.VK_CANCELED) loginVK(activity)
             }
         }
 
-        fun loginVK(activity: AppCompatActivity) {
+        fun loginVK(activity: AppCompatActivity?) {
+            activity ?: return
             VKSdk.logout()
             VKSdk.login(activity, VKScope.PHOTOS)
         }

@@ -1,33 +1,33 @@
 package com.devtau.ironHeroes.ui
 
 import android.os.Bundle
-import com.devtau.ironHeroes.Coordinator
-import com.devtau.ironHeroes.CoordinatorImpl
 import com.devtau.ironHeroes.data.DB
 import com.devtau.ironHeroes.enums.HumanType
-import com.devtau.ironHeroes.ui.activities.functions.FunctionsActivity
-import com.devtau.ironHeroes.ui.activities.functions.FunctionsPresenterImpl
-import com.devtau.ironHeroes.ui.activities.heroDetails.HeroDetailsActivity
-import com.devtau.ironHeroes.ui.activities.heroDetails.HeroDetailsPresenterImpl
-import com.devtau.ironHeroes.ui.activities.heroesList.HeroesActivity
-import com.devtau.ironHeroes.ui.activities.heroesList.HeroesPresenterImpl
-import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsActivity
-import com.devtau.ironHeroes.ui.activities.trainingDetails.TrainingDetailsPresenterImpl
+import com.devtau.ironHeroes.ui.CoordinatorImpl.EXERCISE_IN_TRAINING_ID
+import com.devtau.ironHeroes.ui.CoordinatorImpl.HERO_ID
+import com.devtau.ironHeroes.ui.CoordinatorImpl.HUMAN_TYPE
+import com.devtau.ironHeroes.ui.CoordinatorImpl.POSITION
+import com.devtau.ironHeroes.ui.CoordinatorImpl.TRAINING_ID
+import com.devtau.ironHeroes.ui.activities.main.MainActivity
+import com.devtau.ironHeroes.ui.activities.main.MainPresenterImpl
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExercisePresenterImpl
+import com.devtau.ironHeroes.ui.fragments.functions.FunctionsFragment
+import com.devtau.ironHeroes.ui.fragments.functions.FunctionsPresenterImpl
+import com.devtau.ironHeroes.ui.fragments.heroDetails.HeroDetailsFragment
+import com.devtau.ironHeroes.ui.fragments.heroDetails.HeroDetailsPresenterImpl
+import com.devtau.ironHeroes.ui.fragments.heroesList.HeroesFragment
+import com.devtau.ironHeroes.ui.fragments.heroesList.HeroesPresenterImpl
 import com.devtau.ironHeroes.ui.fragments.other.OtherFragment
 import com.devtau.ironHeroes.ui.fragments.other.OtherPresenterImpl
 import com.devtau.ironHeroes.ui.fragments.settings.SettingsFragment
 import com.devtau.ironHeroes.ui.fragments.settings.SettingsPresenterImpl
 import com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment
 import com.devtau.ironHeroes.ui.fragments.statistics.StatisticsPresenterImpl
+import com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsFragment
+import com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsPresenterImpl
 import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment
 import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsPresenterImpl
-import com.devtau.ironHeroes.util.Constants.EXERCISE_IN_TRAINING_ID
-import com.devtau.ironHeroes.util.Constants.HERO_ID
-import com.devtau.ironHeroes.util.Constants.HUMAN_TYPE
-import com.devtau.ironHeroes.util.Constants.POSITION
-import com.devtau.ironHeroes.util.Constants.TRAINING_ID
 import com.devtau.ironHeroes.util.PreferencesManager
 
 object DependencyRegistry {
@@ -38,49 +38,54 @@ object DependencyRegistry {
 
 
     //<editor-fold desc="injectors">
-    fun inject(activity: FunctionsActivity) {
+    fun inject(activity: MainActivity) {
         val db = DB.getInstance(activity)
-        val presenter = FunctionsPresenterImpl(activity, db.heroDao(), db.trainingDao(),
+        val presenter = MainPresenterImpl(activity, db.heroDao(), db.trainingDao(),
             db.exerciseDao(), db.muscleGroupDao(), db.exerciseInTrainingDao(), prefs)
         activity.configureWith(presenter, coordinator)
     }
 
-    @Throws(NoSuchElementException::class)
-    fun inject(activity: HeroesActivity) {
-        val db = DB.getInstance(activity)
-        val humanType = humanTypeFromBundleOrThrow(activity.intent?.extras)
-        val presenter = HeroesPresenterImpl(activity, db.heroDao(), humanType)
-        activity.configureWith(presenter, coordinator)
+    fun inject(fragment: FunctionsFragment) = fragment.context?.let {
+        val db = DB.getInstance(it)
+        val presenter = FunctionsPresenterImpl(fragment, db.heroDao(), db.trainingDao(),
+            db.exerciseDao(), db.muscleGroupDao(), db.exerciseInTrainingDao(), prefs)
+        fragment.configureWith(presenter, coordinator)
     }
 
     @Throws(NoSuchElementException::class)
-    fun inject(activity: HeroDetailsActivity) {
-        val db = DB.getInstance(activity)
-        val heroId = heroIdFromBundle(activity.intent?.extras)
-        val humanType = humanTypeFromBundleOrThrow(activity.intent?.extras)
-        val presenter = HeroDetailsPresenterImpl(activity, db.heroDao(), heroId, humanType)
-        activity.configureWith(presenter)
+    fun inject(fragment: HeroesFragment) = fragment.context?.let {
+        val db = DB.getInstance(it)
+        val humanType = humanTypeFromBundleOrThrow(fragment.arguments)
+        val presenter = HeroesPresenterImpl(fragment, db.heroDao(), humanType)
+        fragment.configureWith(presenter, coordinator)
     }
 
-    fun inject(fragment: TrainingsFragment) {
-        val context = fragment.context ?: return
-        val db = DB.getInstance(context)
+    @Throws(NoSuchElementException::class)
+    fun inject(fragment: HeroDetailsFragment) = fragment.context?.let {
+        val db = DB.getInstance(it)
+        val heroId = heroIdFromBundle(fragment.arguments)
+        val humanType = humanTypeFromBundleOrThrow(fragment.arguments)
+        val presenter = HeroDetailsPresenterImpl(fragment, db.heroDao(), heroId, humanType)
+        fragment.configureWith(presenter)
+    }
+
+    fun inject(fragment: TrainingsFragment) = fragment.context?.let {
+        val db = DB.getInstance(it)
         val presenter = TrainingsPresenterImpl(fragment, db.heroDao(), db.trainingDao(), prefs)
         fragment.configureWith(presenter, coordinator)
     }
 
-    fun inject(activity: TrainingDetailsActivity) {
-        val db = DB.getInstance(activity)
-        val trainingId = trainingIdFromBundle(activity.intent?.extras)
-        val presenter = TrainingDetailsPresenterImpl(activity, db.heroDao(), db.trainingDao(),
+    fun inject(fragment: TrainingDetailsFragment) = fragment.context?.let {
+        val db = DB.getInstance(it)
+        val trainingId = trainingIdFromBundle(fragment.arguments)
+        val presenter = TrainingDetailsPresenterImpl(fragment, db.heroDao(), db.trainingDao(),
             db.exerciseDao(), db.exerciseInTrainingDao(), prefs, trainingId)
-        activity.configureWith(presenter, coordinator)
+        fragment.configureWith(presenter, coordinator)
     }
 
     @Throws(NoSuchElementException::class)
-    fun inject(dialog: ExerciseDialog) {
-        val context = dialog.context ?: return
-        val db = DB.getInstance(context)
+    fun inject(dialog: ExerciseDialog) = dialog.context?.let {
+        val db = DB.getInstance(it)
         val heroId = heroIdFromBundleOrThrow(dialog.arguments)
         val trainingId = trainingIdFromBundle(dialog.arguments)
         val exerciseId = exerciseIdFromBundle(dialog.arguments)
@@ -92,21 +97,19 @@ object DependencyRegistry {
     }
 
     @Throws(NoSuchElementException::class)
-    fun inject(fragment: StatisticsFragment) {
-        val context = fragment.context ?: return
-        val db = DB.getInstance(context)
+    fun inject(fragment: StatisticsFragment) = fragment.context?.let {
+        val db = DB.getInstance(it)
         val presenter = StatisticsPresenterImpl(fragment, db.heroDao(), db.exerciseDao(), db.exerciseInTrainingDao(), db.muscleGroupDao(), prefs)
         fragment.configureWith(presenter, coordinator)
     }
 
-    fun inject(fragment: SettingsFragment) {
+    fun inject(fragment: SettingsFragment) = fragment.context?.let {
         val presenter = SettingsPresenterImpl(fragment, prefs)
         fragment.configureWith(presenter)
     }
 
-    fun inject(fragment: OtherFragment) {
-        val context = fragment.context ?: return
-        val db = DB.getInstance(context)
+    fun inject(fragment: OtherFragment) = fragment.context?.let {
+        val db = DB.getInstance(it)
         val presenter = OtherPresenterImpl(fragment, db.heroDao(), db.trainingDao(), db.exerciseInTrainingDao())
         fragment.configureWith(presenter, coordinator)
     }

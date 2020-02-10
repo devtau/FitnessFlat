@@ -21,12 +21,6 @@ object Constants {
     const val UNAUTHORIZED = 401
     const val TOO_MANY_REQUESTS = 429
 
-    const val HERO_ID = "heroId"
-    const val HUMAN_TYPE = "humanType"
-    const val TRAINING_ID = "trainingId"
-    const val EXERCISE_IN_TRAINING_ID = "exerciseInTrainingId"
-    const val POSITION = "position"
-
     const val CSV_EXT = ".csv"
     const val TXT_EXT = ".txt"
     const val SEPARATOR = ','
