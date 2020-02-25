@@ -5,9 +5,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.devtau.ironHeroes.data.DB
-import com.devtau.ironHeroes.data.dao.ExerciseDao
 import com.devtau.ironHeroes.data.model.Exercise
+import com.devtau.ironHeroes.data.source.local.DB
+import com.devtau.ironHeroes.data.source.local.exercise.ExerciseDao
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

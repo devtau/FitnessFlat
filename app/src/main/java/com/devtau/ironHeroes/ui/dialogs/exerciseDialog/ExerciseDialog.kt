@@ -15,12 +15,12 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.dialogs.ViewSubscriberDialog
+import com.devtau.ironHeroes.ui.dialogs.BaseDialog
 import com.devtau.ironHeroes.util.*
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.dialog_exercise.*
 
-class ExerciseDialog: ViewSubscriberDialog(),
+class ExerciseDialog: BaseDialog(),
     ExerciseContract.View {
 
     private lateinit var presenter: ExerciseContract.Presenter
@@ -173,7 +173,7 @@ class ExerciseDialog: ViewSubscriberDialog(),
             context?.getString(R.string.no_data)
         } else {
             val formatter = context?.getString(R.string.previous_training_data_formatter) ?: ""
-            val dateFormatted = AppUtils.formatDateWithWeekDay(date)
+            val dateFormatted = DateUtils.formatDateWithWeekDay(date)
             String.format(formatter, dateFormatted, weight.toString(), repeats.toString(), count.toString())
         }
     //</editor-fold>

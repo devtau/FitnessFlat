@@ -48,6 +48,7 @@
 	<string name="weight">Вес</string>
 	<string name="count">Повторы</string>
 	<string name="error_formatter" formatted="false">Ошибка: %s</string>
+	<string name="error_trainings_list">Ошибка при загрузке списка тренировок</string>
 	<string name="cancel">Отмена</string>
 	<string name="save">Сохранить</string>
 	<string name="filters">Фильтры</string>
@@ -71,6 +72,7 @@
 	<string name="further">Далее</string>
 	<string name="previous_exercise_data">Прошлый раз вы выполнили это упражнение:</string>
 	<string name="no_data">нет данных</string>
+	<string name="no_trainings">Тренировок не найдено</string>
 	<string name="previous_training_data_formatter" formatted="false">%s %s x %s x %s</string>
 	<string name="settings">Настройки</string>
 	<string name="other">Прочее</string>
@@ -90,14 +92,9 @@
 	<string name="roma_first_name">Рома</string>
 	<string name="anton_first_name">Антон</string>
 	<string name="denis_first_name">Денис</string>
-	<string name="masha_first_name">Маша</string>
-	<string name="eugen_first_name">Евгений</string>
-	
 	<string name="roma_last_name">Богданов</string>
 	<string name="anton_last_name">Щукин</string>
 	<string name="denis_last_name">Русских</string>
-	<string name="masha_last_name">Черничкина</string>
-	<string name="eugen_last_name">Стирманов</string>
 	
 	
 	//Грудь

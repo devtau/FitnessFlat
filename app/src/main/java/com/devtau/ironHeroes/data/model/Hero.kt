@@ -9,10 +9,10 @@ import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.enums.Gender
 import com.devtau.ironHeroes.enums.HumanType
-import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.DateUtils
 
 @Entity(tableName = "Heroes")
-class Hero(
+data class Hero(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "heroId")
     var id: Long?,
     var humanType: HumanType,
@@ -61,10 +61,10 @@ class Hero(
             return listOf(
                 Hero(1, HumanType.CHAMPION, c.getString(R.string.roma_first_name), c.getString(R.string.roma_last_name),
                     romaPhone, Gender.MALE.code, "romanyurievich93", "d29028@yandex.ru",
-                    AppUtils.parseDate("20.07.1993").timeInMillis, null, R.drawable.roma),
+                    DateUtils.parseDate("20.07.1993").timeInMillis, null, R.drawable.roma),
                 Hero(2, HumanType.CHAMPION, c.getString(R.string.anton_first_name), c.getString(R.string.anton_last_name),
                     antonPhone, Gender.MALE.code, "shukin2007", "d29029@yandex.ru",
-                    AppUtils.parseDate("28.02.1993").timeInMillis, null, R.drawable.anton))
+                    DateUtils.parseDate("28.02.1993").timeInMillis, null, R.drawable.anton))
         }
 
         fun getMockHeroes(c: Context): List<Hero> {
@@ -72,7 +72,7 @@ class Hero(
             return listOf(
                 Hero(3, HumanType.HERO, c.getString(R.string.denis_first_name), c.getString(R.string.denis_last_name),
                     denisPhone, Gender.MALE.code, "devtau", "d29025@yandex.ru",
-                    AppUtils.parseDate("25.09.1983").timeInMillis, null, R.drawable.denis))
+                    DateUtils.parseDate("25.09.1983").timeInMillis, null, R.drawable.denis))
         }
 
 //        "https://yadi.sk/i/hZhu1zg73GNum4"

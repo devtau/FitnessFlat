@@ -8,13 +8,19 @@ buildscript {
         retrofitVersion = '2.7.1'
         archCoreVersion = '2.1.0'
         navigationVersion = '2.3.0-alpha01'
+        daggerVersion = '2.23.2'
+        lifecycleVersion = '2.2.0'
+        glideVersion = '4.11.0'
+        stethoVersion = '1.5.1'
+        coroutinesVersion = '1.2.1'
+        robolectricVersion = '4.3.1'
     }
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.0-rc02'
+        classpath 'com.android.tools.build:gradle:3.6.0-rc03'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.3'
     }

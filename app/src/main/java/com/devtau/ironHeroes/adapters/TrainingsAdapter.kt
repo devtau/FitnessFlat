@@ -1,80 +1,51 @@
 package com.devtau.ironHeroes.adapters
 
-import android.text.TextUtils
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.util.Animator
-import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.Threading
-import io.reactivex.functions.Consumer
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.list_item_training.*
+import com.devtau.ironHeroes.databinding.ListItemTrainingBinding
+import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsViewModel
 
 class TrainingsAdapter(
-    private val listener: Consumer<Training>
-): RecyclerView.Adapter<TrainingsAdapter.TrainingsViewHolder>() {
+    private val viewModel: TrainingsViewModel
+): ListAdapter<Training, TrainingsAdapter.ViewHolder>(DiffCallback()) {
 
-    private var trainings: MutableList<Training> = mutableListOf()
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder.from(parent)
 
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrainingsViewHolder {
-        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.list_item_training, parent, false)
-        return TrainingsViewHolder(view)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = getItem(position)
+        holder.bind(viewModel, item)
     }
 
-    override fun onBindViewHolder(holder: TrainingsViewHolder, position: Int) {
-        val training = trainings[position]
-        Logger.v(LOG_TAG, "onBindViewHolder. training=$training")
-        Glide.with(holder.championImage).load(
-            if (!TextUtils.isEmpty(training.champion?.avatarUrl)) training.champion?.avatarUrl
-            else if (training.champion?.avatarId != null) training.champion?.avatarId
-            else null)
-            .transform(CircleCrop())
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(holder.championImage)
-        holder.date.text = AppUtils.formatDateTimeWithWeekDay(training.date)
-        Glide.with(holder.championImage).load(
-            if (!TextUtils.isEmpty(training.hero?.avatarUrl)) training.hero?.avatarUrl
-            else if (training.hero?.avatarId != null) training.hero?.avatarId
-            else null)
-            .transform(CircleCrop())
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(holder.heroImage)
-        holder.containerView.setOnClickListener { listener.accept(training) }
-    }
 
-    override fun getItemCount(): Int = trainings.size
+    class ViewHolder private constructor(
+        private val binding: ListItemTrainingBinding
+    ): RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(viewModel: TrainingsViewModel, item: Training) {
+            binding.viewModel = viewModel
+            binding.training = item
+            binding.executePendingBindings()
+        }
 
 
-    fun setList(list: List<Training>, listView: RecyclerView?) {
-        if (itemCount == 0) {
-            Threading.dispatchMainDelayed(Consumer {
-                listView?.visibility = View.INVISIBLE
-                trainings.clear()
-                trainings.addAll(list)
-                notifyDataSetChanged()
-                val unbounded = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-                listView?.measure(unbounded, unbounded)
-                Animator.animateDropdownSlide(listView, listView?.measuredHeight, Animator.ANIMATION_LENGTH_MED, true)
-            }, Animator.ANIMATION_LENGTH_MED)
-        } else {
-            trainings.clear()
-            trainings.addAll(list)
-            notifyDataSetChanged()
+        companion object {
+            fun from(parent: ViewGroup): ViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ListItemTrainingBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder(binding)
+            }
         }
     }
 
 
-    class TrainingsViewHolder(override val containerView: View):
-        RecyclerView.ViewHolder(containerView), LayoutContainer
+    private class DiffCallback: DiffUtil.ItemCallback<Training>() {
+        override fun areItemsTheSame(oldItem: Training, newItem: Training) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Training, newItem: Training) = oldItem == newItem
+    }
 
 
     companion object {

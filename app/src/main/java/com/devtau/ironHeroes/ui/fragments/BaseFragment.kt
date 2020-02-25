@@ -11,6 +11,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import com.devtau.ironHeroes.IronHeroesApp
+import com.devtau.ironHeroes.ViewModelFactory
+import com.devtau.ironHeroes.ui.Coordinator
+import com.devtau.ironHeroes.ui.CoordinatorImpl
 import com.devtau.ironHeroes.ui.StandardView
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.CLICKS_DEBOUNCE_RATE_MS
@@ -22,7 +26,7 @@ import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import java.util.concurrent.TimeUnit
 
-abstract class ViewSubscriberFragment: Fragment(), StandardView {
+abstract class BaseFragment: Fragment(), StandardView, Coordinator by CoordinatorImpl {
 
     private val compositeUiDisposable = CompositeDisposable()
 
@@ -80,4 +84,10 @@ fun FragmentActivity?.initActionBar(titleId: Int?, show: Boolean = true): Boolea
     if (show) actionbar.show() else actionbar.hide()
     actionbar.title = if (titleId == null) "" else this.getString(titleId)
     return true
+}
+
+fun Fragment.getViewModelFactory(): ViewModelFactory {
+    val trainingsRepository = (requireContext().applicationContext as IronHeroesApp).trainingsRepository
+    val heroesRepository = (requireContext().applicationContext as IronHeroesApp).heroesRepository
+    return ViewModelFactory(trainingsRepository, heroesRepository, this)
 }

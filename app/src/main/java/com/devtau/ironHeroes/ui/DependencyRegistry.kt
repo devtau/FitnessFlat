@@ -1,15 +1,13 @@
 package com.devtau.ironHeroes.ui
 
 import android.os.Bundle
-import com.devtau.ironHeroes.data.DB
+import com.devtau.ironHeroes.data.source.local.DB
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.CoordinatorImpl.EXERCISE_IN_TRAINING_ID
 import com.devtau.ironHeroes.ui.CoordinatorImpl.HERO_ID
 import com.devtau.ironHeroes.ui.CoordinatorImpl.HUMAN_TYPE
 import com.devtau.ironHeroes.ui.CoordinatorImpl.POSITION
 import com.devtau.ironHeroes.ui.CoordinatorImpl.TRAINING_ID
-import com.devtau.ironHeroes.ui.activities.main.MainActivity
-import com.devtau.ironHeroes.ui.activities.main.MainPresenterImpl
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExercisePresenterImpl
 import com.devtau.ironHeroes.ui.fragments.functions.FunctionsFragment
@@ -26,8 +24,6 @@ import com.devtau.ironHeroes.ui.fragments.statistics.StatisticsFragment
 import com.devtau.ironHeroes.ui.fragments.statistics.StatisticsPresenterImpl
 import com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsFragment
 import com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsPresenterImpl
-import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment
-import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsPresenterImpl
 import com.devtau.ironHeroes.util.PreferencesManager
 
 object DependencyRegistry {
@@ -38,13 +34,6 @@ object DependencyRegistry {
 
 
     //<editor-fold desc="injectors">
-    fun inject(activity: MainActivity) {
-        val db = DB.getInstance(activity)
-        val presenter = MainPresenterImpl(activity, db.heroDao(), db.trainingDao(),
-            db.exerciseDao(), db.muscleGroupDao(), db.exerciseInTrainingDao(), prefs)
-        activity.configureWith(presenter, coordinator)
-    }
-
     fun inject(fragment: FunctionsFragment) = fragment.context?.let {
         val db = DB.getInstance(it)
         val presenter = FunctionsPresenterImpl(fragment, db.heroDao(), db.trainingDao(),
@@ -67,12 +56,6 @@ object DependencyRegistry {
         val humanType = humanTypeFromBundleOrThrow(fragment.arguments)
         val presenter = HeroDetailsPresenterImpl(fragment, db.heroDao(), heroId, humanType)
         fragment.configureWith(presenter)
-    }
-
-    fun inject(fragment: TrainingsFragment) = fragment.context?.let {
-        val db = DB.getInstance(it)
-        val presenter = TrainingsPresenterImpl(fragment, db.heroDao(), db.trainingDao(), prefs)
-        fragment.configureWith(presenter, coordinator)
     }
 
     fun inject(fragment: TrainingDetailsFragment) = fragment.context?.let {

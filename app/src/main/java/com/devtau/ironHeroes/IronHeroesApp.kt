@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
+import com.devtau.ironHeroes.data.source.repositories.HeroesRepository
+import com.devtau.ironHeroes.data.source.repositories.TrainingsRepository
 import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
@@ -17,10 +19,24 @@ import com.vk.sdk.api.VKError
 
 class IronHeroesApp: Application() {
 
+    val trainingsRepository: TrainingsRepository
+        get() = ServiceLocator.provideTrainingsRepository(this)
+
+    val heroesRepository: HeroesRepository
+        get() = ServiceLocator.provideHeroesRepository(this)
+
+
     override fun onCreate() {
         super.onCreate()
         PreferencesManager.init(this)
 
+        initFirebase()
+        initVK()
+        initNotificationChannels()
+    }
+
+
+    private fun initFirebase() {
         FirebaseApp.initializeApp(this)
         FirebaseInstanceId.getInstance().instanceId
             .addOnCompleteListener {
@@ -30,8 +46,9 @@ class IronHeroesApp: Application() {
                     Logger.d(LOG_TAG, "getInstanceId. firebase token=${it.result?.token}")
                 }
             }
+    }
 
-        //vk
+    private fun initVK() {
         VKSdk.initialize(this)
         object: VKAccessTokenTracker() {
             override fun onVKAccessTokenChanged(oldToken: VKAccessToken?, newToken: VKAccessToken?) {
@@ -43,13 +60,16 @@ class IronHeroesApp: Application() {
                 }
             }
         }.startTracking()
+    }
 
+    private fun initNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
             AppUtils.createChannelIfNeeded(notificationManager, ChannelStats.DEFAULT_SOUND)
             AppUtils.createChannelIfNeeded(notificationManager, ChannelStats.CUSTOM_SOUND)
         }
     }
+
 
     companion object {
         const val LOGOUT = "com.devtau.ironHeroes.action.LOGOUT"

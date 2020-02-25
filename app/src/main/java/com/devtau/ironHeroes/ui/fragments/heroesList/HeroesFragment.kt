@@ -5,19 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.HeroesAdapter
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
 import com.devtau.ironHeroes.ui.fragments.initActionBar
 import com.devtau.ironHeroes.util.Constants
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_heroes.*
 
-class HeroesFragment: ViewSubscriberFragment(), HeroesContract.View {
+class HeroesFragment: BaseFragment(), HeroesContract.View {
 
     private lateinit var presenter: HeroesContract.Presenter
     private lateinit var coordinator: Coordinator
@@ -76,11 +75,9 @@ class HeroesFragment: ViewSubscriberFragment(), HeroesContract.View {
     }
 
     private fun initList() {
-        val context = context ?: return
         adapter = HeroesAdapter(null, Consumer {
             coordinator.launchHeroDetails(listView, it.id, presenter.provideHumanType())
         })
-        listView?.layoutManager = CustomLinearLayoutManager(context)
         listView?.adapter = adapter
     }
     //</editor-fold>

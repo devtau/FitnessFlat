@@ -4,50 +4,39 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
+import androidx.fragment.app.viewModels
 import com.devtau.ironHeroes.adapters.TrainingsAdapter
-import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.ui.Coordinator
-import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.databinding.FragmentTrainingsBinding
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
+import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
 import com.devtau.ironHeroes.util.Constants
-import com.devtau.ironHeroes.util.SpinnerUtils
-import io.reactivex.functions.Consumer
+import com.devtau.ironHeroes.util.EventObserver
+import com.devtau.ironHeroes.util.PreferencesManager
+import com.devtau.ironHeroes.util.setupSnackbar
 import kotlinx.android.synthetic.main.fragment_trainings.*
 
-class TrainingsFragment: ViewSubscriberFragment(), TrainingsContract.View {
+class TrainingsFragment: BaseFragment() {
 
-    private lateinit var presenter: TrainingsContract.Presenter
-    private lateinit var coordinator: Coordinator
-    private var adapter: TrainingsAdapter? = null
+    private val _viewModel by viewModels<TrainingsViewModel> { getViewModelFactory() }
+    private lateinit var binding: FragmentTrainingsBinding
+    private val prefs = PreferencesManager
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        DependencyRegistry.inject(this)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
+        binding = FragmentTrainingsBinding.inflate(inflater, container, false).apply {
+            viewModel = _viewModel
+        }
+        return binding.root
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_trainings, container, false)
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initUi()
-        initList()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.restartLoaders()
-        subscribeField(champion, Consumer { applyFilter() })
-        subscribeField(hero, Consumer { applyFilter() })
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.onStop()
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.fab.postDelayed({ binding.fab.show() }, Constants.STANDARD_DELAY_MS)
+        binding.listView.adapter = TrainingsAdapter(_viewModel)
+        setupNavigation()
+        view?.setupSnackbar(viewLifecycleOwner, _viewModel.snackbarText)
     }
     //</editor-fold>
 
@@ -55,47 +44,15 @@ class TrainingsFragment: ViewSubscriberFragment(), TrainingsContract.View {
     //<editor-fold desc="Interface overrides">
     override fun getLogTag() = LOG_TAG
     override fun initActionbar() = false
-
-    override fun updateTrainings(list: List<Training>) {
-        adapter?.setList(list, listView)
-    }
-
-    override fun showChampions(list: List<String>, selectedIndex: Int) =
-        SpinnerUtils.initSpinner(champion, list, selectedIndex, context)
-
-    override fun showHeroes(list: List<String>, selectedIndex: Int) =
-        SpinnerUtils.initSpinner(hero, list, selectedIndex, context)
     //</editor-fold>
 
 
-    fun configureWith(presenter: TrainingsContract.Presenter, coordinator: Coordinator) {
-        this.presenter = presenter
-        this.coordinator = coordinator
-    }
-
-    fun updateSpinnersVisibility() {
-        championContainer?.visibility = if (presenter.isChampionFilterNeeded()) View.VISIBLE else View.GONE
-        heroContainer?.visibility = if (presenter.isHeroFilterNeeded()) View.VISIBLE else View.GONE
-    }
-
-
     //<editor-fold desc="Private methods">
-    private fun initUi() {
-        listView?.postDelayed({ fab?.show() }, Constants.STANDARD_DELAY_MS)
-        fab?.setOnClickListener { coordinator.launchTrainingDetails(fab, null) }
-        updateSpinnersVisibility()
-    }
-
-    private fun initList() {
-        val context = context ?: return
-        adapter = TrainingsAdapter(Consumer {
-            coordinator.launchTrainingDetails(listView, it.id)
+    private fun setupNavigation() {
+        _viewModel.openTrainingEvent.observe(viewLifecycleOwner, EventObserver {
+            launchTrainingDetails(listView, it)
         })
-        listView?.layoutManager = CustomLinearLayoutManager(context)
-        listView?.adapter = adapter
     }
-
-    private fun applyFilter() = presenter.filterAndUpdateList(champion?.selectedItemPosition ?: 0, hero?.selectedItemPosition ?: 0)
     //</editor-fold>
 
 

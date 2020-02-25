@@ -14,6 +14,15 @@ object FileUtils {
 
     private const val LOG_TAG = "FileUtils"
 
+    const val CSV_EXT = ".csv"
+    const val TXT_EXT = ".txt"
+    const val SEPARATOR = ','
+    const val QUOTE_CHAR = '"'
+    const val ESCAPE_CHAR = '"'
+    const val LINE_END = "\n"
+    const val TRAININGS_FILE_NAME = "Trainings"
+    const val EXERCISES_FILE_NAME = "ExercisesInTrainings"
+
 
     fun exportToJSON(list: List<*>, exchangeDirName: String, fileName: String, listener: Consumer<Int?>? = null) {
         Threading.async(Callable {
@@ -28,7 +37,7 @@ object FileUtils {
                 return@Callable
             }
 
-            val file = File(exchangeDir, "$fileName${Constants.TXT_EXT}")
+            val file = File(exchangeDir, "$fileName$TXT_EXT")
             var writer: FileWriter? = null
             try {
                 file.createNewFile()
@@ -49,7 +58,7 @@ object FileUtils {
         Threading.async(Callable {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             val exchangeDir = File(downloadsDir, exchangeDirName)
-            val fileToRead = File(exchangeDir, "$fileName${Constants.TXT_EXT}")
+            val fileToRead = File(exchangeDir, "$fileName$TXT_EXT")
             val reader = BufferedReader(FileReader(fileToRead))
             val list = Serializer.deserializeListOfTrainings(reader.readLine())
             reader.close()
@@ -62,7 +71,7 @@ object FileUtils {
         Threading.async(Callable {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             val exchangeDir = File(downloadsDir, exchangeDirName)
-            val fileToRead = File(exchangeDir, "$fileName${Constants.TXT_EXT}")
+            val fileToRead = File(exchangeDir, "$fileName$TXT_EXT")
             val reader = BufferedReader(FileReader(fileToRead))
             val list = Serializer.deserializeListOfExercisesInTrainings(reader.readLine())
             reader.close()

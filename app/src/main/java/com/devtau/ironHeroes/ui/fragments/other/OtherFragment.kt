@@ -10,12 +10,12 @@ import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
 import com.devtau.ironHeroes.util.PermissionHelperImpl
 import io.reactivex.functions.Action
 import kotlinx.android.synthetic.main.fragment_other.*
 
-class OtherFragment: ViewSubscriberFragment(), OtherContract.View {
+class OtherFragment: BaseFragment(), OtherContract.View {
 
     private lateinit var presenter: OtherContract.Presenter
     private lateinit var coordinator: Coordinator

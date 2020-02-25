@@ -17,18 +17,15 @@ import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.enums.Gender
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
 import com.devtau.ironHeroes.ui.fragments.initActionBar
-import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants
-import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.PermissionHelperImpl
+import com.devtau.ironHeroes.util.*
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_hero_details.*
 import java.util.*
 
-class HeroDetailsFragment: ViewSubscriberFragment(),
+class HeroDetailsFragment: BaseFragment(),
     HeroDetailsContract.View {
 
     private lateinit var presenter: HeroDetailsContract.Presenter
@@ -104,12 +101,12 @@ class HeroDetailsFragment: ViewSubscriberFragment(),
 
         AppUtils.updateInputField(vkIdInput, hero?.vkId)
         AppUtils.updateInputField(emailInput, hero?.email)
-        AppUtils.updateInputField(birthdayText, AppUtils.formatDate(hero?.birthDay))
+        AppUtils.updateInputField(birthdayText, DateUtils.formatDate(hero?.birthDay))
         isChampion?.isChecked = hero?.humanType == HumanType.CHAMPION
     }
 
     override fun onDateSet(date: Calendar) {
-        birthdayText?.text = AppUtils.formatDate(date)
+        birthdayText?.text = DateUtils.formatDate(date)
         updateHeroData("birthdayText", birthdayText?.text?.toString())
     }
 

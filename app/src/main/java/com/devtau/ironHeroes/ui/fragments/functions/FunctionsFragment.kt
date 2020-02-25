@@ -11,14 +11,12 @@ import com.devtau.ironHeroes.adapters.FunctionsPagerAdapter
 import com.devtau.ironHeroes.data.model.*
 import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
-import com.devtau.ironHeroes.ui.fragments.settings.SettingsFragment
-import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsFragment
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
 import com.devtau.ironHeroes.util.Logger
 import kotlinx.android.synthetic.main.fragment_functions.*
 import java.util.*
 
-class FunctionsFragment: ViewSubscriberFragment(), FunctionsContract.View, SettingsFragment.Listener {
+class FunctionsFragment: BaseFragment(), FunctionsContract.View {
 
     private lateinit var presenter: FunctionsContract.Presenter
     private lateinit var coordinator: Coordinator
@@ -92,8 +90,6 @@ class FunctionsFragment: ViewSubscriberFragment(), FunctionsContract.View, Setti
         applyPageIndicatorState(pageIndex)
         functionsPager?.currentItem = pageIndex
     }
-
-    override fun updateSpinnersVisibility() = (pagerAdapter?.getItem(0) as TrainingsFragment).updateSpinnersVisibility()
     //</editor-fold>
 
 
@@ -150,7 +146,7 @@ class FunctionsFragment: ViewSubscriberFragment(), FunctionsContract.View, Setti
 
 
     companion object {
-        private const val LOG_TAG = "FunctionsActivity"
+        private const val LOG_TAG = "FunctionsFragment"
         private const val PAGE_INDEX = "pageIndex"
     }
 }

@@ -1,15 +1,16 @@
 package com.devtau.ironHeroes.ui.fragments.other
 
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.dao.ExerciseInTrainingDao
-import com.devtau.ironHeroes.data.dao.HeroDao
-import com.devtau.ironHeroes.data.dao.TrainingDao
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.exerciseInTraining.ExerciseInTrainingDao
+import com.devtau.ironHeroes.data.source.local.hero.HeroDao
+import com.devtau.ironHeroes.data.source.local.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.training.TrainingDao
 import com.devtau.ironHeroes.ui.DBSubscriber
-import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.FileUtils
+import com.devtau.ironHeroes.util.FileUtils.EXERCISES_FILE_NAME
+import com.devtau.ironHeroes.util.FileUtils.TRAININGS_FILE_NAME
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.Threading
 import io.reactivex.functions.Action
@@ -29,7 +30,7 @@ class OtherPresenterImpl(
 
     //<editor-fold desc="Interface overrides">
     override fun restartLoaders() {
-        disposeOnStop(trainingDao.getList()
+        disposeOnStop(trainingDao.getListAsFlowable()
             .map { relation -> relation.map { it.convert() } }
             .subscribeDefault(Consumer {
                 Logger.d(LOG_TAG, "got new trainings list with size=${it.size}")
@@ -59,7 +60,7 @@ class OtherPresenterImpl(
             view.showMsg(R.string.no_exercises_or_trainings_found)
             return
         }
-        FileUtils.exportToJSON(trainings, exchangeDirName, Constants.TRAININGS_FILE_NAME, Consumer {
+        FileUtils.exportToJSON(trainings, exchangeDirName, TRAININGS_FILE_NAME, Consumer {
             Threading.dispatchMain(Action {
                 if (it == null) {
                     view.showMsg(R.string.export_error)
@@ -70,7 +71,7 @@ class OtherPresenterImpl(
             })
         })
 
-        FileUtils.exportToJSON(exercises, exchangeDirName, Constants.EXERCISES_FILE_NAME, Consumer {
+        FileUtils.exportToJSON(exercises, exchangeDirName, EXERCISES_FILE_NAME, Consumer {
             Threading.dispatchMain(Action {
                 if (it == null) {
                     view.showMsg(R.string.export_error)
@@ -89,15 +90,15 @@ class OtherPresenterImpl(
             if (trainingsCount > 0 && exercisesCount > 0) view.showReadFromFile(trainingsCount, exercisesCount)
         }
         val exchangeDirName = view.resolveString(R.string.app_name)
-        FileUtils.readTrainingsJSON(exchangeDirName, Constants.TRAININGS_FILE_NAME, Consumer {
-            trainingDao.insert(it)
+        FileUtils.readTrainingsJSON(exchangeDirName, TRAININGS_FILE_NAME, Consumer {
+            trainingDao.insertListAsync(it)
                 .subscribeDefault("trainingDao.insert")
             Threading.dispatchMain(Action {
                 trainingsCount = it.size
                 showReadFromFile()
             })
         })
-        FileUtils.readExercisesJSON(exchangeDirName, Constants.EXERCISES_FILE_NAME, Consumer {
+        FileUtils.readExercisesJSON(exchangeDirName, EXERCISES_FILE_NAME, Consumer {
             exerciseInTrainingDao.insert(it)
                 .subscribeDefault("exerciseInTrainingDao.insert")
             Threading.dispatchMain(Action {
@@ -108,9 +109,9 @@ class OtherPresenterImpl(
     }
 
     override fun clearDB() {
-        heroDao.delete()
+        heroDao.deleteAsync()
             .subscribeDefault("heroDao.delete")
-        trainingDao.delete()
+        trainingDao.deleteAsync()
             .subscribeDefault("trainingDao.delete")
         exerciseInTrainingDao.delete()
             .subscribeDefault("exerciseInTrainingDao.delete")

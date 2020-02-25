@@ -60,6 +60,7 @@
     <string name="weight">Weight</string>
     <string name="count">Count</string>
     <string name="error_formatter" formatted="false">Error: %s</string>
+    <string name="error_trainings_list">Error loading workout list</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="filters">Filters</string>
@@ -83,6 +84,7 @@
     <string name="further">Further</string>
     <string name="previous_exercise_data">Last time you completed this exercise:</string>
     <string name="no_data">there is no data</string>
+    <string name="no_trainings">No trainings found</string>
     <string name="previous_training_data_formatter" formatted="false">%s %s x %s x %s</string>
     <string name="settings">Settings</string>
     <string name="other">Other</string>
@@ -102,14 +104,10 @@
     <string name="roma_first_name">Roman</string>
     <string name="anton_first_name">Antony</string>
     <string name="denis_first_name">Denis</string>
-    <string name="masha_first_name">Mary</string>
-    <string name="eugen_first_name">Eugen</string>
     
     <string name="roma_last_name">Bogdanov</string>
     <string name="anton_last_name">Shukin</string>
     <string name="denis_last_name">Russikh</string>
-    <string name="masha_last_name">Chernyichkina</string>
-    <string name="eugen_last_name">Strimanov</string>
     
     
     //Chest

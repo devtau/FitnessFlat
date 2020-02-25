@@ -1,8 +1,12 @@
 package com.devtau.ironHeroes.ui.fragments.functions
 
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.dao.*
-import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.exercise.ExerciseDao
+import com.devtau.ironHeroes.data.source.local.exerciseInTraining.ExerciseInTrainingDao
+import com.devtau.ironHeroes.data.source.local.hero.HeroDao
+import com.devtau.ironHeroes.data.source.local.muscleGroup.MuscleGroupDao
+import com.devtau.ironHeroes.data.source.local.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.training.TrainingDao
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.Logger
@@ -22,7 +26,7 @@ class FunctionsPresenterImpl(
 ): DBSubscriber(), FunctionsContract.Presenter {
 
     init {
-        disposeOnStop(heroDao.getList(HumanType.HERO.ordinal)
+        disposeOnStop(heroDao.getListAsFlowable(HumanType.HERO.ordinal)
             .subscribeDefault(Consumer { heroes ->
                 if (prefs.firstLaunch && (heroes == null || heroes.isEmpty())) {
                     createMuscleGroupsAndExercises()
@@ -70,11 +74,11 @@ class FunctionsPresenterImpl(
     }
 
     private fun loadDemoConfig() {
-        heroDao.insert(view.provideMockHeroes())
+        heroDao.insertListAsync(view.provideMockHeroes())
             .subscribeDefault("heroDao.insert heroes")
-        heroDao.insert(view.provideMockChampions())
+        heroDao.insertListAsync(view.provideMockChampions())
             .subscribeDefault("heroDao.insert champions")
-        trainingDao.insert(view.provideMockTrainings())
+        trainingDao.insertListAsync(view.provideMockTrainings())
             .subscribeDefault("trainingDao.insert")
         exerciseInTrainingDao.insert(view.provideMockExercisesInTrainings())
             .subscribeDefault("exerciseInTrainingDao.insert")

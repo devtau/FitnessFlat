@@ -1,8 +1,12 @@
 package com.devtau.ironHeroes.util
 
 import android.os.Environment
+import com.devtau.ironHeroes.util.FileUtils.CSV_EXT
+import com.devtau.ironHeroes.util.FileUtils.LINE_END
+import com.devtau.ironHeroes.util.FileUtils.QUOTE_CHAR
+import com.devtau.ironHeroes.util.FileUtils.SEPARATOR
 import java.io.*
-import java.util.ArrayList
+import java.util.*
 
 class CSVReader(reader: Reader) {
 
@@ -32,7 +36,7 @@ class CSVReader(reader: Reader) {
         var inQuotes = false
         do {
             if (inQuotes) {
-                sb.append(Constants.LINE_END)
+                sb.append(LINE_END)
                 nextLineLoc = readNextLine()
                 if (nextLineLoc == null) break
             }
@@ -40,18 +44,18 @@ class CSVReader(reader: Reader) {
             while (i < nextLineLoc!!.length) {
                 val c = nextLineLoc[i]
                 when {
-                    c == Constants.QUOTE_CHAR ->
-                        if (inQuotes && nextLineLoc.length > i + 1 && nextLineLoc[i + 1] == Constants.QUOTE_CHAR) {
+                    c == QUOTE_CHAR ->
+                        if (inQuotes && nextLineLoc.length > i + 1 && nextLineLoc[i + 1] == QUOTE_CHAR) {
                             sb.append(nextLineLoc[i + 1])
                             i++
                         } else {
                             inQuotes = !inQuotes
-                            if (i > 2 && nextLineLoc[i - 1] != Constants.SEPARATOR &&
-                                nextLineLoc.length > i + 1 && nextLineLoc[i + 1] != Constants.SEPARATOR) {
+                            if (i > 2 && nextLineLoc[i - 1] != SEPARATOR &&
+                                nextLineLoc.length > i + 1 && nextLineLoc[i + 1] != SEPARATOR) {
                                 sb.append(c)
                             }
                         }
-                    c == Constants.SEPARATOR && !inQuotes -> {
+                    c == SEPARATOR && !inQuotes -> {
                         tokensOnThisLine.add(sb.toString())
                         sb = StringBuffer()
                     }
@@ -74,7 +78,7 @@ class CSVReader(reader: Reader) {
         fun readCSV(exchangeDirName: String, fileName: String) {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             val exchangeDir = File(downloadsDir, exchangeDirName)
-            val fileToRead = File(exchangeDir, "$fileName${Constants.CSV_EXT}")
+            val fileToRead = File(exchangeDir, "$fileName$CSV_EXT")
             val reader = CSVReader(FileReader(fileToRead))
 
             var nextLine: Array<String>?
@@ -82,9 +86,9 @@ class CSVReader(reader: Reader) {
 
             nextLine = reader.readNext()
             while (nextLine != null) {
-                for (i in 0 until nextLine.size) {
+                for (i in nextLine.indices) {
                     if (i == nextLine.size - 1) values.append(nextLine[i])
-                    else values.append(nextLine[i]).append(Constants.SEPARATOR)
+                    else values.append(nextLine[i]).append(SEPARATOR)
                 }
                 values.append("\n")
                 nextLine = reader.readNext()

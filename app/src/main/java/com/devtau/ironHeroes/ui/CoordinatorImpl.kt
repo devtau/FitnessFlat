@@ -1,12 +1,16 @@
 package com.devtau.ironHeroes.ui
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.enums.HumanType
+import com.devtau.ironHeroes.ui.activities.DBViewerActivity
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog
+import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.Logger
 
 object CoordinatorImpl: Coordinator {
@@ -31,10 +35,14 @@ object CoordinatorImpl: Coordinator {
         view.findNavController().navigate(R.id.action_heroesFragment_to_heroDetailsFragment, bundle)
     }
 
-    override fun launchTrainingDetails(view: View?, trainingId: Long?) {
+    override fun launchTrainingDetails(view: View?, trainingId: Long) {
         val bundle = Bundle()
-        if (trainingId != null) bundle.putLong(TRAINING_ID, trainingId)
+        if (trainingId != Constants.OBJECT_ID_NA) bundle.putLong(TRAINING_ID, trainingId)
         view?.findNavController()?.navigate(R.id.action_functionsFragment_to_trainingDetailsFragment, bundle)
+    }
+
+    override fun launchDBViewer(context: Context?) {
+        context?.startActivity(Intent(context, DBViewerActivity::class.java))
     }
 
     override fun showExercise(view: View?, heroId: Long?, trainingId: Long?, exerciseInTrainingId: Long?, position: Int?) {

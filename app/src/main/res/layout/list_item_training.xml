@@ -1,37 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="@dimen/marginHalf"
-    android:paddingBottom="@dimen/marginHalf"
-    android:paddingLeft="@dimen/marginNormal"
-    android:paddingRight="@dimen/marginNormal"
-    style="@style/SelectableItemBackground"
-    android:orientation="horizontal"
-    android:gravity="center_vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.devtau.ironHeroes.adapters.TrainingsAdapter">
     
-    <ImageView
-        android:id="@+id/championImage"
-        tools:src="@color/colorAccent"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:scaleType="centerCrop"/>
+    <data>
+        <variable
+            name="viewModel"
+            type="com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsViewModel"/>
+        
+        <variable
+            name="training"
+            type="com.devtau.ironHeroes.data.model.Training"/>
+    </data>
     
-    <TextView
-        android:id="@+id/date"
-        tools:text="27.10.2019 09:00, вс"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:padding="@dimen/marginHalf"/>
+        android:paddingTop="@dimen/marginHalf"
+        android:paddingBottom="@dimen/marginHalf"
+        android:paddingLeft="@dimen/marginNormal"
+        android:paddingRight="@dimen/marginNormal"
+        style="@style/SelectableItemBackground"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:onClick="@{() -> viewModel.openTraining(training.id)}">
+        
+        <ImageView
+            android:id="@+id/championImage"
+            tools:src="@color/colorAccent"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            app:humanImage="@{training.champion}"/>
+        
+        <TextView
+            android:id="@+id/date"
+            android:text="@{training.formatDateTimeWithWeekDay()}"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="@dimen/marginHalf"/>
     
-    <ImageView
-        android:id="@+id/heroImage"
-        tools:src="@color/colorAccent"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:scaleType="centerCrop"/>
-</LinearLayout>
+        <ImageView
+            android:id="@+id/heroImage"
+            tools:src="@color/colorAccent"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            app:humanImage="@{training.hero}"/>
+    </LinearLayout>
+</layout>

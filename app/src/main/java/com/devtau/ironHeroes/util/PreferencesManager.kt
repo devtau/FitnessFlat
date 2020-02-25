@@ -75,6 +75,9 @@ object PreferencesManager {
             editor?.apply()
         }
 
+    fun observeShowChampionFilter() = ObservablePreferenceBoolean(prefs, SHOW_CHAMPION_FILTER, true)
+    fun observeShowHeroFilter() = ObservablePreferenceBoolean(prefs, SHOW_HERO_FILTER, true)
+
     var showHeroFilter: Boolean
         get() = prefs.getBoolean(SHOW_HERO_FILTER, true)
         set(value) {

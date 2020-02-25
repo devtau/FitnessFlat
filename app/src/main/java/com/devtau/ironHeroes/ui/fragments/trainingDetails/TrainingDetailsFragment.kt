@@ -7,21 +7,20 @@ import android.view.*
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.adapters.CustomLinearLayoutManager
 import com.devtau.ironHeroes.adapters.ExercisesInTrainingAdapter
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
 import com.devtau.ironHeroes.ui.fragments.initActionBar
-import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.DateUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.SpinnerUtils
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_training_details.*
 import java.util.*
 
-class TrainingDetailsFragment: ViewSubscriberFragment(),
+class TrainingDetailsFragment: BaseFragment(),
     TrainingDetailsContract.View {
 
     private lateinit var presenter: TrainingDetailsContract.Presenter
@@ -87,7 +86,7 @@ class TrainingDetailsFragment: ViewSubscriberFragment(),
 
     override fun showTrainingDate(date: Calendar) {
         trainingDate = date
-        dateText?.text = AppUtils.formatDateTimeWithWeekDay(date)
+        dateText?.text = DateUtils.formatDateTimeWithWeekDay(date)
     }
 
     override fun showExercises(list: List<ExerciseInTraining>?) =
@@ -138,12 +137,10 @@ class TrainingDetailsFragment: ViewSubscriberFragment(),
     }
 
     private fun initList() {
-        val context = context ?: return
         exercisesAdapter = ExercisesInTrainingAdapter(presenter.provideExercises(), Consumer {
             coordinator.showExercise(view, presenter.provideTraining()?.heroId,
                 presenter.provideTraining()?.id, it.id, it.position)
         })
-        listView?.layoutManager = CustomLinearLayoutManager(context)
         listView?.adapter = exercisesAdapter
 
         val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.Callback() {
@@ -183,7 +180,7 @@ class TrainingDetailsFragment: ViewSubscriberFragment(),
 
     private fun onTimeSet(year: Int, month: Int, dayOfMonth: Int, hour: Int, minute: Int) {
         Logger.d(LOG_TAG, "onTimeSet. year=$year, month=$month, dayOfMonth=$dayOfMonth, hour=$hour, minute=$minute")
-        showTrainingDate(AppUtils.getRoundDate(year, month, dayOfMonth, hour, minute))
+        showTrainingDate(DateUtils.getRoundDate(year, month, dayOfMonth, hour, minute))
         updateTrainingData()
     }
     //</editor-fold>

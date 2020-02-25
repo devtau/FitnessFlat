@@ -1,8 +1,7 @@
 package com.devtau.ironHeroes.ui.fragments.statistics
 
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
-import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants
+import com.devtau.ironHeroes.util.DateUtils
 
 class Tag(
     val markerColorId: Int,
@@ -21,7 +20,7 @@ class Tag(
         fun getTitle(exerciseInTraining: ExerciseInTraining): String {
             val exerciseName = exerciseInTraining.exercise?.name ?: ""
             var title: String
-            val datePrefix = AppUtils.formatShortDate(exerciseInTraining.training?.date?.toString()) + DATE_SEPARATOR
+            val datePrefix = DateUtils.formatShortDate(exerciseInTraining.training?.date?.toString()) + DATE_SEPARATOR
             val maxTitleLength = LINES_LENGTH * LINES_COUNT
             val maxExerciseNameLength = maxTitleLength - datePrefix.length
             if (exerciseName.length > maxExerciseNameLength) {

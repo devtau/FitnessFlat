@@ -1,17 +1,17 @@
 package com.devtau.ironHeroes.ui.dialogs.exerciseDialog
 
-import com.devtau.ironHeroes.data.dao.ExerciseDao
-import com.devtau.ironHeroes.data.dao.ExerciseInTrainingDao
-import com.devtau.ironHeroes.data.dao.MuscleGroupDao
-import com.devtau.ironHeroes.data.dao.TrainingDao
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.MuscleGroup
 import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.exercise.ExerciseDao
+import com.devtau.ironHeroes.data.source.local.exerciseInTraining.ExerciseInTrainingDao
+import com.devtau.ironHeroes.data.source.local.muscleGroup.MuscleGroupDao
+import com.devtau.ironHeroes.data.source.local.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.training.TrainingDao
 import com.devtau.ironHeroes.ui.DBSubscriber
-import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Constants.INTEGER_NOT_PARSED
+import com.devtau.ironHeroes.util.DateUtils
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.SpinnerUtils
 import com.devtau.ironHeroes.util.print
@@ -76,7 +76,7 @@ class ExercisePresenterImpl(
                 prepareAndPublishDataToView()
             }, "exerciseInTrainingDao.getById")) }
 
-        trainingId?.let { disposeOnStop(trainingDao.getById(it)
+        trainingId?.let { disposeOnStop(trainingDao.getByIdAsFlowable(it)
             .map { relation -> relation.convert() }
             .subscribeDefault(Consumer { training ->
                 this.training = training
@@ -186,7 +186,7 @@ class ExercisePresenterImpl(
         val maxDate = Calendar.getInstance()
         maxDate.timeInMillis = training.date
         maxDate.add(Calendar.HOUR_OF_DAY, -2)
-        Logger.d(LOG_TAG, "filterExercisesByTrainingDate. maxDate=${AppUtils.formatDateTimeWithWeekDay(maxDate)}")
+        Logger.d(LOG_TAG, "filterExercisesByTrainingDate. maxDate=${DateUtils.formatDateTimeWithWeekDay(maxDate)}")
         val listFiltered = list.filter {
             val trainingDate = Calendar.getInstance()
             trainingDate.timeInMillis = it.training!!.date
@@ -203,7 +203,7 @@ class ExercisePresenterImpl(
             val maxDate = Calendar.getInstance()
             maxDate.timeInMillis = training.date
             maxDate.add(Calendar.HOUR_OF_DAY, -2)
-            Logger.d(LOG_TAG, "getPreviousExerciseData. maxDate=${AppUtils.formatDateTimeWithWeekDay(maxDate)}")
+            Logger.d(LOG_TAG, "getPreviousExerciseData. maxDate=${DateUtils.formatDateTimeWithWeekDay(maxDate)}")
             exercisesInTrainings.print("getPreviousExerciseData")
             for (next in exercisesInTrainings) {
                 val trainingDate = Calendar.getInstance()

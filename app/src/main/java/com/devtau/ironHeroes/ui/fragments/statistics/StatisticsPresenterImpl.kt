@@ -3,15 +3,15 @@ package com.devtau.ironHeroes.ui.fragments.statistics
 import android.util.LongSparseArray
 import com.devtau.ironHeroes.BuildConfig
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.dao.ExerciseDao
-import com.devtau.ironHeroes.data.dao.ExerciseInTrainingDao
-import com.devtau.ironHeroes.data.dao.HeroDao
-import com.devtau.ironHeroes.data.dao.MuscleGroupDao
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.MuscleGroup
-import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.exercise.ExerciseDao
+import com.devtau.ironHeroes.data.source.local.exerciseInTraining.ExerciseInTrainingDao
+import com.devtau.ironHeroes.data.source.local.hero.HeroDao
+import com.devtau.ironHeroes.data.source.local.muscleGroup.MuscleGroupDao
+import com.devtau.ironHeroes.data.source.local.subscribeDefault
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.*
@@ -43,7 +43,7 @@ class StatisticsPresenterImpl(
 
     //<editor-fold desc="Interface overrides">
     override fun restartLoaders() {
-        disposeOnStop(heroDao.getList(HumanType.HERO.ordinal)
+        disposeOnStop(heroDao.getListAsFlowable(HumanType.HERO.ordinal)
             .subscribeDefault(Consumer {
                 Logger.d(LOG_TAG, "got new heroes list with size=${it.size}")
                 heroes.clear()
@@ -190,7 +190,7 @@ class StatisticsPresenterImpl(
         }
         val datesFormatted = ArrayList<String>()
         if (BuildConfig.DEBUG) {
-            for (next in dates) datesFormatted.add(AppUtils.formatDateTimeWithWeekDay(next))
+            for (next in dates) datesFormatted.add(DateUtils.formatDateTimeWithWeekDay(next))
         }
         return dates
     }
@@ -205,8 +205,8 @@ class StatisticsPresenterImpl(
                     return false
                 }
                 if (previous.after(current)) {
-                    val previousFormatted = AppUtils.formatDateTimeWithWeekDay(previous)
-                    val currentFormatted = AppUtils.formatDateTimeWithWeekDay(current)
+                    val previousFormatted = DateUtils.formatDateTimeWithWeekDay(previous)
+                    val currentFormatted = DateUtils.formatDateTimeWithWeekDay(current)
                     view.showMsg("checkSortOrder. list not sorted because $previousFormatted > $currentFormatted")
                     return false
                 }

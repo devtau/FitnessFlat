@@ -1,15 +1,15 @@
 package com.devtau.ironHeroes.ui.fragments.trainingDetails
 
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.dao.ExerciseDao
-import com.devtau.ironHeroes.data.dao.ExerciseInTrainingDao
-import com.devtau.ironHeroes.data.dao.HeroDao
-import com.devtau.ironHeroes.data.dao.TrainingDao
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.exercise.ExerciseDao
+import com.devtau.ironHeroes.data.source.local.exerciseInTraining.ExerciseInTrainingDao
+import com.devtau.ironHeroes.data.source.local.hero.HeroDao
+import com.devtau.ironHeroes.data.source.local.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.training.TrainingDao
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
 import com.devtau.ironHeroes.util.*
@@ -45,14 +45,14 @@ class TrainingDetailsPresenterImpl(
                 publishDataToView()
             }, "exerciseDao.getList"))
 
-        disposeOnStop(heroDao.getList(HumanType.CHAMPION.ordinal)
+        disposeOnStop(heroDao.getListAsFlowable(HumanType.CHAMPION.ordinal)
             .subscribeDefault(Consumer {
                 champions.clear()
                 champions.addAll(it)
                 publishDataToView()
             }, "heroDao.getList"))
 
-        disposeOnStop(heroDao.getList(HumanType.HERO.ordinal)
+        disposeOnStop(heroDao.getListAsFlowable(HumanType.HERO.ordinal)
             .subscribeDefault(Consumer {
                 heroes.clear()
                 heroes.addAll(it)
@@ -69,7 +69,7 @@ class TrainingDetailsPresenterImpl(
                     publishDataToView()
                 }, "exerciseInTrainingDao.getById"))
 
-            disposeOnStop(trainingDao.getById(it)
+            disposeOnStop(trainingDao.getByIdAsFlowable(it)
                 .map { relation -> relation.convert() }
                 .subscribeDefault(Consumer { training ->
                     this.training = training
@@ -81,14 +81,14 @@ class TrainingDetailsPresenterImpl(
     override fun updateTrainingData(championIndex: Int, heroIndex: Int, date: Calendar?) {
         val championId = champions[championIndex].id
         val heroId = heroes[heroIndex].id
-        val trainingDate = date?.timeInMillis ?: AppUtils.getRoundDate().timeInMillis
+        val trainingDate = date?.timeInMillis ?: DateUtils.getRoundDate().timeInMillis
         val allPartsPresent = Training.allObligatoryPartsPresent(championId, heroId, trainingDate)
         val someFieldsChanged = training?.someFieldsChanged(championId, heroId, trainingDate) ?: true
         Logger.d(LOG_TAG, "updateTrainingData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
         if (allPartsPresent && someFieldsChanged) {
             training = Training(trainingId, championId!!, heroId!!, trainingDate)
             Threading.async(Callable {
-                trainingId = trainingDao.insert(training)
+                trainingId = trainingDao.insertNow(training)
                 if (training?.id == null) {
                     training?.id = trainingId
                     disposeOnStop(exerciseInTrainingDao.getListForTraining(trainingId!!)
@@ -131,8 +131,9 @@ class TrainingDetailsPresenterImpl(
                 exerciseInTrainingDao.delete(it)
                     .subscribeDefault("exerciseInTrainingDao.delete")
             }
-            trainingDao.delete(listOf(training))
-                .subscribeDefault("trainingDao.delete")
+            training?.id?.let {
+                trainingDao.deleteAsync(it)
+                    .subscribeDefault("trainingDao.delete") }
             view.closeScreen()
         })
     }
@@ -169,7 +170,7 @@ class TrainingDetailsPresenterImpl(
 
         if (trainingId == null) {
             view.showScreenTitle(true)
-            view.showTrainingDate(AppUtils.getRoundDate())
+            view.showTrainingDate(DateUtils.getRoundDate())
             updateTrainingData(championIndex, heroIndex, null)
         } else {
             for (nextTraining in exercisesInTraining)

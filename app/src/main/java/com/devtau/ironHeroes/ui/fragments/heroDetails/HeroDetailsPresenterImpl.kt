@@ -3,12 +3,12 @@ package com.devtau.ironHeroes.ui.fragments.heroDetails
 import android.app.DatePickerDialog
 import android.content.Context
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.dao.HeroDao
 import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.data.subscribeDefault
+import com.devtau.ironHeroes.data.source.local.hero.HeroDao
+import com.devtau.ironHeroes.data.source.local.subscribeDefault
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.DBSubscriber
-import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.DateUtils
 import com.devtau.ironHeroes.util.Logger
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
@@ -34,7 +34,7 @@ class HeroDetailsPresenterImpl(
             view.showHumanType(humanType)
         } else {
             var disposable: Disposable? = null
-            disposable = heroDao.getById(heroId)
+            disposable = heroDao.getByIdAsFlowable(heroId)
                 .subscribeDefault(Consumer {
                     hero = it
                     val humanType = hero?.humanType ?: HumanType.HERO
@@ -52,12 +52,12 @@ class HeroDetailsPresenterImpl(
                                 avatarUrl: String?, avatarId: Int?) {
         val allPartsPresent = Hero.allObligatoryPartsPresent(firstName, secondName, phone, gender)
         val someFieldsChanged = hero?.someFieldsChanged(firstName, secondName, phone, gender, vkId, email,
-            AppUtils.parseDate(birthDay).timeInMillis, avatarUrl, avatarId) ?: true
+            DateUtils.parseDate(birthDay).timeInMillis, avatarUrl, avatarId) ?: true
         Logger.d(LOG_TAG, "updateHeroData. allPartsPresent=$allPartsPresent, someFieldsChanged=$someFieldsChanged")
         if (allPartsPresent && someFieldsChanged) {
             hero = Hero(heroId, humanType, firstName!!, secondName!!, phone!!, gender!!, vkId, email,
-                AppUtils.parseDate(birthDay).timeInMillis, avatarUrl, avatarId ?: hero?.avatarId)
-            heroDao.insert(listOf(hero))
+                DateUtils.parseDate(birthDay).timeInMillis, avatarUrl, avatarId ?: hero?.avatarId)
+            heroDao.insertListAsync(listOf(hero))
                 .subscribeDefault("heroDao.insert")
         }
     }
@@ -71,7 +71,7 @@ class HeroDetailsPresenterImpl(
             val date = Calendar.getInstance()
             date.timeInMillis = heroBirthDay
             date
-        } else AppUtils.parseDate(selectedBirthday)
+        } else DateUtils.parseDate(selectedBirthday)
 
         val dialog = DatePickerDialog(context,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(year, month, dayOfMonth) },
@@ -95,8 +95,7 @@ class HeroDetailsPresenterImpl(
 
     override fun deleteHero() {
         view.showMsg(R.string.confirm_delete, Action {
-            heroDao.delete(listOf(hero))
-                .subscribeDefault("heroDao.delete")
+            hero?.id?.let { heroDao.deleteAsync(it).subscribeDefault("heroDao.delete") }
             view.closeScreen()
         })
     }

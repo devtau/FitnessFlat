@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
 import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.SpinnerUtils
 import com.github.mikephil.charting.charts.LineChart
@@ -21,7 +21,7 @@ import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_statistics.*
 import java.util.*
 
-class StatisticsFragment: ViewSubscriberFragment(),
+class StatisticsFragment: BaseFragment(),
     StatisticsContract.View {
 
     private lateinit var presenter: StatisticsContract.Presenter

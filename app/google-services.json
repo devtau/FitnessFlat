@@ -34,6 +34,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726232632078:android:21b2164e22ba632882255f",
+        "android_client_info": {
+          "package_name": "com.devtau.ironHeroes.mock"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "726232632078-s00hr3u95f2nj29dd5bp8rrsptae8olq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCBc9ZDhw6NgDUhl7iSvnByU2SF9DecvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "726232632078-s00hr3u95f2nj29dd5bp8rrsptae8olq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
