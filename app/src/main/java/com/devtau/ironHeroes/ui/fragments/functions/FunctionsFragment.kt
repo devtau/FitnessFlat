@@ -4,52 +4,39 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.viewpager.widget.ViewPager
+import androidx.fragment.app.viewModels
+import androidx.viewpager2.widget.ViewPager2
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.FunctionsPagerAdapter
-import com.devtau.ironHeroes.data.model.*
-import com.devtau.ironHeroes.ui.Coordinator
-import com.devtau.ironHeroes.ui.DependencyRegistry
+import com.devtau.ironHeroes.databinding.FragmentFunctionsBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
+import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
+import com.devtau.ironHeroes.util.EventObserver
 import com.devtau.ironHeroes.util.Logger
-import kotlinx.android.synthetic.main.fragment_functions.*
-import java.util.*
+import com.devtau.ironHeroes.util.setupSnackbar
+import com.devtau.ironHeroes.util.showDialog
+import io.reactivex.functions.Action
 
-class FunctionsFragment: BaseFragment(), FunctionsContract.View {
+class FunctionsFragment: BaseFragment() {
 
-    private lateinit var presenter: FunctionsContract.Presenter
-    private lateinit var coordinator: Coordinator
+    private val _viewModel by viewModels<FunctionsViewModel> { getViewModelFactory() }
     private var pageIndex: Int = 0
-    private var pagerAdapter: FunctionsPagerAdapter? = null
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        DependencyRegistry.inject(this)
-        if (savedInstanceState != null) pageIndex = savedInstanceState.getInt(PAGE_INDEX)
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val binding = FragmentFunctionsBinding.inflate(inflater, container, false).apply {
+            viewModel = _viewModel
+            lifecycleOwner = viewLifecycleOwner
+            _viewModel.subscribeToVM(this)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_functions, container, false)
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initUi()
-        initPager()
-        turnPage(pageIndex)
-        setHasOptionsMenu(false)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.restartLoaders()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.onStop()
+            initUi()
+            if (savedInstanceState != null) pageIndex = savedInstanceState.getInt(PAGE_INDEX)
+            turnPage(pageIndex, this)
+        }
+        return binding.root
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -59,66 +46,50 @@ class FunctionsFragment: BaseFragment(), FunctionsContract.View {
     //</editor-fold>
 
 
-    //<editor-fold desc="Interface overrides">
-    override fun getLogTag() = LOG_TAG
-    override fun initActionbar() = true
-
-    override fun showExported(trainingsCount: Int, exercisesCount: Int) {
-        val trainings = resources.getQuantityString(R.plurals.trainings, trainingsCount, trainingsCount)
-        val exercises = resources.getQuantityString(R.plurals.exercises, exercisesCount, exercisesCount)
-        showMsg(String.format(getString(R.string.exported_formatter), trainings, exercises))
-    }
-
-    override fun showReadFromFile(trainingsCount: Int, exercisesCount: Int) {
-        val trainings = resources.getQuantityString(R.plurals.trainings, trainingsCount, trainingsCount)
-        val exercises = resources.getQuantityString(R.plurals.exercises, exercisesCount, exercisesCount)
-        showMsg(String.format(getString(R.string.imported_formatter), trainings, exercises))
-    }
-
-    override fun provideMockHeroes() = context?.let { Hero.getMockHeroes(it) }
-    override fun provideMockChampions() = context?.let { Hero.getMockChampions(it) }
-    override fun provideMockExercises() = context?.let { Exercise.getMock(it) }
-    override fun provideMockMuscleGroups() = context?.let { MuscleGroup.getMock(it) }
-    override fun provideMockTrainings() = context?.let { Training.getMock(it) }
-    override fun provideMockExercisesInTrainings() = context?.let {
-        ExerciseInTraining.getMock(it, Locale.getDefault() == Locale("ru","RU"))
-    }
-
-    override fun turnPage(pageIndex: Int) {
-        Logger.d(LOG_TAG, "turnPage. pageIndex=$pageIndex")
-        this.pageIndex = pageIndex
-        applyPageIndicatorState(pageIndex)
-        functionsPager?.currentItem = pageIndex
-    }
-    //</editor-fold>
-
-
-    fun configureWith(presenter: FunctionsContract.Presenter, coordinator: Coordinator) {
-        this.presenter = presenter
-        this.coordinator = coordinator
-    }
-
-
     //<editor-fold desc="Private methods">
-    private fun initUi() {
-        trainings.setOnClickListener { turnPage(0) }
-        statistics.setOnClickListener { turnPage(1) }
-        settings.setOnClickListener { turnPage(2) }
-        other.setOnClickListener { turnPage(3) }
-    }
+    private fun FunctionsViewModel.subscribeToVM(binding: FragmentFunctionsBinding) {
+        view?.setupSnackbar(viewLifecycleOwner, _viewModel.snackbarText)
 
-    private fun initPager() {
-        pagerAdapter = FunctionsPagerAdapter(childFragmentManager, coordinator)
-        functionsPager?.adapter = pagerAdapter
-        functionsPager?.offscreenPageLimit = 3
-        functionsPager?.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
-            override fun onPageSelected(position: Int) = turnPage(position)
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-            override fun onPageScrollStateChanged(state: Int) {}
+        turnPage.observe(viewLifecycleOwner, EventObserver {
+            turnPage(it, binding)
+        })
+
+        showDemoConfigDialog.observe(viewLifecycleOwner, EventObserver {
+            view?.showDialog(LOG_TAG, R.string.load_demo_configuration, Action {
+                context?.let { _viewModel.loadDemoConfigConfirmed(it) }
+            }, Action {
+                context?.let { _viewModel.loadDemoConfigDeclined(it) }
+            })
+        })
+
+        showCreateHeroesDialog.observe(viewLifecycleOwner, EventObserver {
+            view?.showDialog(LOG_TAG, R.string.create_heroes, Action {
+                turnPage(3, binding)
+                _viewModel.createHeroesConfirmed()
+            }, Action {
+                _viewModel.createHeroesDeclined()
+            })
         })
     }
 
-    private fun applyPageIndicatorState(pageIndex: Int) = context?.let {
+    private fun FragmentFunctionsBinding.initUi() {
+        functionsPager.adapter = FunctionsPagerAdapter(this@FunctionsFragment)
+        functionsPager.offscreenPageLimit = 3
+        functionsPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) = turnPage(position, this@initUi)
+        })
+    }
+
+    private fun turnPage(pageIndex: Int, binding: FragmentFunctionsBinding) {
+        Logger.d(LOG_TAG, "turnPage. pageIndex=$pageIndex")
+        this.pageIndex = pageIndex
+        applyPageIndicatorState(pageIndex, binding.trainings, binding.statistics, binding.settings, binding.other)
+        binding.functionsPager.currentItem = pageIndex
+    }
+
+    private fun applyPageIndicatorState(
+        pageIndex: Int, trainings: TextView?, statistics: TextView?, settings: TextView?, other: TextView?
+    ) = context?.let {
         val colorActive = ContextCompat.getColor(it, R.color.colorAccent)
         val colorInactive = ContextCompat.getColor(it, R.color.secondaryTextColor)
 

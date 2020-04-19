@@ -11,9 +11,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/**
- * Concrete implementation of a data source as a db
- */
 class HeroesLocalDataSourceImpl internal constructor(
     private val dao: HeroDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -21,10 +18,10 @@ class HeroesLocalDataSourceImpl internal constructor(
 
     //<editor-fold desc="Single object operations">
     override suspend fun saveItem(item: Hero) = withContext(ioDispatcher) {
-        dao.insertNow(item)
+        dao.insert(item)
     }
 
-    override suspend fun getItem(id: Long): Result<Hero> = withContext(ioDispatcher) {
+    override suspend fun getItem(id: Long?): Result<Hero?> = withContext(ioDispatcher) {
         try {
             val item = dao.getById(id)
             if (item != null) {
@@ -37,13 +34,13 @@ class HeroesLocalDataSourceImpl internal constructor(
         }
     }
 
-    override fun observeItem(id: Long): LiveData<Result<Hero>> =
+    override fun observeItem(id: Long?): LiveData<Result<Hero?>> =
         dao.observeItem(id).map {
             Success(it)
         }
 
-    override suspend fun deleteItem(id: Long) = withContext(ioDispatcher) {
-        dao.delete(id)
+    override suspend fun deleteItem(item: Hero) = withContext(ioDispatcher) {
+        dao.delete(item)
     }
     //</editor-fold>
 
@@ -65,11 +62,23 @@ class HeroesLocalDataSourceImpl internal constructor(
         }
     }
 
+    override suspend fun getList(): Result<List<Hero>> = withContext(ioDispatcher) {
+        return@withContext try {
+            Success(dao.getList())
+        } catch (e: Exception) {
+            Error(e)
+        }
+    }
+
     override fun observeList(humanType: HumanType?): LiveData<Result<List<Hero>>> {
         val liveData = if (humanType == null) dao.observeList() else dao.observeList(humanType.ordinal)
         return liveData.map {
             Success(it)
         }
+    }
+
+    override fun observeList(): LiveData<Result<List<Hero>>> = dao.observeList().map {
+        Success(it)
     }
 
     override suspend fun deleteAll() = withContext(ioDispatcher) {

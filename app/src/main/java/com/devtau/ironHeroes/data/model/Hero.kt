@@ -14,7 +14,7 @@ import com.devtau.ironHeroes.util.DateUtils
 @Entity(tableName = "Heroes")
 data class Hero(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "heroId")
-    var id: Long?,
+    override var id: Long?,
     var humanType: HumanType,
     var firstName: String,
     var secondName: String,
@@ -26,18 +26,23 @@ data class Hero(
     var birthDay: Long?,
     var avatarUrl: String?,
     var avatarId: Int?
-) {
+): SpinnerItem {
 
-    fun getName(): String = when {
+    override fun getFormattedName(): String = when {
         firstName.isNotEmpty() && secondName.isNotEmpty() -> "$firstName $secondName"
         firstName.isNotEmpty() -> firstName
         else -> secondName
     }
 
-    fun someFieldsChanged(firstName: String?, secondName: String?, phone: String?, gender: String?,
+    fun getGenderAsEnum() = Gender.getByCode(gender)
+
+    fun getFormattedBirthday() = DateUtils.formatDate(birthDay)
+
+    fun someFieldsChanged(humanType: HumanType, firstName: String?, secondName: String?, phone: String?, gender: String?,
                           vkId: String?, email: String?, birthDay: Long?,
                           avatarUrl: String?, avatarId: Int?) =
-        firstName != this.firstName
+        humanType != this.humanType
+                || firstName != this.firstName
                 || secondName != this.secondName
                 || phone != this.phone
                 || gender != this.gender
@@ -54,6 +59,12 @@ data class Hero(
                     && !TextUtils.isEmpty(secondName)
                     && !TextUtils.isEmpty(phone)
                     && !TextUtils.isEmpty(gender)
+
+        fun allObligatoryPartsPresent(firstName: String?, secondName: String?, phone: String?, gender: Gender?) =
+            !TextUtils.isEmpty(firstName)
+                    && !TextUtils.isEmpty(secondName)
+                    && !TextUtils.isEmpty(phone)
+                    && gender != null
 
         fun getMockChampions(c: Context): List<Hero> {
             val romaPhone = if (BuildConfig.DEBUG) "+79111718219" else "+79210000000"

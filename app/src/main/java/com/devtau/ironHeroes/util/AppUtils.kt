@@ -7,22 +7,15 @@ import android.media.AudioAttributes
 import android.net.ConnectivityManager
 import android.os.Build
 import android.telephony.PhoneNumberUtils
-import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.HourMinute
 import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.util.Constants.PHONE_MASK
 import com.devtau.ironHeroes.util.Constants.STANDARD_DELAY_MS
-import com.google.android.material.snackbar.Snackbar
 import com.redmadrobot.inputmask.MaskedTextChangedListener
 import io.reactivex.functions.Action
 
@@ -100,39 +93,6 @@ object AppUtils {
         }
     }
 
-    fun alertD(logTag: String?, @StringRes msgId: Int, context: Context, confirmedListener: Action? = null)
-            = alertD(logTag, context.getString(msgId), context, confirmedListener)
-
-    fun alertD(logTag: String?, msg: String, context: Context?, confirmedListener: Action? = null, cancelledListener: Action? = null) {
-        context ?: return
-        Logger.d(logTag ?: LOG_TAG, msg)
-        try {
-            val builder = AlertDialog.Builder(context)
-                .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    confirmedListener?.run()
-                    dialog.dismiss()
-                }
-            if (cancelledListener != null) {
-                builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
-                    cancelledListener.run()
-                    dialog.dismiss()
-                }
-            }
-
-            builder.setMessage(msg).show()
-        } catch (e: WindowManager.BadTokenException) {
-            Logger.e(logTag ?: LOG_TAG, "in alertD. cannot show dialog")
-            context.toast(msg)
-        }
-    }
-
-    fun updateInputField(input: TextView?, value: String?) {
-        if (input != null && input.text?.toString() != value) {
-            input.setText(value)
-            if (input is EditText) input.setSelection(value?.length ?: 0)
-        }
-    }
-
     fun roundMinutesInHalfHourIntervals(hour: Int, minute: Int): HourMinute =
         if (hour == 23 && minute > 44) HourMinute(hour, 30)
         else when (minute) {
@@ -166,16 +126,6 @@ object AppUtils {
         }
     }
 }
-
-fun Context?.toast(@StringRes msgId: Int) { this?.toast(this.getString(msgId)) }
-fun Context?.toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-
-fun Context?.toastLong(@StringRes msgId: Int) { this?.toastLong(this.getString(msgId)) }
-fun Context?.toastLong(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
-
-fun snackbar(root: View, msg: String) = Snackbar.make(root, msg, Snackbar.LENGTH_LONG)
-    .setTextColor(ContextCompat.getColor(root.context, R.color.colorAccent))
-    .show()
 
 fun <T>List<T>.print(logTag: String): String {
     val string = this.joinToString("\n", "[\n", "\n]\n")

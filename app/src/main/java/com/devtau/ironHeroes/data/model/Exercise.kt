@@ -14,15 +14,18 @@ import com.devtau.ironHeroes.R
 )
 class Exercise(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "exerciseId")
-    var id: Long?,
+    override var id: Long?,
     var name: String,
     var muscleGroupId: Long,
     var muscleGroup: MuscleGroup?
-) {
+): SpinnerItem {
 
     constructor(id: Long?, name: String, muscleGroupId: Long): this(id, name, muscleGroupId, null)
 
     override fun toString(): String = "$name, muscleGroup=$muscleGroup"
+
+    override fun getFormattedName() = name
+
 
     companion object {
         fun getMock(c: Context) = listOf(

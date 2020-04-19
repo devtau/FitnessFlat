@@ -1,30 +1,49 @@
 package com.devtau.ironHeroes.data.source.local.exercise
 
-import androidx.room.*
+import androidx.lifecycle.LiveData
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.Transaction
 import com.devtau.ironHeroes.data.model.Exercise
+import com.devtau.ironHeroes.data.source.local.BaseDao
 import io.reactivex.Completable
 import io.reactivex.Flowable
 
 @Dao
-interface ExerciseDao {
+interface ExerciseDao: BaseDao<Exercise> {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(list: List<Exercise>): Completable
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(exercise: Exercise?): Long
+    //<editor-fold desc="Single object operations">
+    @Transaction
+    @Query("SELECT * FROM Exercises WHERE exerciseId = :id")
+    fun getByIdAsFlowable(id: Long?): Flowable<ExerciseRelation?>
 
     @Transaction
     @Query("SELECT * FROM Exercises WHERE exerciseId = :id")
-    fun getById(id: Long?): Flowable<ExerciseRelation>
+    suspend fun getById(id: Long?): ExerciseRelation?
+
+    @Transaction
+    @Query("SELECT * FROM Exercises WHERE exerciseId = :id")
+    fun observeItem(id: Long?): LiveData<ExerciseRelation?>
+    //</editor-fold>
+
+
+    //<editor-fold desc="Group operations">
+    @Transaction
+    @Query("SELECT * FROM Exercises ORDER BY name")
+    suspend fun getList(): List<ExerciseRelation>
 
     @Transaction
     @Query("SELECT * FROM Exercises ORDER BY name")
-    fun getList(): Flowable<List<ExerciseRelation>>
+    fun getListAsFlowable(): Flowable<List<ExerciseRelation>>
 
-    @Delete
-    fun delete(list: List<Exercise?>): Completable
+    @Transaction
+    @Query("SELECT * FROM Exercises ORDER BY name")
+    fun observeList(): LiveData<List<ExerciseRelation>>
 
     @Query("DELETE FROM Exercises")
-    fun delete(): Completable
+    fun deleteAsync(): Completable
+
+    @Query("DELETE FROM Exercises")
+    suspend fun delete(): Int
+    //</editor-fold>
 }

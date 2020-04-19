@@ -57,7 +57,7 @@
 						android:paddingRight="@dimen/marginHalf"
 						app:spinnerItems="@{viewModel.champions}"
 						app:selectedItem="@{viewModel.selectedChampionId}"
-						app:onItemSelectedListener="@{viewModel}"/>
+						app:onItemSelectedListener="@{viewModel.heroSelectedListener}"/>
 				</LinearLayout>
 				
 				<LinearLayout
@@ -87,7 +87,7 @@
 						android:paddingRight="@dimen/marginHalf"
 						app:spinnerItems="@{viewModel.heroes}"
 						app:selectedItem="@{viewModel.selectedHeroId}"
-						app:onItemSelectedListener="@{viewModel}"/>
+						app:onItemSelectedListener="@{viewModel.heroSelectedListener}"/>
 				</LinearLayout>
 			</LinearLayout>
 			
@@ -122,6 +122,6 @@
 			android:layout_margin="@dimen/marginNormal"
 			android:visibility="invisible"
 			app:srcCompat="@drawable/ic_add"
-			android:onClick="@{() -> viewModel.openTraining(Constants.OBJECT_ID_NA)}"/>
+			android:onClick="@{() -> viewModel.openTraining()}"/>
 	</androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

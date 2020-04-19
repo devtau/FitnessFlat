@@ -13,13 +13,6 @@ import com.devtau.ironHeroes.data.source.local.hero.HeroDao
 import com.devtau.ironHeroes.data.source.local.muscleGroup.MuscleGroupDao
 import com.devtau.ironHeroes.data.source.local.training.TrainingDao
 import com.devtau.ironHeroes.enums.HumanType
-import com.devtau.ironHeroes.util.Logger
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
-import io.reactivex.schedulers.Schedulers
 
 @Database(entities = [
     Hero::class,
@@ -50,25 +43,4 @@ abstract class DB: RoomDatabase() {
             Room.databaseBuilder(context.applicationContext, DB::class.java, BuildConfig.DATABASE_NAME)
                 .fallbackToDestructiveMigration().build()
     }
-}
-
-
-fun <T> Flowable<T>.subscribeDefault(onNext: Consumer<T>, methodName: String): Disposable? =
-    this.subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(onNext, Consumer {
-            Logger.e(DB.LOG_TAG, "Error in $methodName: ${it.message}")
-        })
-
-fun Completable.subscribeDefault(methodName: String) {
-    var disposable: Disposable? = null
-    disposable = subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({
-            Logger.d(DB.LOG_TAG, "Success in $methodName")
-            disposable?.dispose()
-        }, {
-            Logger.e(DB.LOG_TAG, "Error in $methodName: ${it.message}")
-            disposable?.dispose()
-        })
 }

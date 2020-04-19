@@ -27,7 +27,9 @@ class ExerciseInTraining(
     var count: Int,
     var position: Int = MAX_POSITION,
     var comment: String? = null
-) {
+)
+//    : BaseObservable()
+{
 
     constructor(id: Long?, trainingId: Long?, exerciseId: Long?, weight: Int, repeats: Int, count: Int,
                 position: Int = MAX_POSITION, comment: String? = null):
@@ -35,6 +37,29 @@ class ExerciseInTraining(
 
     override fun toString(): String = "training=($training), exercise=($exercise), " +
             "weight=$weight, $repeats*$count, comment=$comment"
+
+
+//    @get:Bindable
+//    var bindableWeight: String? = weight.toString()
+//        set(value) {
+//            field = value
+//            notifyPropertyChanged(BR.bindableWeight)
+//        }
+//
+//    @get:Bindable
+//    var bindableRepeats: String? = repeats.toString()
+//        set(value) {
+//            field = value
+//            notifyPropertyChanged(BR.bindableRepeats)
+//        }
+//
+//    @get:Bindable
+//    var bindableCount: String? = weight.toString()
+//        set(value) {
+//            field = value
+//            notifyPropertyChanged(BR.bindableCount)
+//        }
+
 
     fun someFieldsChanged(exerciseId: Long?, weight: Int?, repeats: Int?, count: Int?, comment: String?) =
         exerciseId != this.exerciseId || weight != this.weight || repeats != this.repeats || count != this.count

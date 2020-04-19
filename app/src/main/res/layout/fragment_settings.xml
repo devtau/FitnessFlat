@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
-            name="model"
-            type="com.devtau.ironHeroes.util.PreferencesManager" />
+            name="viewModel"
+            type="com.devtau.ironHeroes.ui.fragments.settings.SettingsViewModel" />
     </data>
     
     <LinearLayout
@@ -18,7 +18,7 @@
         
         <CheckBox
             android:id="@+id/showChampionFilter"
-            android:checked="@{model.showChampionFilter}"
+            android:checked="@={viewModel.showChampionFilter}"
             android:text="@string/show_champion_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
         
         <CheckBox
             android:id="@+id/showHeroFilter"
-            android:checked="@{model.showHeroFilter}"
+            android:checked="@={viewModel.showHeroFilter}"
             android:text="@string/show_hero_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
         
         <CheckBox
             android:id="@+id/openEditDialogFromStatistics"
-            android:checked="@{model.openEditDialogFromStatistics}"
+            android:checked="@={viewModel.openEditDialogFromStatistics}"
             android:text="@string/show_edit_dialog_at_statistics_screen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

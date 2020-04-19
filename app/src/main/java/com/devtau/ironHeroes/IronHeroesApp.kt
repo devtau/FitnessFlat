@@ -6,12 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
-import com.devtau.ironHeroes.data.source.repositories.HeroesRepository
-import com.devtau.ironHeroes.data.source.repositories.TrainingsRepository
+import com.devtau.ironHeroes.data.source.repositories.*
 import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.util.AppUtils
 import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.PreferencesManager
+import com.devtau.ironHeroes.util.prefs.PreferencesManager
 import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
 import com.vk.sdk.*
@@ -24,6 +23,15 @@ class IronHeroesApp: Application() {
 
     val heroesRepository: HeroesRepository
         get() = ServiceLocator.provideHeroesRepository(this)
+
+    val exercisesInTrainingsRepository: ExercisesInTrainingsRepository
+        get() = ServiceLocator.provideExercisesInTrainingsRepository(this)
+
+    val exercisesRepository: ExercisesRepository
+        get() = ServiceLocator.provideExercisesRepository(this)
+
+    val muscleGroupsRepository: MuscleGroupsRepository
+        get() = ServiceLocator.provideMuscleGroupsRepository(this)
 
 
     override fun onCreate() {

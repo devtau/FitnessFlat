@@ -4,69 +4,37 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import com.devtau.ironHeroes.R
+import androidx.fragment.app.viewModels
 import com.devtau.ironHeroes.databinding.FragmentSettingsBinding
-import com.devtau.ironHeroes.ui.DependencyRegistry
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
-import com.devtau.ironHeroes.util.PreferencesManager
+import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
 
-class SettingsFragment: BaseFragment(), SettingsContract.View {
+class SettingsFragment: BaseFragment() {
 
-    private lateinit var presenter: SettingsContract.Presenter
+    private val _viewModel by viewModels<SettingsViewModel> { getViewModelFactory() }
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        DependencyRegistry.inject(this)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentSettingsBinding>(inflater, R.layout.fragment_settings, container, false)
-        binding.model = PreferencesManager
-        binding.initUi()
+        val binding = FragmentSettingsBinding.inflate(inflater, container, false).apply {
+            viewModel = _viewModel
+            lifecycleOwner = viewLifecycleOwner
+
+            logLifeCycle(LOG_TAG)
+            initUi()
+        }
         return binding.root
     }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.restartLoaders()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.onStop()
-    }
     //</editor-fold>
-
-
-    //<editor-fold desc="Interface overrides">
-    override fun getLogTag() = LOG_TAG
-    override fun initActionbar() = false
-    //</editor-fold>
-
-
-    fun configureWith(presenter: SettingsContract.Presenter) {
-        this.presenter = presenter
-    }
 
 
     //<editor-fold desc="Private methods">
-    private fun FragmentSettingsBinding.initUi() = apply {
-        showChampionFilter.isChecked = presenter.isChampionFilterNeeded()
-        showChampionFilter.setOnCheckedChangeListener { _, isChecked ->
-            presenter.showChampionFilterClicked(isChecked)
-        }
-        showHeroFilter.isChecked = presenter.isHeroFilterNeeded()
-        showHeroFilter.setOnCheckedChangeListener { _, isChecked ->
-            presenter.showHeroFilterClicked(isChecked)
-        }
-        openEditDialogFromStatistics.isChecked = presenter.isEditDialogNeeded()
-        openEditDialogFromStatistics.setOnCheckedChangeListener { _, isChecked ->
-            presenter.openEditDialogFromStatisticsClicked(isChecked)
-        }
-//        invalidateAll()
+    // This method call is needed because of a problem in ViewPager lifecycleOwner
+    // Checkboxes checked states are not initialized correctly without this method call
+    private fun FragmentSettingsBinding.initUi() {
+        showChampionFilter.isChecked = _viewModel.showChampionFilter
+        showHeroFilter.isChecked = _viewModel.showHeroFilter
+        openEditDialogFromStatistics.isChecked = _viewModel.openEditDialogFromStatistics
     }
     //</editor-fold>
 

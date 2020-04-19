@@ -25,26 +25,20 @@ class TrainingsLocalDataSourceImpl internal constructor(
         dao.insert(item)
     }
 
-    override suspend fun getItem(id: Long): Result<Training> = withContext(ioDispatcher) {
-        try {
-            val item = dao.getById(id)?.convert()
-            if (item != null) {
-                return@withContext Success(item)
-            } else {
-                return@withContext Error(Exception("Training not found"))
-            }
-        } catch (e: Exception) {
-            return@withContext Error(e)
-        }
+    override suspend fun getItem(id: Long?): Result<Training> = withContext(ioDispatcher) {
+        val item = dao.getById(id)?.convert()
+        if (item != null) Success(item)
+        else Error(Exception("Training not found"))
     }
 
-    override fun observeItem(id: Long): LiveData<Result<Training>> =
+    override fun observeItem(id: Long?): LiveData<Result<Training?>> =
         dao.observeItem(id).map {
-            Success(it.convert())
+            if (it == null) Error(Exception("Training not found"))
+            else Success(it.convert())
         }
 
-    override suspend fun deleteItem(id: Long) = withContext(ioDispatcher) {
-        dao.delete(id)
+    override suspend fun deleteItem(item: Training) = withContext(ioDispatcher) {
+        dao.delete(item)
     }
     //</editor-fold>
 

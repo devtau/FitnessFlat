@@ -14,3 +14,5 @@ sealed class Result<out T> {
         }
     }
 }
+
+fun Result<*>.succeeded() = this is Result.Success && data != null

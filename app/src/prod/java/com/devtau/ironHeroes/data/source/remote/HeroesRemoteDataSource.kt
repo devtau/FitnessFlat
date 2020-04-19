@@ -1,6 +1,7 @@
 package com.devtau.ironHeroes.data.source.remote
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.devtau.ironHeroes.data.Result
@@ -10,7 +11,6 @@ import com.devtau.ironHeroes.data.source.local.hero.HeroesLocalDataSource
 import com.devtau.ironHeroes.enums.HumanType
 import kotlinx.coroutines.delay
 import java.util.*
-
 /**
  * Implementation of the data source that adds a latency simulating network.
  */
@@ -32,7 +32,7 @@ class HeroesRemoteDataSource(context: Context): HeroesLocalDataSource {
         return 1
     }
 
-    override suspend fun getItem(id: Long): Result<Hero> {
+    override suspend fun getItem(id: Long?): Result<Hero?> {
         // Simulate network by delaying the execution.
         delay(SERVICE_LATENCY_MS)
         heroesOnServer[id]?.let {
@@ -41,20 +41,20 @@ class HeroesRemoteDataSource(context: Context): HeroesLocalDataSource {
         return Error(Exception("Hero not found"))
     }
 
-    override fun observeItem(id: Long) = observableHeroes.map { list ->
+    override fun observeItem(id: Long?): LiveData<Result<Hero?>> = observableHeroes.map { list ->
         when (list) {
             is Loading -> Loading
             is Error -> Error(list.exception)
             is Success -> {
-                val hero = list.data.firstOrNull() { it.id == id }
+                val hero = list.data.firstOrNull { it?.id == id }
                     ?: return@map Error(Exception("Not found"))
                 Success(hero)
             }
         }
     }
 
-    override suspend fun deleteItem(id: Long): Int {
-        heroesOnServer.remove(id)
+    override suspend fun deleteItem(item: Hero): Int {
+        heroesOnServer.remove(item.id)
         return 1
     }
 
@@ -70,7 +70,16 @@ class HeroesRemoteDataSource(context: Context): HeroesLocalDataSource {
         return Success(list)
     }
 
+    override suspend fun getList(): Result<List<Hero>> {
+        // Simulate network by delaying the execution.
+        val list = observableHeroes.value!!
+        delay(SERVICE_LATENCY_MS)
+        return list
+    }
+
     override fun observeList(humanType: HumanType?) = observableHeroes
+
+    override fun observeList() = observableHeroes
 
     override suspend fun deleteAll(): Int {
         val size = heroesOnServer.size

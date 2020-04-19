@@ -1,77 +1,32 @@
 package com.devtau.ironHeroes.ui.fragments
 
-import android.os.Bundle
-import android.view.View
-import android.widget.EditText
-import android.widget.Spinner
-import androidx.annotation.ColorRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.devtau.ironHeroes.IronHeroesApp
 import com.devtau.ironHeroes.ViewModelFactory
 import com.devtau.ironHeroes.ui.Coordinator
 import com.devtau.ironHeroes.ui.CoordinatorImpl
-import com.devtau.ironHeroes.ui.StandardView
-import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Constants.CLICKS_DEBOUNCE_RATE_MS
-import com.jakewharton.rxbinding2.widget.RxAdapterView
-import com.jakewharton.rxbinding2.widget.RxTextView
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
-import java.util.concurrent.TimeUnit
+import com.devtau.ironHeroes.ui.ResourceResolver
+import com.devtau.ironHeroes.util.Logger
 
-abstract class BaseFragment: Fragment(), StandardView, Coordinator by CoordinatorImpl {
+abstract class BaseFragment: Fragment() {
 
-    private val compositeUiDisposable = CompositeDisposable()
+    val coordinator: Coordinator = CoordinatorImpl
 
-    abstract fun getLogTag(): String
-    abstract fun initActionbar(): Boolean?
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initActionbar()
-    }
-
-    override fun onStop() {
-        compositeUiDisposable.clear()
-        super.onStop()
-    }
-
-    override fun showMsg(msgId: Int, confirmedListener: Action?, cancelledListener: Action?)
-            = showMsg(getString(msgId), confirmedListener)
-    override fun showMsg(msg: String, confirmedListener: Action?, cancelledListener: Action?)
-            = AppUtils.alertD(getLogTag(), msg, context, confirmedListener)
-    override fun resolveString(@StringRes stringId: Int): String = getString(stringId)
-    override fun resolveColor(@ColorRes colorId: Int): Int {
-        val context = context
-        return if (context != null) ContextCompat.getColor(context, colorId)
-        else 0
-    }
-    override fun isOnline(): Boolean = AppUtils.checkConnection(context)
-
-    //использование этого слоя не обязательно, но subscribeField следует вызывать в onStart, если слой нужен
-    fun subscribeField(field: EditText?, onNext: Consumer<String>) {
-        field ?: return
-        compositeUiDisposable.add(RxTextView.textChanges(field)
-            .debounce(CLICKS_DEBOUNCE_RATE_MS, TimeUnit.MILLISECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
-            .map(CharSequence::toString)
-            .skip(1)
-            .subscribe(onNext))
-    }
-
-    fun subscribeField(spinner: Spinner?, onNext: Consumer<Int>) {
-        spinner ?: return
-        compositeUiDisposable.add(RxAdapterView.itemSelections(spinner)
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .skip(1)
-            .subscribe(onNext))
+    fun logLifeCycle(logTag: String) {
+        viewLifecycleOwner.lifecycle.addObserver(object: LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_CREATE) fun created() = Logger.d(logTag, "ON_CREATE")
+            @OnLifecycleEvent(Lifecycle.Event.ON_START) fun started() = Logger.d(logTag, "ON_START")
+            @OnLifecycleEvent(Lifecycle.Event.ON_RESUME) fun resumed() = Logger.d(logTag, "ON_RESUME")
+            @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE) fun paused() = Logger.d(logTag, "ON_PAUSE")
+            @OnLifecycleEvent(Lifecycle.Event.ON_STOP) fun stopped() = Logger.d(logTag, "ON_STOP")
+        })
     }
 }
 
@@ -86,8 +41,15 @@ fun FragmentActivity?.initActionBar(titleId: Int?, show: Boolean = true): Boolea
     return true
 }
 
-fun Fragment.getViewModelFactory(): ViewModelFactory {
-    val trainingsRepository = (requireContext().applicationContext as IronHeroesApp).trainingsRepository
-    val heroesRepository = (requireContext().applicationContext as IronHeroesApp).heroesRepository
-    return ViewModelFactory(trainingsRepository, heroesRepository, this)
+fun Fragment.getViewModelFactory(
+    resourceResolver: ResourceResolver? = null
+): ViewModelFactory {
+    val app = requireContext().applicationContext as IronHeroesApp
+    return ViewModelFactory(
+        app.trainingsRepository,
+        app.heroesRepository,
+        app.exercisesInTrainingsRepository,
+        app.exercisesRepository,
+        app.muscleGroupsRepository,
+        this, arguments, resourceResolver)
 }

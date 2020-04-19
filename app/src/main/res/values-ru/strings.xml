@@ -49,6 +49,7 @@
 	<string name="count">Повторы</string>
 	<string name="error_formatter" formatted="false">Ошибка: %s</string>
 	<string name="error_trainings_list">Ошибка при загрузке списка тренировок</string>
+	<string name="error_exercises_list">Ошибка при загрузке списка упражнений</string>
 	<string name="cancel">Отмена</string>
 	<string name="save">Сохранить</string>
 	<string name="filters">Фильтры</string>
@@ -88,6 +89,7 @@
 	<string name="next_set">Следующий подход</string>
 	<string name="recreation">Отдых</string>
 	<string name="recreation_formatter" formatted="false">Вы отдохнули %s</string>
+	<string name="parse_error">Ошибка в списке выполненных упражнений. Возможно неудачный импорт фала</string>
 	
 	<string name="roma_first_name">Рома</string>
 	<string name="anton_first_name">Антон</string>

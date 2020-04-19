@@ -27,6 +27,8 @@ data class Training(
     constructor(id: Long?, championId: Long?, heroId: Long?, date: Long):
             this(id, championId, null, heroId, null, date, null)
 
+    override fun toString() = "id=$id, championId=$championId, heroId=$heroId, " +
+            "date=${DateUtils.formatDateTimeWithWeekDay(date)}, exercises size=${exercises?.size}"
 
     fun someFieldsChanged(championId: Long?, heroId: Long?, date: Long?) =
         championId != this.championId

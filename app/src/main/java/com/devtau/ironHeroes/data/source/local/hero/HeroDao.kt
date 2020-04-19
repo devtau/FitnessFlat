@@ -1,43 +1,31 @@
 package com.devtau.ironHeroes.data.source.local.hero
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.Transaction
 import com.devtau.ironHeroes.data.model.Hero
+import com.devtau.ironHeroes.data.source.local.BaseDao
 import io.reactivex.Completable
 import io.reactivex.Flowable
 
 @Dao
-interface HeroDao {
+interface HeroDao: BaseDao<Hero> {
 
     //<editor-fold desc="Single object operations">
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNow(training: Hero): Long
-
     @Query("SELECT * FROM Heroes WHERE heroId = :id")
     fun getByIdAsFlowable(id: Long): Flowable<Hero>
 
     @Query("SELECT * FROM Heroes WHERE heroId = :id")
-    fun getById(id: Long): Hero?
+    suspend fun getById(id: Long?): Hero?
 
     @Transaction
     @Query("SELECT * FROM Heroes WHERE heroId = :id")
-    fun observeItem(id: Long): LiveData<Hero>
-
-    @Query("DELETE FROM Heroes WHERE heroId = :id")
-    suspend fun delete(id: Long): Int
-
-    @Query("DELETE FROM Heroes WHERE heroId = :id")
-    fun deleteAsync(id: Long): Completable
+    fun observeItem(id: Long?): LiveData<Hero?>
     //</editor-fold>
 
 
     //<editor-fold desc="Group operations">
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertListAsync(list: List<Hero?>?): Completable
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertList(list: List<Hero>)
-
     @Query("SELECT * FROM Heroes WHERE humanType = :humanTypeCode ORDER BY firstName")
     fun getListAsFlowable(humanTypeCode: Int): Flowable<List<Hero>>
 
@@ -56,9 +44,9 @@ interface HeroDao {
     fun observeList(): LiveData<List<Hero>>
 
     @Query("DELETE FROM Heroes")
-    suspend fun delete(): Int
+    fun deleteAsync(): Completable
 
     @Query("DELETE FROM Heroes")
-    fun deleteAsync(): Completable
+    suspend fun delete(): Int
     //</editor-fold>
 }

@@ -5,113 +5,111 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.enums.HumanType
-import com.devtau.ironHeroes.ui.Coordinator
-import com.devtau.ironHeroes.ui.DependencyRegistry
+import com.devtau.ironHeroes.data.model.wrappers.ImpExData
+import com.devtau.ironHeroes.databinding.FragmentOtherBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
+import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
+import com.devtau.ironHeroes.util.EventObserver
 import com.devtau.ironHeroes.util.PermissionHelperImpl
+import com.devtau.ironHeroes.util.setupSnackbar
+import com.devtau.ironHeroes.util.showDialog
 import io.reactivex.functions.Action
-import kotlinx.android.synthetic.main.fragment_other.*
 
-class OtherFragment: BaseFragment(), OtherContract.View {
+class OtherFragment: BaseFragment() {
 
-    private lateinit var presenter: OtherContract.Presenter
-    private lateinit var coordinator: Coordinator
+    private val _viewModel by viewModels<OtherViewModel> { getViewModelFactory() }
+    private lateinit var exchangeDirName: String
     private var exportRequested: Boolean = true
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        DependencyRegistry.inject(this)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_other, container, false)
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initUi()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.restartLoaders()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.onStop()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val binding = FragmentOtherBinding.inflate(inflater, container, false).apply {
+            viewModel = _viewModel
+            lifecycleOwner = viewLifecycleOwner
+            _viewModel.subscribeToVM()
+        }
+        exchangeDirName = getString(R.string.app_name)
+        return binding.root
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == PermissionHelperImpl.STORAGE_REQUEST_CODE &&
             grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (exportRequested) presenter.exportToFile() else presenter.importFromFile()
+            if (exportRequested) _viewModel.exportToFileConfirmed(exchangeDirName)
+            else _viewModel.importFromFileConfirmed(exchangeDirName)
         }
     }
     //</editor-fold>
-
-
-    //<editor-fold desc="Interface overrides">
-    override fun getLogTag() = LOG_TAG
-    override fun initActionbar() = false
-
-    override fun showExported(trainingsCount: Int, exercisesCount: Int) {
-        val trainings = resources.getQuantityString(R.plurals.trainings, trainingsCount, trainingsCount)
-        val exercises = resources.getQuantityString(R.plurals.exercises, exercisesCount, exercisesCount)
-        showMsg(String.format(getString(R.string.exported_formatter), trainings, exercises))
-    }
-
-    override fun showReadFromFile(trainingsCount: Int, exercisesCount: Int) {
-        val trainings = resources.getQuantityString(R.plurals.trainings, trainingsCount, trainingsCount)
-        val exercises = resources.getQuantityString(R.plurals.exercises, exercisesCount, exercisesCount)
-        showMsg(String.format(getString(R.string.imported_formatter), trainings, exercises))
-    }
-
-    override fun provideMockHeroes(): List<Hero> {
-        val context = context
-        return if (context == null) ArrayList() else Hero.getMockHeroes(context)
-    }
-    //</editor-fold>
-
-
-    fun configureWith(presenter: OtherContract.Presenter, coordinator: Coordinator) {
-        this.presenter = presenter
-        this.coordinator = coordinator
-    }
 
 
     //<editor-fold desc="Private methods">
-    private fun initUi() {
-        heroes?.setOnClickListener { coordinator.launchHeroes(it, HumanType.HERO) }
-        champions?.setOnClickListener { coordinator.launchHeroes(it, HumanType.CHAMPION) }
-        exportToFile?.setOnClickListener {
-            val context = context ?: return@setOnClickListener
+    private fun OtherViewModel.subscribeToVM() {
+        view?.setupSnackbar(viewLifecycleOwner, snackbarText)
+
+        trainings.observe(viewLifecycleOwner, Observer {/*NOP*/})
+
+        exercises.observe(viewLifecycleOwner, Observer {/*NOP*/})
+
+        openHero.observe(viewLifecycleOwner, EventObserver {
+            coordinator.launchHeroes(view, it)
+        })
+
+        openDBViewer.observe(viewLifecycleOwner, EventObserver {
+            coordinator.launchDBViewer(context)
+        })
+
+        exportedToFile.observe(viewLifecycleOwner, EventObserver {
+            showExported(it)
+        })
+
+        importedFromFile.observe(viewLifecycleOwner, EventObserver {
+            showImported(it)
+        })
+
+        exportToFile.observe(viewLifecycleOwner, EventObserver {
+            val context = context ?: return@EventObserver
             val permissionHelper = PermissionHelperImpl()
             if (!permissionHelper.checkStoragePermission(context)) {
-                permissionHelper.requestStoragePermission(this)
+                permissionHelper.requestStoragePermission(this@OtherFragment)
                 exportRequested = true
-                return@setOnClickListener
+                return@EventObserver
             }
-            presenter.exportToFile()
-        }
-        importFromFile?.setOnClickListener {
-            val context = context ?: return@setOnClickListener
+            exportToFileConfirmed(exchangeDirName)
+        })
+
+        importFromFile.observe(viewLifecycleOwner, EventObserver {
+            val context = context ?: return@EventObserver
             val permissionHelper = PermissionHelperImpl()
             if (!permissionHelper.checkStoragePermission(context)) {
-                permissionHelper.requestStoragePermission(this)
+                permissionHelper.requestStoragePermission(this@OtherFragment)
                 exportRequested = false
-                return@setOnClickListener
+                return@EventObserver
             }
-            presenter.importFromFile()
-        }
-        clearDB?.setOnClickListener {
-            showMsg(R.string.clear_db_confirm, Action { presenter.clearDB() }, Action {  })
-        }
+            importFromFileConfirmed(exchangeDirName)
+        })
+
+        clearDB.observe(viewLifecycleOwner, EventObserver {
+            view?.showDialog(LOG_TAG, R.string.clear_db_confirm, Action {
+                clearDBConfirmed()
+            })
+        })
+    }
+
+    private fun showExported(wrapper: ImpExData) {
+        val trainings = resources.getQuantityString(R.plurals.trainings, wrapper.trainingsCount, wrapper.trainingsCount)
+        val exercises = resources.getQuantityString(R.plurals.exercises, wrapper.exercisesCount, wrapper.exercisesCount)
+        view?.showDialog(LOG_TAG, String.format(getString(R.string.exported_formatter), trainings, exercises))
+    }
+
+    private fun showImported(wrapper: ImpExData) {
+        val trainings = resources.getQuantityString(R.plurals.trainings, wrapper.trainingsCount, wrapper.trainingsCount)
+        val exercises = resources.getQuantityString(R.plurals.exercises, wrapper.exercisesCount, wrapper.exercisesCount)
+        view?.showDialog(LOG_TAG, String.format(getString(R.string.imported_formatter), trainings, exercises))
     }
     //</editor-fold>
 

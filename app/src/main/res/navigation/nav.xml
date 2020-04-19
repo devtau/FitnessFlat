@@ -16,6 +16,9 @@
 		<action
 			android:id="@+id/action_functionsFragment_to_heroesFragment"
 			app:destination="@id/heroesFragment" />
+		<action
+			android:id="@+id/action_functionsFragment_to_exerciseDialog"
+			app:destination="@id/exerciseDialog" />
 	</fragment>
 	
 	

@@ -61,6 +61,7 @@
     <string name="count">Count</string>
     <string name="error_formatter" formatted="false">Error: %s</string>
     <string name="error_trainings_list">Error loading workout list</string>
+    <string name="error_exercises_list">Error loading exercises list</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="filters">Filters</string>
@@ -100,6 +101,7 @@
     <string name="next_set">Next set</string>
     <string name="recreation">Recreation</string>
     <string name="recreation_formatter" formatted="false">It was %s recreation</string>
+    <string name="parse_error">Error in the list of completed exercises. Possibly unsuccessful file import</string>
     
     <string name="roma_first_name">Roman</string>
     <string name="anton_first_name">Antony</string>
