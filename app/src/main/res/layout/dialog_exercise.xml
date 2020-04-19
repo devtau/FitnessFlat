@@ -1,226 +1,244 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:paddingTop="@dimen/marginHalf"
-	android:paddingBottom="@dimen/marginHalf"
-	android:paddingLeft="@dimen/marginNormal"
-	android:paddingRight="@dimen/marginNormal"
-	android:descendantFocusability="beforeDescendants"
-	android:focusableInTouchMode="true"
-	android:orientation="vertical">
+	tools:context=".ui.fragments.trainingsList.TrainingsFragment">
 	
-	<Spinner
-		android:id="@+id/muscleGroup"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingTop="@dimen/marginHalf"
-		android:paddingBottom="@dimen/marginHalf"
-		android:minHeight="48dp"/>
-	
-	<Spinner
-		android:id="@+id/exercise"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingTop="@dimen/marginHalf"
-		android:paddingBottom="@dimen/marginHalf"
-		android:minHeight="48dp"/>
+	<data>
+		<import type="android.view.View" />
+		<import type="com.devtau.ironHeroes.enums.DialogAction" />
+		
+		<variable
+			name="viewModel"
+			type="com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseViewModel" />
+	</data>
 	
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginLeft="@dimen/marginHalf"
-		android:layout_marginRight="@dimen/marginHalf"
-		android:orientation="horizontal">
+		android:paddingTop="@dimen/marginHalf"
+		android:paddingBottom="@dimen/marginHalf"
+		android:paddingLeft="@dimen/marginNormal"
+		android:paddingRight="@dimen/marginNormal"
+		android:descendantFocusability="beforeDescendants"
+		android:focusableInTouchMode="true"
+		android:orientation="vertical">
 		
-		<TextView
-			android:text="@string/weight"
-			android:layout_width="wrap_content"
+		<Spinner
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:gravity="center_vertical"/>
+			android:paddingTop="@dimen/marginHalf"
+			android:paddingBottom="@dimen/marginHalf"
+			android:minHeight="48dp"
+			app:spinnerItems="@{viewModel.muscleGroups}"
+			app:selectedItem="@{viewModel.selectedMuscleGroupId}"
+			app:onItemSelectedListener="@{viewModel.muscleGroupSelectedListener}"
+			app:withHeader="@{false}"/>
 		
-		<EditText
-			android:id="@+id/weightInput"
-			tools:text="70"
-			android:layout_width="0dp"
+		<Spinner
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:layout_marginLeft="@dimen/marginHalf"
-			android:inputType="number"
-			android:digits="0123456789"
-			android:maxLines="1"
-			android:selectAllOnFocus="true"/>
+			android:paddingTop="@dimen/marginHalf"
+			android:paddingBottom="@dimen/marginHalf"
+			android:minHeight="48dp"
+			app:spinnerItems="@{viewModel.exercisesFiltered}"
+			app:selectedItem="@{viewModel.selectedExerciseId}"
+			app:onItemSelectedListener="@{viewModel.exerciseSelectedListener}"
+			app:withHeader="@{false}"/>
 		
-		<TextView
-			android:text="@string/count"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="@dimen/marginHalf"
-			android:gravity="center_vertical"/>
-		
-		<EditText
-			android:id="@+id/repeatsInput"
-			tools:text="3"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:layout_marginLeft="@dimen/marginHalf"
-			android:inputType="number"
-			android:digits="0123456789"
-			android:maxLines="1"
-			android:selectAllOnFocus="true"/>
-		
-		<TextView
-			android:text="*"
-			android:layout_width="wrap_content"
+		<LinearLayout
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="@dimen/marginHalf"
-			android:gravity="center_vertical"/>
+			android:layout_marginRight="@dimen/marginHalf"
+			android:orientation="horizontal">
+			
+			<TextView
+				android:text="@string/weight"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:gravity="center_vertical"/>
+			
+			<EditText
+				tools:text="70"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:inputType="number"
+				android:digits="0123456789"
+				android:maxLines="1"
+				android:selectAllOnFocus="true"
+				android:text="@={viewModel.weight}"/>
+			
+			<TextView
+				android:text="@string/count"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:gravity="center_vertical"/>
+			
+			<EditText
+				tools:text="3"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:inputType="number"
+				android:digits="0123456789"
+				android:maxLines="1"
+				android:selectAllOnFocus="true"
+				android:text="@={viewModel.repeats}"/>
+			
+			<TextView
+				android:text="*"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:gravity="center_vertical"/>
+			
+			<EditText
+				tools:text="15"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:inputType="number"
+				android:digits="0123456789"
+				android:maxLines="1"
+				android:selectAllOnFocus="true"
+				android:text="@={viewModel.count}"/>
+		</LinearLayout>
 		
-		<EditText
-			android:id="@+id/countInput"
-			tools:text="15"
-			android:layout_width="0dp"
+		
+		<LinearLayout
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:layout_marginLeft="@dimen/marginHalf"
-			android:inputType="number"
-			android:digits="0123456789"
-			android:maxLines="1"
-			android:selectAllOnFocus="true"/>
-	</LinearLayout>
-	
-	
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal">
+			android:orientation="horizontal">
+			
+			<com.google.android.material.textfield.TextInputLayout
+				android:layout_width="80dp"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/marginHalf"
+				android:layout_marginLeft="@dimen/marginHalf"
+				android:layout_marginRight="@dimen/marginHalf">
+				
+				<EditText
+					android:id="@+id/recreationInput"
+					android:text="90"
+					android:hint="@string/recreation"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:inputType="number"
+					android:selectAllOnFocus="true"/>
+			</com.google.android.material.textfield.TextInputLayout>
+			
+			<Button
+				android:text="@string/one"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() -> viewModel.recreationClicked(1)}"/>
+			
+			<Button
+				android:text="@string/two"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() -> viewModel.recreationClicked(2)}"/>
+			
+			<Button
+				android:text="@string/three"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() -> viewModel.recreationClicked(3)}"/>
+			
+			<Button
+				android:text="@string/four"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() -> viewModel.recreationClicked(4)}"/>
+		</LinearLayout>
+		
+		
+		<ProgressBar
+			android:id="@+id/progressBar"
+			style="@android:style/Widget.ProgressBar.Horizontal"
+			android:max="10000"
+			android:progress="0"
+			android:layout_width="match_parent"
+			android:layout_height="4dp"/>
+		
 		
 		<com.google.android.material.textfield.TextInputLayout
-			android:layout_width="80dp"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="@dimen/marginHalf"
 			android:layout_marginLeft="@dimen/marginHalf"
 			android:layout_marginRight="@dimen/marginHalf">
 			
 			<EditText
-				android:id="@+id/recreationInput"
-				android:text="90"
-				android:hint="@string/recreation"
+				android:hint="@string/comment"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:inputType="number"
-				android:selectAllOnFocus="true"/>
+				android:inputType="textMultiLine"
+				android:text="@={viewModel.comment}"/>
 		</com.google.android.material.textfield.TextInputLayout>
 		
-		<Button
-			android:id="@+id/one"
-			android:text="@string/one"
-			android:layout_width="0dp"
+		<TextView
+			android:id="@+id/previousExerciseData"
+			android:text="@string/previous_exercise_data"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"/>
+			android:layout_marginTop="@dimen/marginHalf"
+			android:layout_marginLeft="@dimen/marginHalf"
+			android:layout_marginRight="@dimen/marginNormal"
+			android:textColor="@color/secondaryTextColor"
+			android:textSize="@dimen/secondaryTextSize"
+			android:textStyle="italic"/>
 		
-		<Button
-			android:id="@+id/two"
-			android:text="@string/two"
-			android:layout_width="0dp"
+		<TextView
+			tools:text="@string/no_data"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"/>
+			android:layout_marginLeft="@dimen/marginHalf"
+			android:layout_marginRight="@dimen/marginNormal"
+			android:textColor="@color/secondaryTextColor"
+			android:textSize="@dimen/secondaryTextSize"/>
 		
-		<Button
-			android:id="@+id/three"
-			android:text="@string/three"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"/>
 		
-		<Button
-			android:id="@+id/four"
-			android:text="@string/four"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"/>
-	</LinearLayout>
-	
-	
-	<ProgressBar
-		android:id="@+id/progressBar"
-		style="@android:style/Widget.ProgressBar.Horizontal"
-		android:max="10000"
-		android:progress="0"
-		android:layout_width="match_parent"
-		android:layout_height="4dp"/>
-	
-	
-	<com.google.android.material.textfield.TextInputLayout
-		android:id="@+id/nameTIL"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="@dimen/marginHalf"
-		android:layout_marginLeft="@dimen/marginHalf"
-		android:layout_marginRight="@dimen/marginHalf">
-		
-		<EditText
-			android:id="@+id/commentInput"
-			android:hint="@string/comment"
+		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:inputType="textMultiLine"/>
-	</com.google.android.material.textfield.TextInputLayout>
-	
-	<TextView
-		android:text="@string/previous_exercise_data"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="@dimen/marginHalf"
-		android:layout_marginLeft="@dimen/marginHalf"
-		android:layout_marginRight="@dimen/marginNormal"
-		android:textColor="@color/secondaryTextColor"
-		android:textSize="@dimen/secondaryTextSize"
-		android:textStyle="italic"/>
-	
-	<TextView
-		android:id="@+id/previousExerciseData"
-		tools:text="@string/no_data"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginLeft="@dimen/marginHalf"
-		android:layout_marginRight="@dimen/marginNormal"
-		android:textColor="@color/secondaryTextColor"
-		android:textSize="@dimen/secondaryTextSize"/>
-	
-	
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="@dimen/marginHalf"
-		android:gravity="end">
-		
-		<Button
-			android:id="@+id/cancel"
-			android:text="@string/cancel"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textAllCaps="true"
-			style="@style/Widget.AppCompat.Button.Borderless"/>
-		
-		<Button
-			android:id="@+id/delete"
-			android:text="@string/delete"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textAllCaps="true"
-			style="@style/Widget.AppCompat.Button.Borderless"/>
-		
-		<Button
-			android:id="@+id/save"
-			android:text="@string/save"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textAllCaps="true"
-			android:textColor="@color/colorAccent"
-			style="@style/Widget.AppCompat.Button.Borderless"/>
+			android:layout_marginTop="@dimen/marginHalf"
+			android:gravity="end">
+			
+			<Button
+				android:text="@string/cancel"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textAllCaps="true"
+				style="@style/Widget.AppCompat.Button.Borderless"
+				android:onClick="@{() -> viewModel.dialogActionClicked(DialogAction.CANCEL)}"/>
+			
+			<Button
+				android:text="@string/delete"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textAllCaps="true"
+				style="@style/Widget.AppCompat.Button.Borderless"
+				android:onClick="@{() -> viewModel.dialogActionClicked(DialogAction.DELETE)}"/>
+			
+			<Button
+				android:text="@string/save"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textAllCaps="true"
+				android:textColor="@color/colorAccent"
+				style="@style/Widget.AppCompat.Button.Borderless"
+				android:onClick="@{() -> viewModel.dialogActionClicked(DialogAction.SAVE)}"/>
+		</LinearLayout>
 	</LinearLayout>
-</LinearLayout>
+</layout>

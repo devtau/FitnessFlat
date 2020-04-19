@@ -1,41 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/marginHalf"
-    android:paddingBottom="@dimen/marginHalf"
-    tools:context=".ui.fragments.settings.SettingsFragment">
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.devtau.ironHeroes.ui.fragments.settings.SettingsViewModel" />
+    </data>
     
-    <CheckBox
-        android:id="@+id/showChampionFilter"
-        android:text="@string/show_champion_filter"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:paddingTop="@dimen/marginHalf"
         android:paddingBottom="@dimen/marginHalf"
-        android:layout_marginLeft="@dimen/marginNormal"
-        android:layout_marginRight="@dimen/marginNormal"/>
-    
-    <CheckBox
-        android:id="@+id/showHeroFilter"
-        android:text="@string/show_hero_filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/marginHalf"
-        android:paddingBottom="@dimen/marginHalf"
-        android:layout_marginLeft="@dimen/marginNormal"
-        android:layout_marginRight="@dimen/marginNormal"/>
-    
-    <CheckBox
-        android:id="@+id/openEditDialogFromStatistics"
-        android:text="@string/show_edit_dialog_at_statistics_screen"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/marginHalf"
-        android:paddingBottom="@dimen/marginHalf"
-        android:layout_marginLeft="@dimen/marginNormal"
-        android:layout_marginRight="@dimen/marginNormal"/>
-</LinearLayout>
+        tools:context=".ui.fragments.settings.SettingsFragment">
+        
+        <CheckBox
+            android:id="@+id/showChampionFilter"
+            android:checked="@={viewModel.showChampionFilter}"
+            android:text="@string/show_champion_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/marginHalf"
+            android:paddingBottom="@dimen/marginHalf"
+            android:layout_marginLeft="@dimen/marginNormal"
+            android:layout_marginRight="@dimen/marginNormal"/>
+        
+        <CheckBox
+            android:id="@+id/showHeroFilter"
+            android:checked="@={viewModel.showHeroFilter}"
+            android:text="@string/show_hero_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/marginHalf"
+            android:paddingBottom="@dimen/marginHalf"
+            android:layout_marginLeft="@dimen/marginNormal"
+            android:layout_marginRight="@dimen/marginNormal"/>
+        
+        <CheckBox
+            android:id="@+id/openEditDialogFromStatistics"
+            android:checked="@={viewModel.openEditDialogFromStatistics}"
+            android:text="@string/show_edit_dialog_at_statistics_screen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/marginHalf"
+            android:paddingBottom="@dimen/marginHalf"
+            android:layout_marginLeft="@dimen/marginNormal"
+            android:layout_marginRight="@dimen/marginNormal"/>
+    </LinearLayout>
+</layout>

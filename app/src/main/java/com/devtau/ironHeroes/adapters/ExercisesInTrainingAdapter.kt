@@ -1,62 +1,50 @@
 package com.devtau.ironHeroes.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.devtau.ironHeroes.BuildConfig
-import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.adapters.viewHolders.ExercisesInTrainingViewHolder
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
-import com.devtau.ironHeroes.util.Animator
-import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.Threading
-import io.reactivex.functions.Consumer
+import com.devtau.ironHeroes.databinding.ListItemExerciseInTrainingBinding
+import com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsViewModel
 
 class ExercisesInTrainingAdapter(
-    private var exercises: List<ExerciseInTraining>?,
-    private val listener: Consumer<ExerciseInTraining>
-): RecyclerView.Adapter<ExercisesInTrainingViewHolder>() {
+    private val viewModel: TrainingDetailsViewModel
+): ListAdapter<ExerciseInTraining, ExercisesInTrainingAdapter.ViewHolder>(DiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExercisesInTrainingViewHolder {
-        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.list_item_exercise_in_training, parent, false)
-        return ExercisesInTrainingViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder.from(parent)
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = getItem(position)
+        holder.bind(viewModel, item)
     }
 
-    override fun onBindViewHolder(holder: ExercisesInTrainingViewHolder, position: Int) {
-        val exercise = exercises?.get(position) ?: return
-        Logger.v(LOG_TAG, "onBindViewHolder. exercise=$exercise")
-        if (BuildConfig.DEBUG) {
-            holder.position.visibility = View.GONE
-//            holder.position.text = exercise.position.toString()
-        } else {
-            holder.position.visibility = View.GONE
+
+    class ViewHolder private constructor(
+        private val binding: ListItemExerciseInTrainingBinding
+    ): RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(viewModel: TrainingDetailsViewModel, item: ExerciseInTraining) {
+            binding.viewModel = viewModel
+            binding.exerciseInTraining = item
+            binding.executePendingBindings()
         }
-        holder.exercise.text = exercise.exercise?.name
-        holder.weight.text = exercise.weight.toString()
-        holder.repeats.text = exercise.repeats.toString()
-        holder.count.text = exercise.count.toString()
-        holder.root.setOnClickListener { listener.accept(exercise) }
+
+
+        companion object {
+            fun from(parent: ViewGroup): ViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ListItemExerciseInTrainingBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder(binding)
+            }
+        }
     }
 
-    override fun getItemCount(): Int = exercises?.size ?: 0
 
-
-    fun setList(list: List<ExerciseInTraining>?, listView: RecyclerView?) {
-        if (itemCount == 0) {
-            Threading.dispatchMainDelayed(Consumer {
-                listView?.visibility = View.INVISIBLE
-                exercises = list
-                notifyDataSetChanged()
-                val unbounded = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-                listView?.measure(unbounded, unbounded)
-                Animator.animateDropdownSlide(listView, listView?.measuredHeight, Animator.ANIMATION_LENGTH_MED, true)
-            }, Animator.ANIMATION_LENGTH_SHORT)
-        } else {
-            exercises = list
-            notifyDataSetChanged()
-            listView?.smoothScrollToPosition(itemCount)
-        }
+    private class DiffCallback: DiffUtil.ItemCallback<ExerciseInTraining>() {
+        override fun areItemsTheSame(oldItem: ExerciseInTraining, newItem: ExerciseInTraining) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: ExerciseInTraining, newItem: ExerciseInTraining) = oldItem == newItem
     }
 
 

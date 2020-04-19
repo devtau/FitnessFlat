@@ -1,7 +1,7 @@
 package com.devtau.ironHeroes.ui.fragments.statistics
 
 import android.graphics.Canvas
-import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.DateUtils
 import com.devtau.ironHeroes.util.Logger
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.renderer.XAxisRenderer
@@ -20,7 +20,8 @@ class CustomXAxisRenderer(
 
     override fun drawLabel(c: Canvas, formattedLabel: String, x: Float, y: Float, anchor: MPPointF, angleDegrees: Float) {
         Logger.d("CustomXAxisRenderer", "drawLabel. formattedLabel=$formattedLabel, x=$x, y=$y")
-        val formattedDate = AppUtils.formatShortDate(xLabels[formattedLabel.toInt()])
+        val index = formattedLabel.toInt()
+        val formattedDate = if (index in xLabels.indices) DateUtils.formatShortDate(xLabels[index]) else ""
         Utils.drawXAxisValue(c, formattedDate, x, y, mAxisLabelPaint, anchor, angleDegrees)
     }
 }

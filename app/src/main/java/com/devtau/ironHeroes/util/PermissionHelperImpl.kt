@@ -1,19 +1,16 @@
 package com.devtau.ironHeroes.util
 
+import android.Manifest.permission.*
 import android.annotation.TargetApi
-import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import androidx.core.content.PermissionChecker
 import androidx.appcompat.app.AlertDialog
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
-import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.Manifest.permission.CALL_PHONE
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.PermissionChecker
+import androidx.fragment.app.Fragment
 import com.devtau.ironHeroes.R
 
 class PermissionHelperImpl: PermissionHelper {
@@ -34,7 +31,7 @@ class PermissionHelperImpl: PermissionHelper {
     }
 
     @TargetApi(23)
-    override fun requestGPSPermission(activity: Activity, negativeListener: DialogInterface.OnClickListener) {
+    override fun requestGPSPermission(activity: AppCompatActivity, negativeListener: DialogInterface.OnClickListener) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, ACCESS_FINE_LOCATION)) {
             val explanationText = getExplanationText(activity, R.string.permission_explanation_gps)
             showExplanationDialog(activity, explanationText, ACCESS_FINE_LOCATION, GPS_REQUEST_CODE, negativeListener)
@@ -59,7 +56,7 @@ class PermissionHelperImpl: PermissionHelper {
     }
 
     @TargetApi(23)
-    override fun requestCallPermission(activity: Activity) {
+    override fun requestCallPermission(activity: AppCompatActivity) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, CALL_PHONE)) {
             val explanationText = getExplanationText(activity, R.string.permission_explanation_call)
             val declinedText = activity.getString(R.string.permission_cancelled_msg_call)
@@ -85,7 +82,7 @@ class PermissionHelperImpl: PermissionHelper {
     }
 
     @TargetApi(23)
-    override fun requestStoragePermission(activity: Activity) {
+    override fun requestStoragePermission(activity: AppCompatActivity) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, WRITE_EXTERNAL_STORAGE)) {
             val explanationText = getExplanationText(activity, R.string.permission_explanation_storage)
             val declinedText = activity.getString(R.string.permission_cancelled_msg_storage)
@@ -117,7 +114,7 @@ class PermissionHelperImpl: PermissionHelper {
                 false
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG, e.message)
+            e.message?.let { Logger.e(LOG_TAG, it) }
             false
         }
     }
@@ -134,7 +131,7 @@ class PermissionHelperImpl: PermissionHelper {
     }
 
     @TargetApi(23)
-    private fun showExplanationDialog(activity: Activity, explanationText: String, declinedText: String,
+    private fun showExplanationDialog(activity: AppCompatActivity, explanationText: String, declinedText: String,
                                       permission: String, requestCode: Int) {
         showExplanationDialog(activity, explanationText, permission,
             DialogInterface.OnClickListener { _, _ -> activity.requestPermissions(arrayOf(permission), requestCode) },
@@ -143,7 +140,7 @@ class PermissionHelperImpl: PermissionHelper {
     }
 
     @TargetApi(23)
-    private fun showExplanationDialog(activity: Activity, explanationText: String, permission: String,
+    private fun showExplanationDialog(activity: AppCompatActivity, explanationText: String, permission: String,
                                       requestCode: Int, negativeListener: DialogInterface.OnClickListener) {
         showExplanationDialog(activity, explanationText, permission,
             DialogInterface.OnClickListener { _, _ -> activity.requestPermissions(arrayOf(permission), requestCode) },

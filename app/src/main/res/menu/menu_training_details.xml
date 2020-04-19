@@ -3,12 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.activities.heroesList.HeroesActivity">
+    tools:context=".ui.fragments.trainingDetails.TrainingDetailsFragment">
 
     <item
         android:id="@+id/delete"
         android:title="@string/delete"
         android:icon="@drawable/ic_delete"
-        android:visible="false"
         app:showAsAction="always"/>
 </menu>

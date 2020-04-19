@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/trainingsNav"
+	app:startDestination="@+id/functionsFragment">
+	
+	<fragment
+		android:id="@+id/functionsFragment"
+		android:name="com.devtau.ironHeroes.ui.fragments.functions.FunctionsFragment"
+		android:label="@string/app_name"
+		tools:layout="@layout/fragment_functions">
+		<action
+			android:id="@+id/action_functionsFragment_to_trainingDetailsFragment"
+			app:destination="@id/trainingDetailsFragment" />
+		<action
+			android:id="@+id/action_functionsFragment_to_heroesFragment"
+			app:destination="@id/heroesFragment" />
+		<action
+			android:id="@+id/action_functionsFragment_to_exerciseDialog"
+			app:destination="@id/exerciseDialog" />
+	</fragment>
+	
+	
+	<fragment
+		android:id="@+id/trainingDetailsFragment"
+		android:name="com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsFragment"
+		android:label=""
+		tools:layout="@layout/fragment_training_details">
+		<action
+			android:id="@+id/action_trainingDetailsFragment_to_exerciseDialog"
+			app:destination="@id/exerciseDialog" />
+		<argument
+			android:name="trainingId"
+			app:argType="long" />
+	</fragment>
+	
+	<dialog
+		android:id="@+id/exerciseDialog"
+		android:name="com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialog"
+		android:label=""
+		tools:layout="@layout/dialog_exercise">
+		<argument
+			android:name="exerciseId"
+			app:argType="long" />
+		<argument
+			android:name="heroId"
+			app:argType="long" />
+		<argument
+			android:name="position"
+			app:argType="integer" />
+		<argument
+			android:name="trainingId"
+			app:argType="long" />
+	</dialog>
+	
+	
+	<fragment
+		android:id="@+id/heroesFragment"
+		android:name="com.devtau.ironHeroes.ui.fragments.heroesList.HeroesFragment"
+		android:label=""
+		tools:layout="@layout/fragment_heroes">
+		<action
+			android:id="@+id/action_heroesFragment_to_heroDetailsFragment"
+			app:destination="@id/heroDetailsFragment" />
+	</fragment>
+	
+	<fragment
+		android:id="@+id/heroDetailsFragment"
+		android:name="com.devtau.ironHeroes.ui.fragments.heroDetails.HeroDetailsFragment"
+		android:label=""
+		tools:layout="@layout/fragment_hero_details" >
+		<argument
+			android:name="heroId"
+			app:argType="long" />
+	</fragment>
+</navigation>

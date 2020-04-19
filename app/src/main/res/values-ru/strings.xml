@@ -9,6 +9,7 @@
 	<string name="trainings">Тренировки</string>
 	<string name="statistics">Статистика</string>
 	<string name="database">База данных</string>
+	<string name="no_exercises_or_trainings_found">Не найдено упражнений или тренировок</string>
 	<string name="export_to_file">Экспортировать в файл</string>
 	<string name="import_from_file">Импортировать из файла</string>
 	<string name="export_error">Ошибка при сохранении в файл</string>
@@ -23,13 +24,13 @@
 	<string name="training_add">Добавить тренировку</string>
 	<string name="exercise_add">Добавить упражнение</string>
 	<string name="wait_for_sms">Ожидайте СМС с кодом подтверждения</string>
-	<string name="name">Имя</string>
-	<string name="surname">Фамилия</string>
-	<string name="phone">Телефон</string>
+	<string name="name">Имя *</string>
+	<string name="surname">Фамилия *</string>
+	<string name="phone">Телефон *</string>
 	<string name="email">Email</string>
 	<string name="birthday">День рождения</string>
 	<string name="date">Дата</string>
-	<string name="gender">Пол</string>
+	<string name="gender">Пол *</string>
 	<string name="is_champion">Это тренер</string>
 	<string name="use_vk_avatar">Использовать аватар ВК</string>
 	<string name="vk_id">ID Вконтакте</string>
@@ -47,6 +48,8 @@
 	<string name="weight">Вес</string>
 	<string name="count">Повторы</string>
 	<string name="error_formatter" formatted="false">Ошибка: %s</string>
+	<string name="error_trainings_list">Ошибка при загрузке списка тренировок</string>
+	<string name="error_exercises_list">Ошибка при загрузке списка упражнений</string>
 	<string name="cancel">Отмена</string>
 	<string name="save">Сохранить</string>
 	<string name="filters">Фильтры</string>
@@ -70,32 +73,30 @@
 	<string name="further">Далее</string>
 	<string name="previous_exercise_data">Прошлый раз вы выполнили это упражнение:</string>
 	<string name="no_data">нет данных</string>
+	<string name="no_trainings">Тренировок не найдено</string>
 	<string name="previous_training_data_formatter" formatted="false">%s %s x %s x %s</string>
 	<string name="settings">Настройки</string>
 	<string name="other">Прочее</string>
 	<string name="show_champion_filter">Показывать фильтр по чемпиону</string>
 	<string name="show_hero_filter">Показывать фильтр по герою</string>
 	<string name="show_edit_dialog_at_statistics_screen">Диалог при клике на балун на экране статистики</string>
-	<string name="selected">Выбрано:</string>
+	<string name="selected_formatter" formatted="false">Выбрано: %s</string>
 	<string name="no_exercise_data">Вы еще не выполняли это упражнение</string>
 	<string name="load_demo_configuration">Загрузить демонстрационную конфигурацию?</string>
+	<string name="create_heroes">Создать новых тренирующихся и тренеров?</string>
 	<string name="clear_db">Очистить базу данных</string>
 	<string name="clear_db_confirm">Вы собираетесь удалить все тренировки, упражнения в этих тренировках, героев и чемпионов. Продолжить?</string>
 	<string name="next_set">Следующий подход</string>
 	<string name="recreation">Отдых</string>
 	<string name="recreation_formatter" formatted="false">Вы отдохнули %s</string>
+	<string name="parse_error">Ошибка в списке выполненных упражнений. Возможно неудачный импорт фала</string>
 	
 	<string name="roma_first_name">Рома</string>
 	<string name="anton_first_name">Антон</string>
 	<string name="denis_first_name">Денис</string>
-	<string name="masha_first_name">Маша</string>
-	<string name="eugen_first_name">Евгений</string>
-	
 	<string name="roma_last_name">Богданов</string>
 	<string name="anton_last_name">Щукин</string>
 	<string name="denis_last_name">Русских</string>
-	<string name="masha_last_name">Черничкина</string>
-	<string name="eugen_last_name">Стирманов</string>
 	
 	
 	//Грудь

@@ -10,9 +10,11 @@ import java.util.*
 @Entity(tableName = "MuscleGroups")
 class MuscleGroup(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "muscleGroupId")
-    var id: Long?,
+    override var id: Long?,
     var name: String
-) {
+): SpinnerItem {
+
+    override fun getFormattedName() = name
 
     override fun equals(other: Any?): Boolean = when {
         other !is MuscleGroup -> false

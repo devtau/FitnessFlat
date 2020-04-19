@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	tools:context=".ui.fragments.trainingDetails.TrainingDetailsFragment">
+	
+	<data>
+		<import type="android.view.View" />
+		<import type="com.devtau.ironHeroes.util.Constants" />
+		<import type="com.devtau.ironHeroes.util.DateUtils" />
+		
+		<variable
+			name="viewModel"
+			type="com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsViewModel" />
+	</data>
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical">
+		
+		<TableLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/colorWhite"
+			android:elevation="4dp">
+			
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingBottom="@dimen/marginHalf"
+				android:paddingLeft="@dimen/marginNormal"
+				android:paddingRight="@dimen/marginNormal"
+				android:orientation="horizontal"
+				android:gravity="center_vertical"
+				style="@style/SelectableItemBackground"
+				android:onClick="@{() -> viewModel.dateDialogRequested()}">
+				
+				<TextView
+					android:text="@string/date"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"/>
+				
+				<TextView
+					android:text="@{viewModel.trainingDate}"
+					tools:text="27.10.2019"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:gravity="end"/>
+			</LinearLayout>
+			
+			
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingBottom="@dimen/marginHalf"
+				android:paddingLeft="@dimen/marginNormal"
+				android:orientation="horizontal">
+				
+				<TextView
+					android:text="@string/champion"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"/>
+				
+				<Spinner
+					android:id="@+id/champion"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					app:spinnerItems="@{viewModel.champions}"
+					app:selectedItem="@{viewModel.selectedChampionId}"
+					app:onItemSelectedListener="@{viewModel.heroSelectedListener}"
+					app:withHeader="@{false}" />
+			</TableRow>
+			
+			
+			<TableRow
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingBottom="@dimen/marginHalf"
+				android:paddingLeft="@dimen/marginNormal"
+				android:orientation="horizontal">
+				
+				<TextView
+					android:text="@string/hero"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"/>
+				
+				<Spinner
+					android:id="@+id/hero"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					app:spinnerItems="@{viewModel.heroes}"
+					app:selectedItem="@{viewModel.selectedHeroId}"
+					app:onItemSelectedListener="@{viewModel.heroSelectedListener}"
+					app:withHeader="@{false}" />
+			</TableRow>
+			
+			<Button
+				android:text="@string/exercise_add"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="@dimen/marginNormal"
+				android:layout_marginBottom="@dimen/marginHalf"
+				android:layout_marginLeft="@dimen/marginNormal"
+				android:layout_marginRight="@dimen/marginNormal"
+				android:onClick="@{() -> viewModel.openExercise()}"/>
+		</TableLayout>
+		
+		
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/listView"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			tools:layout_height="110dp"
+			app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+			app:listItems="@{viewModel.exercises}"
+			tools:listitem="@layout/list_item_exercise_in_training"/>
+	</LinearLayout>
+</layout>

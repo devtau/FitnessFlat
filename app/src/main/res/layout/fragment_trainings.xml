@@ -1,92 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
+	xmlns:tools="http://schemas.android.com/tools"
 	tools:context=".ui.fragments.trainingsList.TrainingsFragment">
 	
-	<LinearLayout
+	<data>
+		<import type="android.view.View" />
+		<import type="androidx.core.content.ContextCompat" />
+		<import type="com.devtau.ironHeroes.util.Constants" />
+		
+		<variable
+			name="viewModel"
+			type="com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsViewModel" />
+	</data>
+	
+	<androidx.coordinatorlayout.widget.CoordinatorLayout
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:orientation="vertical">
+		android:layout_height="match_parent">
 		
 		<LinearLayout
-			android:id="@+id/filters"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/colorWhite"
-			android:elevation="4dp"
-			android:orientation="horizontal">
+			android:layout_height="match_parent"
+			android:orientation="vertical">
 			
 			<LinearLayout
-				android:id="@+id/championContainer"
-				android:layout_width="0dp"
-				android:layout_height="match_parent"
-				android:layout_weight="1"
-				android:paddingTop="@dimen/marginHalf"
-				android:paddingBottom="@dimen/marginHalf"
-				android:orientation="vertical">
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/colorWhite"
+				android:elevation="4dp"
+				android:orientation="horizontal">
 				
-				<TextView
-					android:text="@string/champion"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:paddingLeft="@dimen/marginNormal"
-					android:paddingRight="@dimen/marginNormal"
-					android:textColor="@color/secondaryTextColor"
-					android:textSize="@dimen/secondaryTextSize"/>
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="match_parent"
+					android:layout_weight="1"
+					android:paddingTop="@dimen/marginHalf"
+					android:paddingBottom="@dimen/marginHalf"
+					android:orientation="vertical"
+					android:visibility="@{viewModel.showChampionFilter ? View.VISIBLE : View.GONE}">
+					
+					<TextView
+						android:text="@string/champion"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:paddingLeft="@dimen/marginNormal"
+						android:paddingRight="@dimen/marginNormal"
+						android:textColor="@color/secondaryTextColor"
+						android:textSize="@dimen/secondaryTextSize"/>
+					
+					<Spinner
+						android:id="@+id/champion"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="@dimen/marginHalf"
+						android:paddingLeft="@dimen/marginHalf"
+						android:paddingRight="@dimen/marginHalf"
+						app:spinnerItems="@{viewModel.champions}"
+						app:selectedItem="@{viewModel.selectedChampionId}"
+						app:onItemSelectedListener="@{viewModel.heroSelectedListener}"/>
+				</LinearLayout>
 				
-				<Spinner
-					android:id="@+id/champion"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginTop="@dimen/marginHalf"
-					android:paddingLeft="@dimen/marginHalf"
-					android:paddingRight="@dimen/marginHalf"/>
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="match_parent"
+					android:layout_weight="1"
+					android:paddingTop="@dimen/marginHalf"
+					android:paddingBottom="@dimen/marginHalf"
+					android:orientation="vertical"
+					android:visibility="@{viewModel.showHeroFilter ? View.VISIBLE : View.GONE}">
+					
+					<TextView
+						android:text="@string/hero"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:paddingLeft="@dimen/marginNormal"
+						android:paddingRight="@dimen/marginNormal"
+						android:textColor="@color/secondaryTextColor"
+						android:textSize="@dimen/secondaryTextSize"/>
+					
+					<Spinner
+						android:id="@+id/hero"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="@dimen/marginHalf"
+						android:paddingLeft="@dimen/marginHalf"
+						android:paddingRight="@dimen/marginHalf"
+						app:spinnerItems="@{viewModel.heroes}"
+						app:selectedItem="@{viewModel.selectedHeroId}"
+						app:onItemSelectedListener="@{viewModel.heroSelectedListener}"/>
+				</LinearLayout>
 			</LinearLayout>
 			
-			<LinearLayout
-				android:id="@+id/heroContainer"
-				android:layout_width="0dp"
+			<androidx.recyclerview.widget.RecyclerView
+				android:id="@+id/listView"
+				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:layout_weight="1"
-				android:paddingTop="@dimen/marginHalf"
-				android:paddingBottom="@dimen/marginHalf"
-				android:orientation="vertical">
-				
-				<TextView
-					android:text="@string/hero"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:paddingLeft="@dimen/marginNormal"
-					android:paddingRight="@dimen/marginNormal"
-					android:textColor="@color/secondaryTextColor"
-					android:textSize="@dimen/secondaryTextSize"/>
-				
-				<Spinner
-					android:id="@+id/hero"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginTop="@dimen/marginHalf"
-					android:paddingLeft="@dimen/marginHalf"
-					android:paddingRight="@dimen/marginHalf"/>
-			</LinearLayout>
+				app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+				app:listItems="@{viewModel.trainings}"
+				tools:listitem="@layout/list_item_training"/>
 		</LinearLayout>
 		
-		<androidx.recyclerview.widget.RecyclerView
-			android:id="@+id/listView"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"/>
-	</LinearLayout>
-	
-	<com.google.android.material.floatingactionbutton.FloatingActionButton
-		android:id="@+id/fab"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="bottom|end"
-		android:layout_margin="@dimen/marginNormal"
-		android:visibility="invisible"
-		app:srcCompat="@drawable/ic_add"/>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+		<ProgressBar
+			android:id="@+id/progress"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:visibility="gone"
+			android:layout_gravity="center"/>
+		
+		<TextView
+			android:text="@string/no_trainings"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:visibility="@{viewModel.trainingsEmpty ? View.VISIBLE : View.GONE}"/>
+		
+		<com.google.android.material.floatingactionbutton.FloatingActionButton
+			android:id="@+id/fab"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="bottom|end"
+			android:layout_margin="@dimen/marginNormal"
+			android:visibility="invisible"
+			app:srcCompat="@drawable/ic_add"
+			android:onClick="@{() -> viewModel.openTraining()}"/>
+	</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

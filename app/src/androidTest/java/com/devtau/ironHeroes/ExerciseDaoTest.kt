@@ -5,9 +5,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.devtau.ironHeroes.data.DB
-import com.devtau.ironHeroes.data.dao.ExerciseDao
 import com.devtau.ironHeroes.data.model.Exercise
+import com.devtau.ironHeroes.data.source.local.DB
+import com.devtau.ironHeroes.data.source.local.exercise.ExerciseDao
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -36,16 +36,16 @@ class ExerciseDaoTest {
 
 
     @Test fun insertAndGet() {
-        dao.insert(listOf(exerciseA)).blockingAwait()
-        dao.getById(exerciseA.id).test().assertValue {
+        dao.insertListAsync(listOf(exerciseA)).blockingAwait()
+        dao.getByIdAsFlowable(exerciseA.id).test().assertValue {
             exerciseA.id == it.exercise.id
         }
     }
 
 
     @Test fun testQtyAndSortOrder() {
-        dao.insert(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
-        dao.getList().test().assertValue { list ->
+        dao.insertListAsync(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
+        dao.getListAsFlowable().test().assertValue { list ->
             val sorted = arrayListOf<Exercise>()
             for (next in list) sorted.add(next.exercise)
             sorted.sortBy { it.name }
@@ -57,15 +57,15 @@ class ExerciseDaoTest {
     }
 
     @Test fun deleteAllAndGet() {
-        dao.insert(listOf(exerciseA)).blockingAwait()
-        dao.delete().blockingAwait()
-        dao.getById(exerciseA.id).test().assertNoValues()
+        dao.insertListAsync(listOf(exerciseA)).blockingAwait()
+        dao.deleteAsync().blockingAwait()
+        dao.getByIdAsFlowable(exerciseA.id).test().assertNoValues()
     }
 
     @Test fun deleteListAndGet() {
-        dao.insert(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
-        dao.delete(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
-        dao.getById(exerciseA.id).test().assertNoValues()
+        dao.insertListAsync(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
+        dao.deleteAsync(listOf(exerciseA, exerciseC, exerciseB)).blockingAwait()
+        dao.getByIdAsFlowable(exerciseA.id).test().assertNoValues()
     }
 
 

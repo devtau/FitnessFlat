@@ -1,54 +1,51 @@
 package com.devtau.ironHeroes.adapters
 
-import android.text.TextUtils
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.Hero
-import com.devtau.ironHeroes.util.Logger
-import io.reactivex.functions.Consumer
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.list_item_hero.*
+import com.devtau.ironHeroes.databinding.ListItemHeroBinding
+import com.devtau.ironHeroes.ui.fragments.heroesList.HeroesListViewModel
 
 class HeroesAdapter(
-    private var heroes: List<Hero>?,
-    private val listener: Consumer<Hero>
-): RecyclerView.Adapter<HeroesAdapter.HeroesViewHolder>() {
+    private val viewModel: HeroesListViewModel
+): ListAdapter<Hero, HeroesAdapter.ViewHolder>(DiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeroesViewHolder {
-        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.list_item_hero, parent, false)
-        return HeroesViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder.from(parent)
 
-    override fun onBindViewHolder(holder: HeroesViewHolder, position: Int) {
-        val hero = heroes?.get(position) ?: return
-        Logger.v(LOG_TAG, "onBindViewHolder. hero=$hero")
-        Glide.with(holder.image).load(
-            if (!TextUtils.isEmpty(hero.avatarUrl)) hero.avatarUrl
-            else if (hero.avatarId != null) hero.avatarId
-            else null)
-            .transform(CircleCrop())
-            .transition(DrawableTransitionOptions.withCrossFade()).into(holder.image)
-        holder.name.text = hero.getName()
-        holder.containerView.setOnClickListener { listener.accept(hero) }
-    }
-
-    override fun getItemCount(): Int = heroes?.size ?: 0
-
-
-    fun setList(list: List<Hero>?) {
-        heroes = list
-        notifyDataSetChanged()
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = getItem(position)
+        holder.bind(viewModel, item)
     }
 
 
-    class HeroesViewHolder(override val containerView: View):
-        RecyclerView.ViewHolder(containerView), LayoutContainer
+    class ViewHolder private constructor(
+        private val binding: ListItemHeroBinding
+    ): RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(viewModel: HeroesListViewModel, item: Hero) {
+            binding.viewModel = viewModel
+            binding.hero = item
+            binding.executePendingBindings()
+        }
+
+
+        companion object {
+            fun from(parent: ViewGroup): ViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ListItemHeroBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder(binding)
+            }
+        }
+    }
+
+
+    private class DiffCallback: DiffUtil.ItemCallback<Hero>() {
+        override fun areItemsTheSame(oldItem: Hero, newItem: Hero) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Hero, newItem: Hero) = oldItem == newItem
+    }
 
 
     companion object {

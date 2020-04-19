@@ -1,87 +1,42 @@
 package com.devtau.ironHeroes.ui.fragments.settings
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.ui.DependencyRegistry
-import com.devtau.ironHeroes.ui.fragments.ViewSubscriberFragment
+import androidx.fragment.app.viewModels
+import com.devtau.ironHeroes.databinding.FragmentSettingsBinding
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
+import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
 
-class SettingsFragment: ViewSubscriberFragment(), SettingsContract.View {
+class SettingsFragment: BaseFragment() {
 
-    private lateinit var presenter: SettingsContract.Presenter
-    private var listener: Listener? = null
+    private val _viewModel by viewModels<SettingsViewModel> { getViewModelFactory() }
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        DependencyRegistry.inject(this)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_settings, container, false)
-        initUi(root)
-        return root
-    }
+        val binding = FragmentSettingsBinding.inflate(inflater, container, false).apply {
+            viewModel = _viewModel
+            lifecycleOwner = viewLifecycleOwner
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is Listener) listener = context
-        else throw RuntimeException("$context must implement $LOG_TAG Listener")
-    }
-
-    override fun onDetach() {
-        listener = null
-        super.onDetach()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.onStop()
+            logLifeCycle(LOG_TAG)
+            initUi()
+        }
+        return binding.root
     }
     //</editor-fold>
-
-
-    //<editor-fold desc="View overrides">
-    override fun getLogTag() = LOG_TAG
-    //</editor-fold>
-
-
-    fun configureWith(presenter: SettingsContract.Presenter) {
-        this.presenter = presenter
-    }
 
 
     //<editor-fold desc="Private methods">
-    private fun initUi(root: View) {
-        val showChampionFilter = root.findViewById<CheckBox>(R.id.showChampionFilter)
-        showChampionFilter?.isChecked = presenter.isChampionFilterNeeded()
-        showChampionFilter?.setOnCheckedChangeListener { _, isChecked ->
-            presenter.showChampionFilterClicked(isChecked)
-            listener?.updateSpinnersVisibility()
-        }
-        val showHeroFilter = root.findViewById<CheckBox>(R.id.showHeroFilter)
-        showHeroFilter?.isChecked = presenter.isHeroFilterNeeded()
-        showHeroFilter?.setOnCheckedChangeListener { _, isChecked ->
-            presenter.showHeroFilterClicked(isChecked)
-            listener?.updateSpinnersVisibility()
-        }
-        val openEditDialogFromStatistics = root.findViewById<CheckBox>(R.id.openEditDialogFromStatistics)
-        openEditDialogFromStatistics?.isChecked = presenter.isEditDialogNeeded()
-        openEditDialogFromStatistics?.setOnCheckedChangeListener { _, isChecked ->
-            presenter.openEditDialogFromStatisticsClicked(isChecked)
-        }
+    // This method call is needed because of a problem in ViewPager lifecycleOwner
+    // Checkboxes checked states are not initialized correctly without this method call
+    private fun FragmentSettingsBinding.initUi() {
+        showChampionFilter.isChecked = _viewModel.showChampionFilter
+        showHeroFilter.isChecked = _viewModel.showHeroFilter
+        openEditDialogFromStatistics.isChecked = _viewModel.openEditDialogFromStatistics
     }
     //</editor-fold>
-
-
-    interface Listener {
-        fun updateSpinnersVisibility()
-    }
 
 
     companion object {

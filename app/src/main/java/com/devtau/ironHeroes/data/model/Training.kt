@@ -5,7 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.DateUtils
 import java.util.*
 
 @Entity(
@@ -13,7 +13,7 @@ import java.util.*
     indices = [Index("championId", "heroId")],
     ignoredColumns = ["champion", "hero", "exercises"]
 )
-class Training(
+data class Training(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "trainingId")
     var id: Long?,
     var championId: Long?,
@@ -27,20 +27,21 @@ class Training(
     constructor(id: Long?, championId: Long?, heroId: Long?, date: Long):
             this(id, championId, null, heroId, null, date, null)
 
+    override fun toString() = "id=$id, championId=$championId, heroId=$heroId, " +
+            "date=${DateUtils.formatDateTimeWithWeekDay(date)}, exercises size=${exercises?.size}"
 
     fun someFieldsChanged(championId: Long?, heroId: Long?, date: Long?) =
         championId != this.championId
                 || heroId != this.heroId
                 || date != this.date
 
-    override fun toString(): String =
-        "championId=$championId, heroId=$heroId, date=${AppUtils.formatDateTimeWithWeekDay(date)}"
-
     fun getDateCal(): Calendar {
         val cal = Calendar.getInstance()
         cal.timeInMillis = date
         return cal
     }
+
+    fun formatDateTimeWithWeekDay() = DateUtils.formatDateTimeWithWeekDay(date)
 
 
     companion object {
@@ -53,9 +54,9 @@ class Training(
             val denis = Hero.getMockHeroes(c)[0]
 
             return listOf(
-                Training(1, anton.id, denis.id, AppUtils.parseDateTime("27.01.2020 8:00").timeInMillis),
-                Training(2, roma.id, denis.id, AppUtils.parseDateTime("29.01.2020 9:00").timeInMillis),
-                Training(3, roma.id, denis.id, AppUtils.parseDateTime("31.01.2020 8:30").timeInMillis)
+                Training(1, anton.id, denis.id, DateUtils.parseDateTime("27.01.2020 8:00").timeInMillis),
+                Training(2, roma.id, denis.id, DateUtils.parseDateTime("29.01.2020 9:00").timeInMillis),
+                Training(3, roma.id, denis.id, DateUtils.parseDateTime("31.01.2020 8:30").timeInMillis)
             )
         }
     }

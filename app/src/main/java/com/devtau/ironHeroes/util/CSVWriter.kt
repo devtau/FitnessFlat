@@ -2,6 +2,11 @@ package com.devtau.ironHeroes.util
 
 import android.database.Cursor
 import android.os.Environment
+import com.devtau.ironHeroes.util.FileUtils.CSV_EXT
+import com.devtau.ironHeroes.util.FileUtils.ESCAPE_CHAR
+import com.devtau.ironHeroes.util.FileUtils.LINE_END
+import com.devtau.ironHeroes.util.FileUtils.QUOTE_CHAR
+import com.devtau.ironHeroes.util.FileUtils.SEPARATOR
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter
@@ -20,21 +25,20 @@ class CSVWriter(writer: Writer) {
     private fun convertToLine(nextLine: Array<String?>): String {
         val sb = StringBuffer()
         for ((i, next) in nextLine.withIndex()) {
-            if (i != 0) sb.append(Constants.SEPARATOR)
+            if (i != 0) sb.append(SEPARATOR)
             next ?: continue
-            sb.append(Constants.QUOTE_CHAR)
-            for (j in 0 until next.length) {
-                val nextChar = next[j]
-                if (nextChar == Constants.QUOTE_CHAR || nextChar == Constants.ESCAPE_CHAR) {
-                    sb.append(Constants.ESCAPE_CHAR).append(nextChar)
+            sb.append(QUOTE_CHAR)
+            for (nextChar in next) {
+                if (nextChar == QUOTE_CHAR || nextChar == ESCAPE_CHAR) {
+                    sb.append(ESCAPE_CHAR).append(nextChar)
                 } else {
                     sb.append(nextChar)
                 }
             }
-            sb.append(Constants.QUOTE_CHAR)
+            sb.append(QUOTE_CHAR)
         }
 
-        sb.append(Constants.LINE_END)
+        sb.append(LINE_END)
         return sb.toString()
     }
 
@@ -54,7 +58,7 @@ class CSVWriter(writer: Writer) {
             val exchangeDir = File(downloadsDir, exchangeDirName)
             if (!exchangeDir.exists()) exchangeDir.mkdirs()
 
-            val file = File(exchangeDir, "$fileName${Constants.CSV_EXT}")
+            val file = File(exchangeDir, "$fileName$CSV_EXT")
             var csvWriter: CSVWriter? = null
             try {
                 file.createNewFile()
