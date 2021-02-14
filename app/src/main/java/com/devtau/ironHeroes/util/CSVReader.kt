@@ -5,6 +5,7 @@ import com.devtau.ironHeroes.util.FileUtils.CSV_EXT
 import com.devtau.ironHeroes.util.FileUtils.LINE_END
 import com.devtau.ironHeroes.util.FileUtils.QUOTE_CHAR
 import com.devtau.ironHeroes.util.FileUtils.SEPARATOR
+import timber.log.Timber
 import java.io.*
 import java.util.*
 
@@ -73,8 +74,6 @@ class CSVReader(reader: Reader) {
 
 
     companion object {
-        private const val LOG_TAG = "CSVReader"
-
         fun readCSV(exchangeDirName: String, fileName: String) {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             val exchangeDir = File(downloadsDir, exchangeDirName)
@@ -93,7 +92,7 @@ class CSVReader(reader: Reader) {
                 values.append("\n")
                 nextLine = reader.readNext()
             }
-            Logger.d(LOG_TAG, "readCSV. values=$values")
+            Timber.d("readCSV. values=$values")
         }
     }
 }

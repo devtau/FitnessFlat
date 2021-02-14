@@ -7,6 +7,7 @@ import com.devtau.ironHeroes.util.FileUtils.ESCAPE_CHAR
 import com.devtau.ironHeroes.util.FileUtils.LINE_END
 import com.devtau.ironHeroes.util.FileUtils.QUOTE_CHAR
 import com.devtau.ironHeroes.util.FileUtils.SEPARATOR
+import timber.log.Timber
 import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter
@@ -51,8 +52,6 @@ class CSVWriter(writer: Writer) {
 
 
     companion object {
-        private const val LOG_TAG = "CSVWriter"
-
         fun exportToCSV(cursor: Cursor, exchangeDirName: String, fileName: String) {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             val exchangeDir = File(downloadsDir, exchangeDirName)
@@ -69,9 +68,9 @@ class CSVWriter(writer: Writer) {
                     for (i in 0 until cursor.columnCount) nextValue[i] = cursor.getString(i)
                     csvWriter.writeNext(nextValue)
                 }
-                Logger.d(LOG_TAG, "exportToCSV. exported")
+                Timber.d("exportToCSV. exported")
             } catch (e: Exception) {
-                Logger.e(LOG_TAG, "exportToCSV. error ${e.message}\n$e")
+                Timber.e("exportToCSV. error ${e.message}\n$e")
             } finally {
                 csvWriter?.close()
                 cursor.close()
