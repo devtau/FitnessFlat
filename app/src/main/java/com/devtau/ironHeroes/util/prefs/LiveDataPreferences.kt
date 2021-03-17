@@ -2,7 +2,7 @@ package com.devtau.ironHeroes.util.prefs
 
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
-import com.devtau.ironHeroes.util.Logger
+import timber.log.Timber
 
 sealed class LiveDataPreferences<T>(
     protected val prefs: SharedPreferences,
@@ -19,7 +19,7 @@ sealed class LiveDataPreferences<T>(
     override fun onActive() {
         super.onActive()
         value = getValue(key, defValue)
-        Logger.d(LOG_TAG, "onActive. key=$key, value=$value")
+        Timber.d("onActive. key=$key, value=$value")
         prefs.registerOnSharedPreferenceChangeListener(changeListener)
     }
 
@@ -37,9 +37,7 @@ class LiveDataPreferenceBoolean(
 
     override fun getValue(key: String, defValue: Boolean): Boolean {
         val value = sharedPrefs.getBoolean(key, defValue)
-        Logger.d(LOG_TAG, "getValue. key=$key, value=$value")
+        Timber.d("getValue. key=$key, value=$value")
         return value
     }
 }
-
-private const val LOG_TAG = "LiveDataPreferences"

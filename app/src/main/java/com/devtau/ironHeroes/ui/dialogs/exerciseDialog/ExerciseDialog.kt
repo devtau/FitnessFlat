@@ -18,16 +18,20 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.wrappers.ExerciseDataWrapper
 import com.devtau.ironHeroes.databinding.DialogExerciseBinding
 import com.devtau.ironHeroes.enums.ChannelStats
-import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
-import com.devtau.ironHeroes.util.*
+import com.devtau.ironHeroes.ui.fragments.BaseFragment
+import com.devtau.ironHeroes.util.AlarmReceiver
+import com.devtau.ironHeroes.util.Animator
+import com.devtau.ironHeroes.util.DateUtils
+import com.devtau.ironHeroes.util.EventObserver
+import timber.log.Timber
 
 class ExerciseDialog: DialogFragment() {
 
-    private val _viewModel by viewModels<ExerciseViewModel> { getViewModelFactory() }
+    private val _viewModel by viewModels<ExerciseViewModel> { BaseFragment.getViewModelFactory(this) }
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val binding = DialogExerciseBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
@@ -55,7 +59,7 @@ class ExerciseDialog: DialogFragment() {
         showPreviousExerciseData.observe(viewLifecycleOwner, EventObserver {
             binding.previousExerciseData.text = composePreviousExerciseDataString(it)
         })
-        startRecreationTimer.observe(viewLifecycleOwner, EventObserver { number ->
+        startRecreationTimer.observe(viewLifecycleOwner, EventObserver {
             startRecreationTimer(parseRecreationTime(binding), binding.progressBar)
         })
     }
@@ -86,13 +90,12 @@ class ExerciseDialog: DialogFragment() {
         Animator.animateProgressBar(progressBar, 0f, maxProgressValue.toFloat(), restTimeMs)
         object: CountDownTimer(restTimeMs, countDownIntervalMs) {
             override fun onTick(msLeft: Long) {
-                Logger.d(LOG_TAG, "CountDownTimer. Tick of Progress $i, $msLeft ms left")
+                Timber.d("CountDownTimer. Tick of Progress $i, $msLeft ms left")
                 i++
             }
 
             override fun onFinish() {
-                Logger.d(LOG_TAG, "CountDownTimer. onFinish")
-//                progressBar.progress = maxProgressValue
+                Timber.d("CountDownTimer. onFinish")
             }
         }.start()
     }
@@ -116,9 +119,4 @@ class ExerciseDialog: DialogFragment() {
             String.format(formatter, dateFormatted, data.weight.toString(), data.repeats.toString(), data.count.toString())
         }
     //</editor-fold>
-
-
-    companion object {
-        const val LOG_TAG = "ExerciseDialog"
-    }
 }

@@ -4,32 +4,19 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.media.AudioAttributes
-import android.net.ConnectivityManager
 import android.os.Build
 import android.telephony.PhoneNumberUtils
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import com.devtau.ironHeroes.data.model.HourMinute
 import com.devtau.ironHeroes.enums.ChannelStats
-import com.devtau.ironHeroes.util.Constants.PHONE_MASK
-import com.devtau.ironHeroes.util.Constants.STANDARD_DELAY_MS
 import com.redmadrobot.inputmask.MaskedTextChangedListener
 import io.reactivex.functions.Action
+import timber.log.Timber
 
 object AppUtils {
 
-    private const val LOG_TAG = "AppUtils"
-
-
-    fun checkConnection(context: Context?): Boolean {
-        if (context == null) return false
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connectivityManager.activeNetworkInfo ?: return false
-        return networkInfo.isConnectedOrConnecting
-    }
+    private const val PHONE_MASK = "+7 ([000]) [000]-[00]-[00]"
 
     fun initPhoneRMR(phoneInput: EditText?, savedPhone: String? = null) {
         phoneInput ?: return
@@ -41,42 +28,8 @@ object AppUtils {
 
     fun clearPhoneFromMask(savedPhone: String?): String = PhoneNumberUtils.normalizeNumber(savedPhone)
 
-    fun toggleSoftInput(show: Boolean, field: EditText?, activity: AppCompatActivity?) {
-        Logger.d(LOG_TAG, "toggleSoftInput. " + (if (show) "show" else "hide")
-                + ", field " + (if (field == null) "is null" else "ok")
-                + ", activity " + (if (activity == null) "is null" else "ok"))
-        if (show) {
-            field?.requestFocus()
-            field?.postDelayed({
-                val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-                imm?.showSoftInput(field, InputMethodManager.SHOW_IMPLICIT)
-            }, STANDARD_DELAY_MS)
-        } else {
-            field?.clearFocus()
-            field?.postDelayed({
-                val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-                val windowToken = field.windowToken ?: return@postDelayed
-                imm?.hideSoftInputFromWindow(windowToken, 0)
-            }, STANDARD_DELAY_MS)
-        }
-    }
-
-    fun alert(logTag: String?, msg: String, context: Context?) {
-        context ?: return
-        try {
-            AlertDialog.Builder(context)
-                .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
-                .setMessage(msg)
-                .show()
-            Logger.e(logTag ?: LOG_TAG, msg)
-        } catch (e: WindowManager.BadTokenException) {
-            Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
-            context.toast(msg)
-        }
-    }
-
     fun alert(logTag: String?, msg: String, context: Context, confirmedListener: Action? = null) {
-        Logger.e(logTag ?: LOG_TAG, msg)
+        Timber.e("%s, %s", logTag, msg)
         try {
             val builder = AlertDialog.Builder(context)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
@@ -88,20 +41,10 @@ object AppUtils {
 
             builder.setMessage(msg).show()
         } catch (e: WindowManager.BadTokenException) {
-            Logger.e(logTag ?: LOG_TAG, "in alert. cannot show dialog")
+            Timber.e("%s, %s", logTag, "in alert. cannot show dialog")
             context.toast(msg)
         }
     }
-
-    fun roundMinutesInHalfHourIntervals(hour: Int, minute: Int): HourMinute =
-        if (hour == 23 && minute > 44) HourMinute(hour, 30)
-        else when (minute) {
-            in 1..14 -> HourMinute(hour, 0)
-            in 15..29 -> HourMinute(hour, 30)
-            in 31..44 -> HourMinute(hour, 30)
-            in 45..59 -> HourMinute(hour + 1, 0)
-            else -> HourMinute(hour, minute)
-        }
 
     fun createChannelIfNeeded(notificationManager: NotificationManager?, channelStats: ChannelStats) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -129,21 +72,6 @@ object AppUtils {
 
 fun <T>List<T>.print(logTag: String): String {
     val string = this.joinToString("\n", "[\n", "\n]\n")
-    Logger.d(logTag, string)
+    Timber.d("%s, %s", logTag, string)
     return string
 }
-
-fun <T,R>Map<T,R>.print(logTag: String): String {
-    val builder = StringBuilder()
-    var delimiter = ""
-    for (next in entries) {
-        builder.append(delimiter)
-        builder.append("key=${next.key}, value=${next.value}")
-        delimiter = ",\n"
-    }
-    val string = builder.toString()
-    Logger.d(logTag, string)
-    return string
-}
-
-fun <T>List<T>.inBounds(index: Int): Boolean = size > index

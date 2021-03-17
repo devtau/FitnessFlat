@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.devtau.ironHeroes.databinding.FragmentSettingsBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
-import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
 
 class SettingsFragment: BaseFragment() {
 
@@ -15,12 +14,10 @@ class SettingsFragment: BaseFragment() {
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentSettingsBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = viewLifecycleOwner
-
-            logLifeCycle(LOG_TAG)
             initUi()
         }
         return binding.root
@@ -37,9 +34,4 @@ class SettingsFragment: BaseFragment() {
         openEditDialogFromStatistics.isChecked = _viewModel.openEditDialogFromStatistics
     }
     //</editor-fold>
-
-
-    companion object {
-        private const val LOG_TAG = "SettingsFragment"
-    }
 }

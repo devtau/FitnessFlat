@@ -96,7 +96,7 @@ class ExerciseInTraining(
             val fourthMockExerciseId = if (localeIsRu) 16L else 19L
             val fifthMockExerciseId = if (localeIsRu) 48L else 20L
 
-            //27.01
+            //25.01
             var trainingId = Training.getMock(c)[0].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, firstMockExerciseId, 90, 3, 20, 0),
@@ -105,7 +105,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, fourthMockExerciseId, 50, 3, 8, 3),
                 ExerciseInTraining(null, trainingId, fifthMockExerciseId, 40, 3, 8, 4)))
 
-            //29.01
+            //27.01
             trainingId = Training.getMock(c)[1].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, firstMockExerciseId, 90, 3, 20, 0),
@@ -114,7 +114,7 @@ class ExerciseInTraining(
                 ExerciseInTraining(null, trainingId, fourthMockExerciseId, 56, 3, 8, 3),
                 ExerciseInTraining(null, trainingId, fifthMockExerciseId, 44, 3, 8, 4)))
 
-            //31.01
+            //29.01
             trainingId = Training.getMock(c)[2].id
             list.addAll(listOf(
                 ExerciseInTraining(null, trainingId, firstMockExerciseId, 90, 3, 20, 0),

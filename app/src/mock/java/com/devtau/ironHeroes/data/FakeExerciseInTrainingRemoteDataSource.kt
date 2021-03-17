@@ -55,7 +55,7 @@ object FakeExerciseInTrainingRemoteDataSource: ExerciseInTrainingLocalDataSource
                 is Loading -> Loading
                 is Error -> Error(list.exception)
                 is Success -> {
-                    val list = list.data.firstOrNull() { it.id == id }
+                    val list = list.data.firstOrNull { it.id == id }
                         ?: return@map Error(Exception("Not found"))
                     Success(list)
                 }

@@ -12,29 +12,34 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.FunctionsPagerAdapter
 import com.devtau.ironHeroes.databinding.FragmentFunctionsBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
-import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
+import com.devtau.ironHeroes.ui.fragments.other.OtherFragment
 import com.devtau.ironHeroes.util.EventObserver
-import com.devtau.ironHeroes.util.Logger
-import com.devtau.ironHeroes.util.setupSnackbar
 import com.devtau.ironHeroes.util.showDialog
-import io.reactivex.functions.Action
+import timber.log.Timber
 
-class FunctionsFragment: BaseFragment() {
+class FunctionsFragment: BaseFragment(), OtherFragment.Listener {
 
     private val _viewModel by viewModels<FunctionsViewModel> { getViewModelFactory() }
+    private lateinit var binding: FragmentFunctionsBinding
+    private val pagerListener = object: ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) = turnPage(position, binding)
+    }
     private var pageIndex: Int = 0
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentFunctionsBinding.inflate(inflater, container, false).apply {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentFunctionsBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = viewLifecycleOwner
             _viewModel.subscribeToVM(this)
 
             initUi()
-            if (savedInstanceState != null) pageIndex = savedInstanceState.getInt(PAGE_INDEX)
-            turnPage(pageIndex, this)
+            if (savedInstanceState != null) {
+                pageIndex = savedInstanceState.getInt(PAGE_INDEX)
+                turnPage(pageIndex, this)
+                notifyPager(pageIndex, this)
+            }
         }
         return binding.root
     }
@@ -45,28 +50,33 @@ class FunctionsFragment: BaseFragment() {
     }
     //</editor-fold>
 
+    override fun loadDemoConfig() {
+        context?.let { _viewModel.loadDemoConfigConfirmed(it) }
+    }
 
     //<editor-fold desc="Private methods">
     private fun FunctionsViewModel.subscribeToVM(binding: FragmentFunctionsBinding) {
-        view?.setupSnackbar(viewLifecycleOwner, _viewModel.snackbarText)
+        snackbarText.observe(viewLifecycleOwner, ::tryToShowSnackbar)
 
         turnPage.observe(viewLifecycleOwner, EventObserver {
             turnPage(it, binding)
+            notifyPager(it, binding)
         })
 
         showDemoConfigDialog.observe(viewLifecycleOwner, EventObserver {
-            view?.showDialog(LOG_TAG, R.string.load_demo_configuration, Action {
+            view?.showDialog(LOG_TAG, R.string.load_demo_configuration_question, {
                 context?.let { _viewModel.loadDemoConfigConfirmed(it) }
-            }, Action {
+            }, {
                 context?.let { _viewModel.loadDemoConfigDeclined(it) }
             })
         })
 
         showCreateHeroesDialog.observe(viewLifecycleOwner, EventObserver {
-            view?.showDialog(LOG_TAG, R.string.create_heroes, Action {
+            view?.showDialog(LOG_TAG, R.string.create_heroes, {
                 turnPage(3, binding)
+                notifyPager(3, binding)
                 _viewModel.createHeroesConfirmed()
-            }, Action {
+            }, {
                 _viewModel.createHeroesDeclined()
             })
         })
@@ -75,16 +85,19 @@ class FunctionsFragment: BaseFragment() {
     private fun FragmentFunctionsBinding.initUi() {
         functionsPager.adapter = FunctionsPagerAdapter(this@FunctionsFragment)
         functionsPager.offscreenPageLimit = 3
-        functionsPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) = turnPage(position, this@initUi)
-        })
+        functionsPager.registerOnPageChangeCallback(pagerListener)
     }
 
     private fun turnPage(pageIndex: Int, binding: FragmentFunctionsBinding) {
-        Logger.d(LOG_TAG, "turnPage. pageIndex=$pageIndex")
+        Timber.d("turnPage. pageIndex=$pageIndex")
         this.pageIndex = pageIndex
         applyPageIndicatorState(pageIndex, binding.trainings, binding.statistics, binding.settings, binding.other)
-        binding.functionsPager.currentItem = pageIndex
+    }
+
+    private fun notifyPager(pageIndex: Int, binding: FragmentFunctionsBinding) {
+        binding.functionsPager.unregisterOnPageChangeCallback(pagerListener)
+        binding.functionsPager.setCurrentItem(pageIndex, false)
+        binding.functionsPager.registerOnPageChangeCallback(pagerListener)
     }
 
     private fun applyPageIndicatorState(

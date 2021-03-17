@@ -2,43 +2,43 @@ package com.devtau.ironHeroes
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import com.devtau.ironHeroes.data.FakeHeroesRemoteDataSource
 import com.devtau.ironHeroes.data.FakeTrainingsRemoteDataSource
 import com.devtau.ironHeroes.data.source.local.DB
-import com.devtau.ironHeroes.data.source.local.exercise.ExerciseLocalDataSource
 import com.devtau.ironHeroes.data.source.local.exercise.ExerciseLocalDataSourceImpl
-import com.devtau.ironHeroes.data.source.local.exerciseInTraining.ExerciseInTrainingLocalDataSource
 import com.devtau.ironHeroes.data.source.local.exerciseInTraining.ExerciseInTrainingLocalDataSourceImpl
 import com.devtau.ironHeroes.data.source.local.hero.HeroesLocalDataSourceImpl
-import com.devtau.ironHeroes.data.source.local.muscleGroup.MuscleGroupLocalDataSource
 import com.devtau.ironHeroes.data.source.local.muscleGroup.MuscleGroupLocalDataSourceImpl
-import com.devtau.ironHeroes.data.source.local.training.TrainingsLocalDataSource
 import com.devtau.ironHeroes.data.source.local.training.TrainingsLocalDataSourceImpl
 import com.devtau.ironHeroes.data.source.repositories.*
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 /**
- * A Service Locator for the [TrainingsRepository]. This is the mock version, with a
- * [FakeTrainingsRemoteDataSource] and [FakeHeroesRemoteDataSource].
+ * A Service Locator for repositories. This is the mock version, with fake RemoteDataSources
  */
 object ServiceLocator {
 
     private val lock = Any()
     private var database: DB? = null
 
-    @Volatile var trainingsRepository: TrainingsRepository? = null
+    @Volatile
+    var trainingsRepository: TrainingsRepository? = null
         @VisibleForTesting set
 
-    @Volatile var heroesRepository: HeroesRepository? = null
+    @Volatile
+    var heroesRepository: HeroesRepository? = null
         @VisibleForTesting set
 
-    @Volatile var exercisesInTrainingsRepository: ExercisesInTrainingsRepository? = null
+    @Volatile
+    var exercisesInTrainingsRepository: ExercisesInTrainingsRepository? = null
         @VisibleForTesting set
 
-    @Volatile var exercisesRepository: ExercisesRepository? = null
+    @Volatile
+    var exercisesRepository: ExercisesRepository? = null
         @VisibleForTesting set
 
-    @Volatile var muscleGroupsRepository: MuscleGroupsRepository? = null
+    @Volatile
+    var muscleGroupsRepository: MuscleGroupsRepository? = null
         @VisibleForTesting set
 
 
@@ -50,17 +50,19 @@ object ServiceLocator {
         return heroesRepository ?: createHeroesRepository(context)
     }
 
-    fun provideExercisesInTrainingsRepository(context: Context): ExercisesInTrainingsRepository = synchronized(this) {
-        return exercisesInTrainingsRepository ?: createExercisesInTrainingsRepository(context)
-    }
+    fun provideExercisesInTrainingsRepository(context: Context): ExercisesInTrainingsRepository =
+        synchronized(this) {
+            return exercisesInTrainingsRepository ?: createExercisesInTrainingsRepository(context)
+        }
 
     fun provideExercisesRepository(context: Context): ExercisesRepository = synchronized(this) {
         return exercisesRepository ?: createExercisesRepository(context)
     }
 
-    fun provideMuscleGroupsRepository(context: Context): MuscleGroupsRepository = synchronized(this) {
-        return muscleGroupsRepository ?: createMuscleGroupsRepository(context)
-    }
+    fun provideMuscleGroupsRepository(context: Context): MuscleGroupsRepository =
+        synchronized(this) {
+            return muscleGroupsRepository ?: createMuscleGroupsRepository(context)
+        }
 
     @VisibleForTesting
     fun resetRepository() = synchronized(lock) {
@@ -78,78 +80,53 @@ object ServiceLocator {
 
 
     private fun createTrainingsRepository(context: Context): TrainingsRepository {
-        fun createDataSource(context: Context): TrainingsLocalDataSource {
-            val database = database ?: createDataBase(context)
-            return TrainingsLocalDataSourceImpl(database.trainingDao())
-        }
-
+        val db = provideDataBase(context)
         val newRepo = TrainingsRepositoryImpl(
-            null,
-            createDataSource(context)
+            TrainingsLocalDataSourceImpl(db.trainingDao())
         )
         trainingsRepository = newRepo
         return newRepo
     }
 
     private fun createHeroesRepository(context: Context): HeroesRepository {
-        fun createDataSource(context: Context): HeroesLocalDataSourceImpl {
-            val database = database ?: createDataBase(context)
-            return HeroesLocalDataSourceImpl(database.heroDao())
-        }
-
+        val db = provideDataBase(context)
         val newRepo = HeroesRepositoryImpl(
-            null,
-            createDataSource(context)
+            HeroesLocalDataSourceImpl(db.heroDao())
         )
         heroesRepository = newRepo
         return newRepo
     }
 
     private fun createExercisesInTrainingsRepository(context: Context): ExercisesInTrainingsRepository {
-        fun createDataSource(context: Context): ExerciseInTrainingLocalDataSource {
-            val database = database ?: createDataBase(context)
-            return ExerciseInTrainingLocalDataSourceImpl(database.exerciseInTrainingDao())
-        }
-
+        val db = provideDataBase(context)
         val newRepo = ExercisesInTrainingsRepositoryImpl(
-            null,
-            createDataSource(context)
+            ExerciseInTrainingLocalDataSourceImpl(db.exerciseInTrainingDao())
         )
         exercisesInTrainingsRepository = newRepo
         return newRepo
     }
 
     private fun createExercisesRepository(context: Context): ExercisesRepository {
-        fun createDataSource(context: Context): ExerciseLocalDataSource {
-            val database = database ?: createDataBase(context)
-            return ExerciseLocalDataSourceImpl(database.exerciseDao())
-        }
-
+        val db = provideDataBase(context)
         val newRepo = ExercisesRepositoryImpl(
-            null,
-            createDataSource(context)
+            ExerciseLocalDataSourceImpl(db.exerciseDao())
         )
         exercisesRepository = newRepo
         return newRepo
     }
 
     private fun createMuscleGroupsRepository(context: Context): MuscleGroupsRepository {
-        fun createDataSource(context: Context): MuscleGroupLocalDataSource {
-            val database = database ?: createDataBase(context)
-            return MuscleGroupLocalDataSourceImpl(database.muscleGroupDao())
-        }
-
+        val db = provideDataBase(context)
         val newRepo = MuscleGroupsRepositoryImpl(
-            null,
-            createDataSource(context)
+            MuscleGroupLocalDataSourceImpl(db.muscleGroupDao())
         )
         muscleGroupsRepository = newRepo
         return newRepo
     }
 
-    private fun createDataBase(context: Context): DB {
-        val result = DB.getInstance(context)
-        database = result
-        return result
+    private fun provideDataBase(context: Context): DB = database ?: with(DB.getInstance(context)) {
+        Timber.d("db initialized")
+        database = this
+        this
     }
 }

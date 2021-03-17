@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.Training
-import com.devtau.ironHeroes.util.Logger
+import timber.log.Timber
 
 class TrainingRelation {
 
@@ -25,16 +25,11 @@ class TrainingRelation {
         }
 
         if (msg != null) {
-            Logger.e(LOG_TAG, msg)
+            Timber.e(msg)
             return training
         }
         training.champion = champion
         training.hero = hero
         return training
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "TrainingRelation"
     }
 }

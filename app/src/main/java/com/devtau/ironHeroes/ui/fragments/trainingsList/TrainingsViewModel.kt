@@ -14,9 +14,9 @@ import com.devtau.ironHeroes.data.source.repositories.TrainingsRepository
 import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.Event
-import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.prefs.PreferencesManager
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class TrainingsViewModel(
     private val trainingsRepository: TrainingsRepository,
@@ -24,7 +24,7 @@ class TrainingsViewModel(
     private val prefs: PreferencesManager?
 ): BaseViewModel() {
 
-    private val forceUpdateHeroes = MutableLiveData<Boolean>(false)
+    private val forceUpdateHeroes = MutableLiveData(false)
     private val forceUpdateTrainings = MutableLiveData<Boolean>()
 
     private val _trainings: LiveData<List<Training>> = forceUpdateTrainings.switchMap { forceUpdate ->
@@ -65,14 +65,12 @@ class TrainingsViewModel(
                     if (selectedChampionId != item?.id) {
                         selectedChampionId = item?.id
                         forceUpdateTrainings.value = false
-                        Logger.d(LOG_TAG, "onHeroSelected. heroId=${item?.id}, humanType=$humanType")
                     }
                 }
                 HumanType.HERO -> {
                     if (selectedHeroId != item?.id) {
                         selectedHeroId = item?.id
                         forceUpdateTrainings.value = false
-                        Logger.d(LOG_TAG, "onHeroSelected. heroId=${item?.id}, humanType=$humanType")
                     }
                 }
             }
@@ -80,20 +78,19 @@ class TrainingsViewModel(
     }
 
 
-    private val _openTrainingEvent = MutableLiveData<Event<Long>>()
-    val openTrainingEvent: LiveData<Event<Long>> = _openTrainingEvent
-    fun openTraining() = openTraining(Constants.OBJECT_ID_NA)//OBJECT_ID_NA for adding new item
+    val openTrainingEvent = MutableLiveData<Event<Long>>()
+    fun addTraining() = openTraining(Constants.OBJECT_ID_NA)
     fun openTraining(id: Long?) {
-        if (id != null) _openTrainingEvent.value = Event(id)
+        if (id != null) openTrainingEvent.value = Event(id)
     }
 
 
     private fun processTrainingsFromDB(result: Result<List<Training>?>): LiveData<List<Training>> =
         if (result is Success && result.data != null) {
-            Logger.d(LOG_TAG, "got new trainings list. size=${result.data.size}")
+            Timber.d("got new trainings list. size=${result.data.size}")
             filterTrainingsIfPossible(result.data, selectedChampionId, selectedHeroId, prefs)
         } else {
-            _snackbarText.value = Event(R.string.error_trainings_list)
+            snackbarText.value = Event(R.string.error_trainings_list)
             MutableLiveData(emptyList())
         }
 
@@ -106,14 +103,14 @@ class TrainingsViewModel(
         val liveData = MutableLiveData<List<Training>>()
 
         if (trainings == null) {
-            Logger.w(LOG_TAG, "filterTrainingsIfPossible. some data not ready. aborting")
+            Timber.w("filterTrainingsIfPossible. some data not ready. aborting")
             return liveData
         }
 
         saveState(selectedChampionId, selectedHeroId, prefs)
 
         liveData.value = filterTrainings(trainings, selectedChampionId, selectedHeroId)
-        Logger.d(LOG_TAG, "filterTrainingsIfPossible. trainings filtered size=${liveData.value?.size}")
+        Timber.d("filterTrainingsIfPossible. trainings filtered size=${liveData.value?.size}")
         isTrainingsListLoaded = true
         return liveData
     }
@@ -132,10 +129,5 @@ class TrainingsViewModel(
             prefs?.favoriteChampionId = championId
         if (prefs?.favoriteHeroId != heroId)
             prefs?.favoriteHeroId = heroId
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "TrainingsViewModel"
     }
 }

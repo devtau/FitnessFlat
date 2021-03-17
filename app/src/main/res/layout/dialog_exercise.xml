@@ -91,7 +91,7 @@
 				android:text="@={viewModel.repeats}"/>
 			
 			<TextView
-				android:text="*"
+				android:text="@string/asterisk"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="@dimen/marginHalf"
@@ -125,7 +125,7 @@
 				
 				<EditText
 					android:id="@+id/recreationInput"
-					android:text="90"
+					android:text="@string/ninety"
 					android:hint="@string/recreation"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
@@ -188,9 +188,8 @@
 		</com.google.android.material.textfield.TextInputLayout>
 		
 		<TextView
-			android:id="@+id/previousExerciseData"
 			android:text="@string/previous_exercise_data"
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="@dimen/marginHalf"
 			android:layout_marginLeft="@dimen/marginHalf"
@@ -200,8 +199,9 @@
 			android:textStyle="italic"/>
 		
 		<TextView
+			android:id="@+id/previousExerciseData"
 			tools:text="@string/no_data"
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="@dimen/marginHalf"
 			android:layout_marginRight="@dimen/marginNormal"

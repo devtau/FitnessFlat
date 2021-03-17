@@ -21,7 +21,7 @@
         android:paddingBottom="@dimen/marginHalf"
         android:paddingLeft="@dimen/marginNormal"
         android:paddingRight="@dimen/marginNormal"
-        style="@style/SelectableItemBackground"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:onClick="@{() -> viewModel.openTraining(training.id)}">
@@ -29,8 +29,8 @@
         <ImageView
             android:id="@+id/championImage"
             tools:src="@color/colorAccent"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/iconSize"
+            android:layout_height="@dimen/iconSize"
             android:scaleType="centerCrop"
             app:humanImage="@{training.champion}"/>
         
@@ -46,8 +46,8 @@
         <ImageView
             android:id="@+id/heroImage"
             tools:src="@color/colorAccent"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/iconSize"
+            android:layout_height="@dimen/iconSize"
             android:scaleType="centerCrop"
             app:humanImage="@{training.hero}"/>
     </LinearLayout>

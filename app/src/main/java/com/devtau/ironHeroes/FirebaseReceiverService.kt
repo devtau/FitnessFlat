@@ -1,8 +1,8 @@
 package com.devtau.ironHeroes
 
-import com.devtau.ironHeroes.util.Logger
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import timber.log.Timber
 
 class FirebaseReceiverService: FirebaseMessagingService() {
 
@@ -14,16 +14,11 @@ class FirebaseReceiverService: FirebaseMessagingService() {
                 "текст сообщения: " + remoteMessage.notification?.body + ", " +
                 "пользовательские данные: " + remoteMessage.data + ", " +
                 "отправитель: " + remoteMessage.from
-        Logger.d(LOG_TAG, msg)
+        Timber.d(msg)
     }
 
     override fun onNewToken(refreshedToken: String) {
-        Logger.d(LOG_TAG, "refreshedToken: $refreshedToken")
+        Timber.d("refreshedToken: $refreshedToken")
 //        prefs.firebaseToken = refreshedToken
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "FirebaseReceiverService"
     }
 }

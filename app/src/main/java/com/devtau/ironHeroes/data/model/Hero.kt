@@ -38,33 +38,28 @@ data class Hero(
 
     fun getFormattedBirthday() = DateUtils.formatDate(birthDay)
 
-    fun someFieldsChanged(humanType: HumanType, firstName: String?, secondName: String?, phone: String?, gender: String?,
-                          vkId: String?, email: String?, birthDay: Long?,
-                          avatarUrl: String?, avatarId: Int?) =
-        humanType != this.humanType
-                || firstName != this.firstName
-                || secondName != this.secondName
-                || phone != this.phone
-                || gender != this.gender
-                || vkId != this.vkId
-                || email != this.email
-                || birthDay != this.birthDay
-                || avatarUrl != this.avatarUrl
-                || avatarId != this.avatarId
+    fun someFieldsChanged(
+        humanType: HumanType, firstName: String?, secondName: String?, phone: String?,
+        gender: String?, vkId: String?, email: String?, birthDay: Long?,
+        avatarUrl: String?, avatarId: Int?) = humanType != this.humanType
+            || firstName != this.firstName
+            || secondName != this.secondName
+            || phone != this.phone
+            || gender != this.gender
+            || vkId != this.vkId
+            || email != this.email
+            || birthDay != this.birthDay
+            || avatarUrl != this.avatarUrl
+            || avatarId != this.avatarId
 
 
     companion object {
-        fun allObligatoryPartsPresent(firstName: String?, secondName: String?, phone: String?, gender: String?) =
-            !TextUtils.isEmpty(firstName)
-                    && !TextUtils.isEmpty(secondName)
-                    && !TextUtils.isEmpty(phone)
-                    && !TextUtils.isEmpty(gender)
-
-        fun allObligatoryPartsPresent(firstName: String?, secondName: String?, phone: String?, gender: Gender?) =
-            !TextUtils.isEmpty(firstName)
-                    && !TextUtils.isEmpty(secondName)
-                    && !TextUtils.isEmpty(phone)
-                    && gender != null
+        fun allObligatoryPartsPresent(
+            firstName: String?, secondName: String?, phone: String?, gender: Gender?
+        ) = !TextUtils.isEmpty(firstName)
+                && !TextUtils.isEmpty(secondName)
+                && !TextUtils.isEmpty(phone)
+                && gender != null
 
         fun getMockChampions(c: Context): List<Hero> {
             val romaPhone = if (BuildConfig.DEBUG) "+79111718219" else "+79210000000"
@@ -85,9 +80,5 @@ data class Hero(
                     denisPhone, Gender.MALE.code, "devtau", "d29025@yandex.ru",
                     DateUtils.parseDate("25.09.1983").timeInMillis, null, R.drawable.denis))
         }
-
-//        "https://yadi.sk/i/hZhu1zg73GNum4"
-//        "https://drive.google.com/open?id=0BwZwHCn4b4EseUZKYVB6eW1acTQ"
-//        "https://img2.freepng.ru/20180425/jrq/kisspng-youtube-avatar-clip-art-5ae0f8f81d8590.5706172815246932401209.jpg"
     }
 }

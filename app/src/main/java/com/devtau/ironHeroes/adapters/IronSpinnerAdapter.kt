@@ -19,6 +19,7 @@ class IronSpinnerAdapter(
 ): ArrayAdapter<SpinnerItem>(context, listItemRes, values) {
 
     override fun getCount(): Int = values.size + if (withHeader) 1 else 0
+
     override fun getItem(position: Int): SpinnerItem? =
         if (withHeader && position == 0) {
             null

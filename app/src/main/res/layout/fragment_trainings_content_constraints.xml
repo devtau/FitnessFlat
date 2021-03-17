@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	tools:context=".ui.fragments.trainingsList.TrainingsFragment">
+	
+	<data>
+		<import type="android.view.View" />
+		
+		<variable
+			name="viewModel"
+			type="com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsViewModel" />
+	</data>
+	
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		
+		<TextView
+			android:id="@+id/champion_text"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:paddingLeft="@dimen/marginNormal"
+			android:paddingRight="@dimen/marginNormal"
+			android:text="@string/champion"
+			android:textColor="@color/secondaryTextColor"
+			android:textSize="@dimen/secondaryTextSize"
+			android:visibility="@{viewModel.showChampionFilter ? View.VISIBLE : View.GONE}"
+			app:layout_constraintEnd_toStartOf="@+id/hero_text"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
+		
+		<Spinner
+			android:id="@+id/champion"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/marginHalf"
+			android:paddingLeft="@dimen/marginHalf"
+			android:paddingRight="@dimen/marginHalf"
+			android:visibility="@{viewModel.showChampionFilter ? View.VISIBLE : View.GONE}"
+			app:layout_constraintEnd_toStartOf="@+id/hero"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/champion_text"
+			app:onItemSelectedListener="@{viewModel.heroSelectedListener}"
+			app:selectedItem="@{viewModel.selectedChampionId}"
+			app:spinnerItems="@{viewModel.champions}" />
+		
+		<TextView
+			android:id="@+id/hero_text"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:paddingLeft="@dimen/marginNormal"
+			android:paddingRight="@dimen/marginNormal"
+			android:text="@string/hero"
+			android:textColor="@color/secondaryTextColor"
+			android:textSize="@dimen/secondaryTextSize"
+			android:visibility="@{viewModel.showHeroFilter ? View.VISIBLE : View.GONE}"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@id/champion_text"
+			app:layout_constraintTop_toTopOf="parent" />
+		
+		<Spinner
+			android:id="@+id/hero"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/marginHalf"
+			android:paddingLeft="@dimen/marginHalf"
+			android:paddingRight="@dimen/marginHalf"
+			android:visibility="@{viewModel.showHeroFilter ? View.VISIBLE : View.GONE}"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@id/champion"
+			app:layout_constraintTop_toBottomOf="@id/hero_text"
+			app:onItemSelectedListener="@{viewModel.heroSelectedListener}"
+			app:selectedItem="@{viewModel.selectedHeroId}"
+			app:spinnerItems="@{viewModel.heroes}" />
+		
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/listView"
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/champion"
+			app:listItems="@{viewModel.trainings}"
+			tools:listitem="@layout/list_item_training" />
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

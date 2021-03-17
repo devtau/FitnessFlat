@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	tools:context=".ui.fragments.trainingsList.TrainingsFragment">
+	
+	<data>
+		<import type="android.view.View" />
+		
+		<variable
+			name="viewModel"
+			type="com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsViewModel" />
+	</data>
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical">
+		
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/colorWhite"
+			android:elevation="4dp"
+			android:orientation="horizontal"
+			android:baselineAligned="false">
+			
+			<LinearLayout
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingBottom="@dimen/marginHalf"
+				android:orientation="vertical"
+				android:visibility="@{viewModel.showChampionFilter ? View.VISIBLE : View.GONE}">
+				
+				<TextView
+					android:text="@string/champion"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:paddingLeft="@dimen/marginNormal"
+					android:paddingRight="@dimen/marginNormal"
+					android:textColor="@color/secondaryTextColor"
+					android:textSize="@dimen/secondaryTextSize"/>
+				
+				<Spinner
+					android:id="@+id/champion"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="@dimen/marginHalf"
+					android:paddingLeft="@dimen/marginHalf"
+					android:paddingRight="@dimen/marginHalf"
+					app:spinnerItems="@{viewModel.champions}"
+					app:selectedItem="@{viewModel.selectedChampionId}"
+					app:onItemSelectedListener="@{viewModel.heroSelectedListener}"/>
+			</LinearLayout>
+			
+			<LinearLayout
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:paddingTop="@dimen/marginHalf"
+				android:paddingBottom="@dimen/marginHalf"
+				android:orientation="vertical"
+				android:visibility="@{viewModel.showHeroFilter ? View.VISIBLE : View.GONE}">
+				
+				<TextView
+					android:text="@string/hero"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:paddingLeft="@dimen/marginNormal"
+					android:paddingRight="@dimen/marginNormal"
+					android:textColor="@color/secondaryTextColor"
+					android:textSize="@dimen/secondaryTextSize"/>
+				
+				<Spinner
+					android:id="@+id/hero"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="@dimen/marginHalf"
+					android:paddingLeft="@dimen/marginHalf"
+					android:paddingRight="@dimen/marginHalf"
+					app:spinnerItems="@{viewModel.heroes}"
+					app:selectedItem="@{viewModel.selectedHeroId}"
+					app:onItemSelectedListener="@{viewModel.heroSelectedListener}"/>
+			</LinearLayout>
+		</LinearLayout>
+		
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/listView"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+			app:listItems="@{viewModel.trainings}"
+			tools:listitem="@layout/list_item_training"/>
+	</LinearLayout>
+</layout>

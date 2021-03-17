@@ -9,8 +9,8 @@ import com.devtau.ironHeroes.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.*
 
 class MuscleGroupsRepositoryImpl(
-    private val remote: MuscleGroupLocalDataSource?,
     private val local: MuscleGroupLocalDataSource,
+    private val remote: MuscleGroupLocalDataSource? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ): MuscleGroupsRepository {
 

@@ -10,8 +10,8 @@ import com.devtau.ironHeroes.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.*
 
 class HeroesRepositoryImpl(
-    private val remote: HeroesLocalDataSource?,
     private val local: HeroesLocalDataSource,
+    private val remote: HeroesLocalDataSource? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ): HeroesRepository {
 

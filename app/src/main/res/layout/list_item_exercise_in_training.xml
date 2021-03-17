@@ -21,7 +21,7 @@
         android:paddingBottom="@dimen/marginHalf"
         android:paddingLeft="@dimen/marginNormal"
         android:paddingRight="@dimen/marginNormal"
-        style="@style/SelectableItemBackground"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal"
         android:onClick="@{() -> viewModel.openExercise(exerciseInTraining)}">
         
@@ -44,7 +44,7 @@
             android:layout_marginLeft="8dp"/>
         
         <TextView
-            android:text="*"
+            android:text="@string/asterisk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"/>
@@ -58,7 +58,7 @@
             android:layout_marginLeft="4dp"/>
         
         <TextView
-            android:text="*"
+            android:text="@string/asterisk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"/>

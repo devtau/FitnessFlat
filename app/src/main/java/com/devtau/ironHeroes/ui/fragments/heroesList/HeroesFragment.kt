@@ -8,24 +8,21 @@ import androidx.fragment.app.viewModels
 import com.devtau.ironHeroes.adapters.HeroesAdapter
 import com.devtau.ironHeroes.databinding.FragmentHeroesBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
-import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
-import com.devtau.ironHeroes.ui.fragments.initActionBar
-import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.EventObserver
 
 class HeroesFragment: BaseFragment() {
 
-    private val _viewModel by viewModels<HeroesListViewModel> { getViewModelFactory() }
+    private val _viewModel by viewModels<HeroesViewModel> { getViewModelFactory() }
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentHeroesBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = viewLifecycleOwner
             _viewModel.subscribeToVM(this)
 
-            fab.postDelayed({ fab.show() }, Constants.STANDARD_DELAY_MS)
+            fab.postDelayed({ fab.show() }, android.R.integer.config_mediumAnimTime.toLong())
             listView.adapter = HeroesAdapter(_viewModel)
         }
         return binding.root
@@ -34,18 +31,10 @@ class HeroesFragment: BaseFragment() {
 
 
     //<editor-fold desc="Private methods">
-    private fun HeroesListViewModel.subscribeToVM(binding: FragmentHeroesBinding) {
-        toolbarTitle.observe(viewLifecycleOwner, EventObserver {
-            activity?.initActionBar(it)
-        })
+    private fun HeroesViewModel.subscribeToVM(binding: FragmentHeroesBinding) {
         openHeroEvent.observe(viewLifecycleOwner, EventObserver {
-            coordinator.launchHeroDetails(binding.listView, it.heroId, it.humanType)
+            launchHeroDetails(binding.listView, it.heroId, it.humanType)
         })
     }
     //</editor-fold>
-
-
-    companion object {
-        private const val LOG_TAG = "HeroesFragment"
-    }
 }

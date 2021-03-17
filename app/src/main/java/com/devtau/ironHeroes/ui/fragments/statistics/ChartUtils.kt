@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import android.widget.TextView
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.util.Logger
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
@@ -12,11 +11,10 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import timber.log.Timber
 import java.util.*
 
 object ChartUtils {
-
-    private const val LOG_TAG = "ChartUtils"
 
     fun initChart(context: Context?, chart: LineChart?, selected: TextView?,
                   lineData: LineData?, xLabels: List<Calendar>, xLabelsCount: Int,
@@ -24,8 +22,6 @@ object ChartUtils {
     ) {
         context ?: return
         chart ?: return
-//        chart.setViewPortOffsets(0f, 0f, 0f, 0f)
-//        chart.setBackgroundColor(Color.rgb(104, 241, 175))
         chart.description.isEnabled = false
         chart.setTouchEnabled(true)
         chart.isDragEnabled = true
@@ -49,17 +45,11 @@ object ChartUtils {
                 exerciseId = tag?.exerciseInTrainingId
                 selected?.visibility = View.VISIBLE
                 val exerciseName = tag?.title?.replace("\n", " ")
-                selected?.text = String.format(context.getString(R.string.selected_formatter, exerciseName))
-                Logger.d(
-                    LOG_TAG,
-                    "onValueSelected. trainingId=$trainingId, exerciseId=$exerciseId"
-                )
+                selected?.text = context.getString(R.string.selected_formatter, exerciseName)
+                Timber.d("onValueSelected. trainingId=$trainingId, exerciseId=$exerciseId")
             }
             override fun onNothingSelected() {
-                closeHighlight(
-                    chart,
-                    selected
-                )
+                closeHighlight(chart, selected)
                 listener.onBalloonClicked(trainingId, exerciseId)
             }
         })
@@ -78,7 +68,6 @@ object ChartUtils {
         chart.extraBottomOffset = chart.rendererXAxis.paintAxisLabels.textSize
         chart.axisRight?.isEnabled = false
         chart.data = lineData
-//        chart.animateXY(400, 400)
         chart.invalidate()
     }
 
@@ -93,16 +82,13 @@ object ChartUtils {
         xAxis.setDrawGridLines(true)
 
         chart.setXAxisRenderer(
-            CustomXAxisRenderer(chart.viewPortHandler, xAxis, chart.getTransformer(
-                YAxis.AxisDependency.LEFT), xLabels)
+            CustomXAxisRenderer(
+                chart.viewPortHandler,
+                xAxis,
+                chart.getTransformer(YAxis.AxisDependency.LEFT),
+                xLabels
+            )
         )
-//        xAxis.axisLineColor = Color.TRANSPARENT
-//        xAxis.axisMinimum = -1f
-//        xAxis.axisMaximum = labelsCount.toFloat()
-//        xAxis.valueFormatter = object: ValueFormatter() {
-//            override fun getFormattedValue(value: Float, axis: AxisBase?) =
-//                statisticsType?.getFormattedValue(this@StatisticsActivity, value.toInt())
-//        }
     }
 
     private fun tuneYAxis(chart: LineChart, axisTextColor: Int, axisMinimum: Int) {
@@ -112,12 +98,6 @@ object ChartUtils {
         yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
         yAxis.setDrawGridLines(true)
         yAxis.axisMinimum = axisMinimum.toFloat()
-//        yAxis.valueFormatter = object: ValueFormatter() {
-//            override fun getFormattedValue(value: Float, axis: AxisBase?) = if (value == 0f) "" else value.toInt().toString()
-//        }
-//        yAxis.axisLineColor = Color.TRANSPARENT
-//        yAxis.xOffset = -5f
-//        yAxis.typeface = someTypeface
     }
 
     private fun closeHighlight(chart: LineChart?, selected: TextView?) {

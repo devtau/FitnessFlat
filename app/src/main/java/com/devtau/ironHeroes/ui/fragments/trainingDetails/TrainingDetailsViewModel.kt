@@ -1,7 +1,6 @@
 package com.devtau.ironHeroes.ui.fragments.trainingDetails
 
 import androidx.lifecycle.*
-import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.adapters.IronSpinnerAdapter.ItemSelectedListener
 import com.devtau.ironHeroes.data.Result
 import com.devtau.ironHeroes.data.Result.Success
@@ -18,12 +17,9 @@ import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.DateUtils
 import com.devtau.ironHeroes.util.Event
-import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.prefs.PreferencesManager
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import java.util.*
 
 class TrainingDetailsViewModel(
@@ -34,18 +30,16 @@ class TrainingDetailsViewModel(
     private var trainingId: Long?
 ): ViewModel() {
 
-    private val _training = MutableLiveData<Training?>(null)
-    val training: LiveData<Training?> = _training
+    val training = MutableLiveData<Training?>(null)
 
 
     private val forceUpdateHeroes = MutableLiveData(false)
 
 
-    private val _trainingDate = MutableLiveData<String>()
-    val trainingDate: LiveData<String> = _trainingDate
+    val trainingDate = MutableLiveData<String>()
     fun updateTrainingDate(year: Int, month: Int, dayOfMonth: Int, hour: Int, minute: Int) {
         val date = DateUtils.getRoundDate(year, month, dayOfMonth, hour, minute)
-        _trainingDate.value = DateUtils.formatDateTimeWithWeekDay(date)
+        trainingDate.value = DateUtils.formatDateTimeWithWeekDay(date)
         updateTraining()
     }
     fun deleteTraining() {
@@ -56,17 +50,12 @@ class TrainingDetailsViewModel(
                 trainingsRepository.deleteItem(training)
                 exercisesInTrainingsRepository.deleteListForTraining(trainingId)
             }
-            _closeScreenEvent.value = Event(Unit)
+            closeScreenEvent.value = Event(Unit)
         }
     }
 
 
-    val toolbarTitle: LiveData<Event<Int>> = MutableLiveData(Event(
-        if (trainingId == null) R.string.training_add else R.string.training_edit
-    ))
-
-
-    private val _exercises: LiveData<List<ExerciseInTraining>?> = _training.switchMap { training ->
+    private val _exercises: LiveData<List<ExerciseInTraining>?> = training.switchMap { training ->
         exercisesInTrainingsRepository.observeListForTraining(training?.id).switchMap {
             processExercisesFromDB(it)
         }
@@ -82,26 +71,6 @@ class TrainingDetailsViewModel(
         viewModelScope.launch {
             exercisesInTrainingsRepository.saveList(exercises)
         }
-
-        runBlocking {
-            launch {
-                delay(200L)
-                println("Hello 1")
-            }
-
-            coroutineScope {
-                launch {
-                    delay(500L)
-                    println("Hello 2")
-                }
-
-                delay(100L)
-                println("Hello 3")
-
-            }
-
-            println("Hello 4")
-        }
     }
 
 
@@ -110,8 +79,7 @@ class TrainingDetailsViewModel(
             MutableLiveData(if (it is Success) it.data else emptyList())
         }
     }
-    private val _selectedChampionId = MutableLiveData<Long?>()
-    val selectedChampionId: LiveData<Long?> = _selectedChampionId
+    val selectedChampionId = MutableLiveData<Long?>()
 
 
     val heroes: LiveData<List<Hero>> = forceUpdateHeroes.switchMap {
@@ -119,25 +87,22 @@ class TrainingDetailsViewModel(
             MutableLiveData(if (it is Success) it.data else emptyList())
         }
     }
-    private val _selectedHeroId = MutableLiveData<Long?>()
-    val selectedHeroId: LiveData<Long?> = _selectedHeroId
+    val selectedHeroId = MutableLiveData<Long?>()
 
 
     val heroSelectedListener = object: ItemSelectedListener {
         override fun onItemSelected(item: SpinnerItem?, humanType: HumanType?) {
             when (humanType) {
                 HumanType.HERO -> {
-                    if (_selectedHeroId.value != item?.id) {
-                        _selectedHeroId.value = item?.id
+                    if (selectedHeroId.value != item?.id) {
+                        selectedHeroId.value = item?.id
                         updateTraining()
-                        Logger.d(LOG_TAG, "onHeroSelected. heroId=${item?.id}, humanType=$humanType")
                     }
                 }
                 HumanType.CHAMPION -> {
-                    if (_selectedChampionId.value != item?.id) {
-                        _selectedChampionId.value = item?.id
+                    if (selectedChampionId.value != item?.id) {
+                        selectedChampionId.value = item?.id
                         updateTraining()
-                        Logger.d(LOG_TAG, "onHeroSelected. heroId=${item?.id}, humanType=$humanType")
                     }
                 }
             }
@@ -145,8 +110,7 @@ class TrainingDetailsViewModel(
     }
 
 
-    private val _showDateDialog = MutableLiveData<Event<DatePickerDialogDataWrapper>>()
-    val showDateDialog: LiveData<Event<DatePickerDialogDataWrapper>> = _showDateDialog
+    val showDateDialog = MutableLiveData<Event<DatePickerDialogDataWrapper>>()
     fun dateDialogRequested() {
         val trainingDate = training.value?.date
         val selectedDate = Calendar.getInstance()
@@ -158,21 +122,20 @@ class TrainingDetailsViewModel(
         val nowPlusTwoDays = Calendar.getInstance()
         nowPlusTwoDays.add(Calendar.DAY_OF_MONTH, 2)
 
-        _showDateDialog.value = Event(DatePickerDialogDataWrapper(selectedDate, nowMinusCentury, nowPlusTwoDays))
+        showDateDialog.value = Event(DatePickerDialogDataWrapper(selectedDate, nowMinusCentury, nowPlusTwoDays))
     }
 
 
-    private val _openExerciseEvent = MutableLiveData<Event<EditDialogDataWrapper>>()
-    val openExerciseEvent: LiveData<Event<EditDialogDataWrapper>> = _openExerciseEvent
+    val openExerciseEvent = MutableLiveData<Event<EditDialogDataWrapper>>()
     fun openExercise() = openExercise(null)//null for add new item
     fun openExercise(item: ExerciseInTraining?) {
         val heroId = training.value?.heroId
         val trainingId = training.value?.id
         if (heroId == null || trainingId == null) {
-            Logger.e(LOG_TAG, "openExercise. bad data. aborting")
+            Timber.e("openExercise. bad data. aborting")
             return
         }
-        _openExerciseEvent.value = Event(EditDialogDataWrapper(
+        openExerciseEvent.value = Event(EditDialogDataWrapper(
             heroId,
             trainingId,
             item?.id ?: Constants.OBJECT_ID_NA,
@@ -180,41 +143,39 @@ class TrainingDetailsViewModel(
         ))
     }
 
-    private val _closeScreenEvent = MutableLiveData<Event<Unit>>()
-    val closeScreenEvent: LiveData<Event<Unit>> = _closeScreenEvent
+    val closeScreenEvent = MutableLiveData<Event<Unit>>()
 
 
     private fun processExercisesFromDB(result: Result<List<ExerciseInTraining>?>): LiveData<List<ExerciseInTraining>?> =
         if (result is Success && result.data != null) {
-            Logger.d(LOG_TAG, "got new exercises=${result.data}")
+            Timber.d("got new exercises=${result.data}")
             MutableLiveData(result.data)
         } else {
             MutableLiveData(null)
         }
 
     private fun getNextExercisePosition(): Int = with(training.value?.exercises) {
-        if (this == null || this.isEmpty()) 0
-        else this.maxBy { it.position }!!.position + 1
+        val max = this?.maxByOrNull { it.position }
+        if (max == null) 0 else max.position + 1
     }
 
     private fun updateTraining() {
-        val training = _training.value
-        val championId = _selectedChampionId.value
-        val heroId = _selectedHeroId.value
-        val date = DateUtils.parseDateTimeWithWeekDay(_trainingDate.value)?.timeInMillis
+        val training = training.value
+        val championId = selectedChampionId.value
+        val heroId = selectedHeroId.value
+        val date = DateUtils.parseDateTimeWithWeekDay(trainingDate.value)?.timeInMillis
         if (!Training.allObligatoryPartsPresent(championId, heroId, date)) {
-            Logger.w(LOG_TAG, "updateTraining. some data missing. aborting")
+            Timber.w("updateTraining. some data missing. aborting")
             return
         }
 
-        Logger.d(LOG_TAG, "updateTraining. training={$training}, championId=$championId, heroId=$heroId," +
-                " date=${DateUtils.formatDateTimeWithWeekDay(date)}")
+        Timber.d("updateTraining. training={$training}, championId=$championId, heroId=$heroId, date=${DateUtils.formatDateTimeWithWeekDay(date)}")
         if (trainingId == null || training == null) {
             viewModelScope.launch {
                 val newTraining = Training(null, championId!!, heroId!!, date!!)
                 trainingId = trainingsRepository.saveItem(newTraining)
                 newTraining.id = trainingId
-                _training.value = newTraining
+                this@TrainingDetailsViewModel.training.value = newTraining
             }
             return
         }
@@ -223,7 +184,7 @@ class TrainingDetailsViewModel(
             viewModelScope.launch {
                 val updatedTraining = Training(trainingId, championId!!, heroId!!, date!!)
                 trainingsRepository.saveItem(updatedTraining)
-                _training.value = updatedTraining
+                this@TrainingDetailsViewModel.training.value = updatedTraining
             }
         }
     }
@@ -236,25 +197,20 @@ class TrainingDetailsViewModel(
 
     init {
         if (trainingId == null) {
-            _training.value = null
-            _trainingDate.value = DateUtils.formatDateTimeWithWeekDay(DateUtils.getRoundDate())
-            _selectedChampionId.value = getSelectedHumanId(prefs, HumanType.CHAMPION)
-            _selectedHeroId.value = getSelectedHumanId(prefs, HumanType.HERO)
+            training.value = null
+            trainingDate.value = DateUtils.formatDateTimeWithWeekDay(DateUtils.getRoundDate())
+            selectedChampionId.value = getSelectedHumanId(prefs, HumanType.CHAMPION)
+            selectedHeroId.value = getSelectedHumanId(prefs, HumanType.HERO)
         } else {
             viewModelScope.launch {
                 val result = trainingsRepository.getItem(trainingId)
                 if (result is Success && result.data != null) {
-                    _training.value = result.data
-                    _trainingDate.value = result.data.formatDateTimeWithWeekDay()
-                    _selectedChampionId.value = getSelectedHumanId(prefs, HumanType.CHAMPION, result.data)
-                    _selectedHeroId.value = getSelectedHumanId(prefs, HumanType.HERO, result.data)
+                    training.value = result.data
+                    trainingDate.value = result.data.formatDateTimeWithWeekDay()
+                    selectedChampionId.value = getSelectedHumanId(prefs, HumanType.CHAMPION, result.data)
+                    selectedHeroId.value = getSelectedHumanId(prefs, HumanType.HERO, result.data)
                 }
             }
         }
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "TrainingDetailsViewModel"
     }
 }

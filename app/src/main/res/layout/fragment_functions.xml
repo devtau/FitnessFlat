@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	tools:context=".ui.fragments.functions.FunctionsFragment">
 	
@@ -34,55 +35,55 @@
 			
 			<TextView
 				android:id="@+id/trainings"
-				style="@style/SelectableItemBackground"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:drawableTop="@drawable/ic_workouts_gray"
 				android:gravity="center_horizontal"
 				android:paddingTop="8dp"
 				android:paddingBottom="8dp"
 				android:text="@string/trainings"
-				android:onClick="@{() -> viewModel.turnPage(0)}" />
+				android:background="?attr/selectableItemBackground"
+				android:onClick="@{() -> viewModel.turnPage(0)}"
+				app:drawableTopCompat="@drawable/ic_workouts_gray" />
 			
 			<TextView
 				android:id="@+id/statistics"
-				style="@style/SelectableItemBackground"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:drawableTop="@drawable/ic_statistics_gray"
 				android:gravity="center_horizontal"
 				android:paddingTop="8dp"
 				android:paddingBottom="8dp"
 				android:text="@string/statistics"
-				android:onClick="@{() -> viewModel.turnPage(1)}" />
+				android:background="?attr/selectableItemBackground"
+				android:onClick="@{() -> viewModel.turnPage(1)}"
+				app:drawableTopCompat="@drawable/ic_statistics_gray" />
 			
 			<TextView
 				android:id="@+id/settings"
-				style="@style/SelectableItemBackground"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:drawableTop="@drawable/ic_settings_gray"
 				android:gravity="center_horizontal"
 				android:paddingTop="8dp"
 				android:paddingBottom="8dp"
 				android:text="@string/settings"
-				android:onClick="@{() -> viewModel.turnPage(2)}" />
+				android:background="?attr/selectableItemBackground"
+				android:onClick="@{() -> viewModel.turnPage(2)}"
+				app:drawableTopCompat="@drawable/ic_settings_gray" />
 			
 			<TextView
 				android:id="@+id/other"
-				style="@style/SelectableItemBackground"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:drawableTop="@drawable/ic_other_gray"
 				android:gravity="center_horizontal"
 				android:paddingTop="8dp"
 				android:paddingBottom="8dp"
 				android:text="@string/other"
-				android:onClick="@{() -> viewModel.turnPage(3)}" />
+				android:background="?attr/selectableItemBackground"
+				android:onClick="@{() -> viewModel.turnPage(3)}"
+				app:drawableTopCompat="@drawable/ic_other_gray" />
 		</LinearLayout>
 	</LinearLayout>
 </layout>

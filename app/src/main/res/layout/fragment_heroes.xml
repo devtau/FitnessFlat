@@ -9,7 +9,7 @@
 		
 		<variable
 			name="viewModel"
-			type="com.devtau.ironHeroes.ui.fragments.heroesList.HeroesListViewModel" />
+			type="com.devtau.ironHeroes.ui.fragments.heroesList.HeroesViewModel" />
 	</data>
 	
 	<androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -33,6 +33,6 @@
 			android:layout_margin="@dimen/marginNormal"
 			android:visibility="invisible"
 			app:srcCompat="@drawable/ic_add"
-			android:onClick="@{() -> viewModel.openHero()}"/>
+			android:onClick="@{() -> viewModel.addHero()}"/>
 	</androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

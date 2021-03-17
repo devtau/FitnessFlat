@@ -2,18 +2,18 @@ package com.devtau.ironHeroes.data.source.remote
 
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.ui.StandardView
-import com.devtau.ironHeroes.util.Logger
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 
 abstract class BaseCallback<T>(private val view: StandardView): Callback<T> {
     override fun onResponse(call: Call<T>, response: Response<T>) {
         val baseResponseBody = response.body()
         if (response.isSuccessful) {
-            Logger.d(LOG_TAG, "retrofit response isSuccessful")
+            Timber.d("retrofit response isSuccessful")
             processBody(baseResponseBody)
         } else {
             handleError(response.code(), response.errorBody(), response.body())
@@ -21,7 +21,7 @@ abstract class BaseCallback<T>(private val view: StandardView): Callback<T> {
     }
 
     override fun onFailure(call: Call<T>, t: Throwable) {
-        Logger.e(LOG_TAG, "retrofit failure: " + t.localizedMessage)
+        Timber.e(t)
         val localizedMessage = t.localizedMessage ?: return
         when {
             localizedMessage.contains("Unable to resolve host") ->
@@ -49,15 +49,13 @@ abstract class BaseCallback<T>(private val view: StandardView): Callback<T> {
                 view.showMsg(errorMsg)
             }
         }
-        if (errorCode != UNAUTHORIZED) Logger.e(LOG_TAG, errorMsg)
+        if (errorCode != UNAUTHORIZED) Timber.e(errorMsg)
     }
 
     abstract fun processBody(responseBody: T?): Unit?
 
 
     companion object {
-        private const val LOG_TAG = "NetworkLayer"
-
         const val INTERNAL_SERVER_ERROR = 500
         const val BAD_REQUEST = 400
         const val NOT_FOUND = 404

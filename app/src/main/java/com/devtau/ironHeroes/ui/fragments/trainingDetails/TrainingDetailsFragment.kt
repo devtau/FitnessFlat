@@ -12,12 +12,9 @@ import com.devtau.ironHeroes.adapters.ExercisesInTrainingAdapter
 import com.devtau.ironHeroes.data.model.wrappers.DatePickerDialogDataWrapper
 import com.devtau.ironHeroes.databinding.FragmentTrainingDetailsBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
-import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
-import com.devtau.ironHeroes.ui.fragments.initActionBar
 import com.devtau.ironHeroes.util.EventObserver
-import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.showDialog
-import io.reactivex.functions.Action
+import timber.log.Timber
 import java.util.*
 
 class TrainingDetailsFragment: BaseFragment() {
@@ -26,7 +23,7 @@ class TrainingDetailsFragment: BaseFragment() {
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentTrainingDetailsBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = viewLifecycleOwner
@@ -46,7 +43,7 @@ class TrainingDetailsFragment: BaseFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.delete -> {
-            view?.showDialog(LOG_TAG, R.string.confirm_delete, Action {
+            view?.showDialog(LOG_TAG, R.string.confirm_delete, {
                 _viewModel.deleteTraining()
             })
             true
@@ -83,16 +80,12 @@ class TrainingDetailsFragment: BaseFragment() {
     }
 
     private fun TrainingDetailsViewModel.subscribeToVM() {
-        toolbarTitle.observe(viewLifecycleOwner, EventObserver {
-            activity?.initActionBar(it)
-        })
-
         showDateDialog.observe(viewLifecycleOwner, EventObserver {
             showDateDialog(it)
         })
 
         openExerciseEvent.observe(viewLifecycleOwner, EventObserver {
-            coordinator.showExerciseFromTraining(view, it)
+            showExerciseFromTraining(view, it)
         })
 
         closeScreenEvent.observe(viewLifecycleOwner, EventObserver {
@@ -103,7 +96,7 @@ class TrainingDetailsFragment: BaseFragment() {
     private fun showDateDialog(wrapper: DatePickerDialogDataWrapper)  {
         val context = context ?: return
         val dialog = DatePickerDialog(context,
-            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(wrapper.selectedDate, year, month, dayOfMonth) },
+            { _, year, month, dayOfMonth -> onDateSet(wrapper.selectedDate, year, month, dayOfMonth) },
             wrapper.selectedDate.get(Calendar.YEAR), wrapper.selectedDate.get(Calendar.MONTH), wrapper.selectedDate.get(Calendar.DAY_OF_MONTH))
         dialog.datePicker.minDate = wrapper.minDate.timeInMillis
         dialog.datePicker.maxDate = wrapper.maxDate.timeInMillis
@@ -112,13 +105,13 @@ class TrainingDetailsFragment: BaseFragment() {
 
     private fun onDateSet(date: Calendar, year: Int, month: Int, dayOfMonth: Int) {
         val dialog = TimePickerDialog(context,
-            TimePickerDialog.OnTimeSetListener { _, hour, minute -> onTimeSet(year, month, dayOfMonth, hour, minute) },
+            { _, hour, minute -> onTimeSet(year, month, dayOfMonth, hour, minute) },
             date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE), true)
         dialog.show()
     }
 
     private fun onTimeSet(year: Int, month: Int, dayOfMonth: Int, hour: Int, minute: Int) {
-        Logger.d(LOG_TAG, "onTimeSet. year=$year, month=$month, dayOfMonth=$dayOfMonth, hour=$hour, minute=$minute")
+        Timber.d("onTimeSet. year=$year, month=$month, dayOfMonth=$dayOfMonth, hour=$hour, minute=$minute")
         _viewModel.updateTrainingDate(year, month, dayOfMonth, hour, minute)
     }
     //</editor-fold>

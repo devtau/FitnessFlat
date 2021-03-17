@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.devtau.ironHeroes.ui.fragments.heroesList.HeroesListViewModel"/>
+            type="com.devtau.ironHeroes.ui.fragments.heroesList.HeroesViewModel"/>
         
         <variable
             name="hero"
@@ -21,26 +21,24 @@
         android:paddingBottom="@dimen/marginHalf"
         android:paddingLeft="@dimen/marginNormal"
         android:paddingRight="@dimen/marginNormal"
-        style="@style/SelectableItemBackground"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal"
         android:onClick="@{() -> viewModel.openHero(hero.id)}">
         
         <ImageView
-            android:id="@+id/image"
             tools:src="@color/colorAccent"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/iconSize"
+            android:layout_height="@dimen/iconSize"
             android:scaleType="centerCrop"
             app:humanImage="@{hero}"/>
         
         <TextView
-            android:id="@+id/name"
             tools:text="Денис Русских"
             android:text="@{hero.formattedName}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/marginHalf"
+            android:layout_marginStart="@dimen/marginNormal"
             android:gravity="center_vertical"
-            android:drawableEnd="@drawable/ic_edit"/>
+            app:drawableEndCompat="@drawable/ic_edit" />
     </LinearLayout>
 </layout>

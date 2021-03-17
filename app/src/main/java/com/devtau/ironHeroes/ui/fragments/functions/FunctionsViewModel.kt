@@ -1,10 +1,10 @@
 package com.devtau.ironHeroes.ui.fragments.functions
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.devtau.ironHeroes.BaseViewModel
+import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.Result
 import com.devtau.ironHeroes.data.model.*
 import com.devtau.ironHeroes.data.source.repositories.*
@@ -22,15 +22,13 @@ class FunctionsViewModel(
     private val prefs: PreferencesManager
 ): BaseViewModel() {
 
-    private val _turnPage = MutableLiveData<Event<Int>>()
-    val turnPage: LiveData<Event<Int>> = _turnPage
+    val turnPage = MutableLiveData<Event<Int>>()
     fun turnPage(pageIndex: Int) {
-        _turnPage.value = Event(pageIndex)
+        turnPage.value = Event(pageIndex)
     }
 
 
-    private val _showDemoConfigDialog = MutableLiveData<Event<Unit>>()
-    val showDemoConfigDialog: LiveData<Event<Unit>> = _showDemoConfigDialog
+    val showDemoConfigDialog = MutableLiveData<Event<Unit>>()
     fun loadDemoConfigConfirmed(context: Context) {
         prefs.firstLaunch = false
         viewModelScope.launch {
@@ -40,16 +38,16 @@ class FunctionsViewModel(
             heroesRepository.saveList(Hero.getMockChampions(context))
             trainingsRepository.saveList(Training.getMock(context))
             exercisesInTrainingsRepository.saveList(ExerciseInTraining.getMock(context, localeIsRu))
+            snackbarText.value = Event(R.string.database_populated)
         }
     }
     fun loadDemoConfigDeclined(context: Context) {
         createMuscleGroupsAndExercises(context)
-        _showCreateHeroesDialog.value = Event(Unit)
+        showCreateHeroesDialog.value = Event(Unit)
     }
 
 
-    private val _showCreateHeroesDialog = MutableLiveData<Event<Unit>>()
-    val showCreateHeroesDialog: LiveData<Event<Unit>> = _showCreateHeroesDialog
+    val showCreateHeroesDialog = MutableLiveData<Event<Unit>>()
     fun createHeroesConfirmed() {
         prefs.firstLaunch = false
     }
@@ -62,7 +60,7 @@ class FunctionsViewModel(
         viewModelScope.launch {
             val heroesResult = heroesRepository.getList()
             if (prefs.firstLaunch && heroesResult is Result.Success && heroesResult.data.isEmpty()) {
-                _showDemoConfigDialog.value = Event(Unit)
+                showDemoConfigDialog.value = Event(Unit)
             }
         }
     }
@@ -72,10 +70,5 @@ class FunctionsViewModel(
             muscleGroupsRepository.saveList(MuscleGroup.getMock(context))
             exercisesRepository.saveList(Exercise.getMock(context))
         }
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "FunctionsViewModel"
     }
 }

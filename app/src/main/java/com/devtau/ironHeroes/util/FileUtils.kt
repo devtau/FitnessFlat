@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -14,14 +15,7 @@ import java.io.FileWriter
 
 object FileUtils {
 
-    private const val LOG_TAG = "FileUtils"
-
-    const val CSV_EXT = ".csv"
-    const val TXT_EXT = ".txt"
-    const val SEPARATOR = ','
-    const val QUOTE_CHAR = '"'
-    const val ESCAPE_CHAR = '"'
-    const val LINE_END = "\n"
+    private const val TXT_EXT = ".txt"
     const val TRAININGS_FILE_NAME = "Trainings"
     const val EXERCISES_FILE_NAME = "ExercisesInTrainings"
 
@@ -36,7 +30,7 @@ object FileUtils {
 
         val json = serializeList(list)
         if (json == null) {
-            Logger.e(LOG_TAG, "exportToJSON. json is null. aborting")
+            Timber.e("exportToJSON. json is null. aborting")
             return@withContext null
         }
 
@@ -47,10 +41,10 @@ object FileUtils {
             file.createNewFile()
             writer = FileWriter(file)
             writer.write(json)
-            Logger.d(LOG_TAG, "exportToJSON. exported")
+            Timber.d("exportToJSON. exported")
             result = list.size
         } catch (e: Exception) {
-            Logger.e(LOG_TAG, "exportToJSON. error ${e.message}\n$e")
+            Timber.e("exportToJSON. error ${e.message}\n$e")
             result = null
         } finally {
             writer?.close()
@@ -68,7 +62,7 @@ object FileUtils {
         val reader = BufferedReader(FileReader(fileToRead))
         val list = deserializeListOfTrainings(reader.readLine())
         reader.close()
-        Logger.d(LOG_TAG, "readTrainingsJSON. heroes=$list")
+        Timber.d("readTrainingsJSON. heroes=$list")
         list ?: emptyList()
     }
 
@@ -81,7 +75,7 @@ object FileUtils {
         val reader = BufferedReader(FileReader(fileToRead))
         val list = deserializeListOfExercisesInTrainings(reader.readLine())
         reader.close()
-        Logger.d(LOG_TAG, "readExercisesJSON. heroes=$list")
+        Timber.d("readExercisesJSON. heroes=$list")
         list ?: emptyList()
     }
 

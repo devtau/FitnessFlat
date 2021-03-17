@@ -26,6 +26,6 @@ enum class ChannelStats(
 
     companion object {
         fun getCustomNotificationSound(): Uri = Uri.parse("${ContentResolver.SCHEME_ANDROID_RESOURCE}://" +
-                "${BuildConfig.APPLICATION_ID}/${ChannelStats.CUSTOM_SOUND.soundResId}")
+                "${BuildConfig.APPLICATION_ID}/${CUSTOM_SOUND.soundResId}")
     }
 }

@@ -1,32 +1,28 @@
 package com.devtau.ironHeroes.ui.fragments.other
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.wrappers.ImpExData
 import com.devtau.ironHeroes.databinding.FragmentOtherBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
-import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
-import com.devtau.ironHeroes.util.EventObserver
-import com.devtau.ironHeroes.util.PermissionHelperImpl
-import com.devtau.ironHeroes.util.setupSnackbar
-import com.devtau.ironHeroes.util.showDialog
-import io.reactivex.functions.Action
+import com.devtau.ironHeroes.util.*
 
 class OtherFragment: BaseFragment() {
 
     private val _viewModel by viewModels<OtherViewModel> { getViewModelFactory() }
     private lateinit var exchangeDirName: String
     private var exportRequested: Boolean = true
+    private var listener: Listener? = null
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentOtherBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = viewLifecycleOwner
@@ -34,6 +30,15 @@ class OtherFragment: BaseFragment() {
         }
         exchangeDirName = getString(R.string.app_name)
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = when {
+            context is Listener -> context
+            parentFragment is Listener -> parentFragment as Listener
+            else -> throw RuntimeException("$context must implement $LOG_TAG Listener")
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -49,18 +54,14 @@ class OtherFragment: BaseFragment() {
 
     //<editor-fold desc="Private methods">
     private fun OtherViewModel.subscribeToVM() {
-        view?.setupSnackbar(viewLifecycleOwner, snackbarText)
+        snackbarText.observe(viewLifecycleOwner, ::tryToShowSnackbar)
 
-        trainings.observe(viewLifecycleOwner, Observer {/*NOP*/})
+        trainings.observe(viewLifecycleOwner, {/*NOP*/})
 
-        exercises.observe(viewLifecycleOwner, Observer {/*NOP*/})
+        exercises.observe(viewLifecycleOwner, {/*NOP*/})
 
         openHero.observe(viewLifecycleOwner, EventObserver {
-            coordinator.launchHeroes(view, it)
-        })
-
-        openDBViewer.observe(viewLifecycleOwner, EventObserver {
-            coordinator.launchDBViewer(context)
+            launchHeroes(view, it)
         })
 
         exportedToFile.observe(viewLifecycleOwner, EventObserver {
@@ -94,9 +95,13 @@ class OtherFragment: BaseFragment() {
         })
 
         clearDB.observe(viewLifecycleOwner, EventObserver {
-            view?.showDialog(LOG_TAG, R.string.clear_db_confirm, Action {
+            view?.showDialog(LOG_TAG, R.string.clear_db_confirm, {
                 clearDBConfirmed()
             })
+        })
+
+        loadDemoConfig.observe(viewLifecycleOwner, EventObserver {
+            listener?.loadDemoConfig()
         })
     }
 
@@ -112,6 +117,10 @@ class OtherFragment: BaseFragment() {
         view?.showDialog(LOG_TAG, String.format(getString(R.string.imported_formatter), trainings, exercises))
     }
     //</editor-fold>
+
+    interface Listener {
+        fun loadDemoConfig()
+    }
 
 
     companion object {

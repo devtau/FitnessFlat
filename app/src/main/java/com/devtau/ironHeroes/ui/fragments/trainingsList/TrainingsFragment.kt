@@ -8,10 +8,7 @@ import androidx.fragment.app.viewModels
 import com.devtau.ironHeroes.adapters.TrainingsAdapter
 import com.devtau.ironHeroes.databinding.FragmentTrainingsBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
-import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
-import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.EventObserver
-import com.devtau.ironHeroes.util.setupSnackbar
 
 class TrainingsFragment: BaseFragment() {
 
@@ -19,14 +16,15 @@ class TrainingsFragment: BaseFragment() {
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentTrainingsBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
+            content.viewModel = _viewModel
             lifecycleOwner = viewLifecycleOwner
             _viewModel.subscribeToVM(this)
 
-            fab.postDelayed({ fab.show() }, Constants.STANDARD_DELAY_MS)
-            listView.adapter = TrainingsAdapter(_viewModel)
+            fab.postDelayed({ fab.show() }, android.R.integer.config_mediumAnimTime.toLong())
+            content.listView.adapter = TrainingsAdapter(_viewModel)
         }
         return binding.root
     }
@@ -35,16 +33,11 @@ class TrainingsFragment: BaseFragment() {
 
     //<editor-fold desc="Private methods">
     private fun TrainingsViewModel.subscribeToVM(binding: FragmentTrainingsBinding) {
-        view?.setupSnackbar(viewLifecycleOwner, snackbarText)
+        snackbarText.observe(viewLifecycleOwner, ::tryToShowSnackbar)
 
         openTrainingEvent.observe(viewLifecycleOwner, EventObserver {
-            coordinator.launchTrainingDetails(binding.listView, it)
+            launchTrainingDetails(binding.content.listView, it)
         })
     }
     //</editor-fold>
-
-
-    companion object {
-        private const val LOG_TAG = "TrainingsFragment"
-    }
 }

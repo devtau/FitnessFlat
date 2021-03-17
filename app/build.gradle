@@ -1,18 +1,21 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.gms.google-services'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
+    id 'androidx.navigation.safeargs.kotlin'
+}
 androidExtensions { experimental = true }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.devtau.ironHeroes"
         minSdkVersion 23
-        targetSdkVersion 29
-        versionCode 5
-        versionName "1.4.0"
+        targetSdkVersion 30
+        versionCode 6
+        versionName "1.5.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "DATABASE_NAME", "\"IronHeroesDB\""
         buildConfigField "Boolean", "WITH_LOGS", "true"
@@ -79,7 +82,9 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
-    dataBinding { enabled = true }
+    buildFeatures {
+        dataBinding true
+    }
 }
 
 dependencies {
@@ -87,17 +92,18 @@ dependencies {
 
     implementation "com.google.android.material:material:$materialVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.0-rc01'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core-ktx:1.5.0-beta01'
     implementation 'com.redmadrobot:inputmask:2.3.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.2.0'
     implementation 'com.vk:androidsdk:1.6.9'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.pixplicity.sharp:library:1.1.0'//svg image loader
-    implementation 'androidx.preference:preference:1.1.1'
-    implementation "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
+    implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation "androidx.constraintlayout:constraintlayout:2.1.0-alpha2"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
+    implementation "com.jakewharton.timber:timber:4.7.1"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
@@ -110,7 +116,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.2'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.3.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.5.0'
     implementation "com.facebook.stetho:stetho:$stethoVersion"
     implementation "com.facebook.stetho:stetho-okhttp3:$stethoVersion"
 
@@ -138,7 +144,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
     implementation "android.arch.paging:runtime:1.0.1"
 
@@ -157,9 +162,9 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
 
     //Android unit tests
-    androidTestImplementation "androidx.test.ext:junit:1.1.1"
-    androidTestImplementation "androidx.test:runner:1.2.0"
-    androidTestImplementation "androidx.test:rules:1.2.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.2"
+    androidTestImplementation "androidx.test:runner:1.3.0"
+    androidTestImplementation "androidx.test:rules:1.3.0"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
     androidTestImplementation "androidx.arch.core:core-testing:$archCoreVersion"
     androidTestImplementation 'junit:junit:4.13'

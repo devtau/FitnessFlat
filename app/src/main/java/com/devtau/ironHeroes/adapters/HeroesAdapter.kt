@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.databinding.ListItemHeroBinding
-import com.devtau.ironHeroes.ui.fragments.heroesList.HeroesListViewModel
+import com.devtau.ironHeroes.ui.fragments.heroesList.HeroesViewModel
 
 class HeroesAdapter(
-    private val viewModel: HeroesListViewModel
+    private val viewModel: HeroesViewModel
 ): ListAdapter<Hero, HeroesAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder.from(parent)
@@ -25,12 +25,11 @@ class HeroesAdapter(
         private val binding: ListItemHeroBinding
     ): RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(viewModel: HeroesListViewModel, item: Hero) {
+        fun bind(viewModel: HeroesViewModel, item: Hero) {
             binding.viewModel = viewModel
             binding.hero = item
             binding.executePendingBindings()
         }
-
 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
@@ -45,10 +44,5 @@ class HeroesAdapter(
     private class DiffCallback: DiffUtil.ItemCallback<Hero>() {
         override fun areItemsTheSame(oldItem: Hero, newItem: Hero) = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: Hero, newItem: Hero) = oldItem == newItem
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "HeroesAdapter"
     }
 }

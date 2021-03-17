@@ -8,7 +8,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.devtau.ironHeroes.IronHeroesApp
 import com.devtau.ironHeroes.R
-import com.devtau.ironHeroes.ui.fragments.getCurrentNavigationFragment
 import com.devtau.ironHeroes.ui.fragments.heroDetails.HeroDetailsFragment
 import com.vk.sdk.VKSdk
 import com.vk.sdk.api.VKApiConst
@@ -49,9 +48,10 @@ class MainActivity: AppCompatActivity(), HeroDetailsFragment.Listener {
         } else super.onActivityResult(requestCode, resultCode, intent)
     }
 
-    override fun onSupportNavigateUp() = with (supportFragmentManager.getCurrentNavigationFragment()) {
-        if (this is HeroDetailsFragment) {
-            tryCloseScreen()
+    override fun onSupportNavigateUp(): Boolean {
+        val top = supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.fragments?.first()
+        return if (top is HeroDetailsFragment) {
+            top.tryCloseScreen()
             true
         } else {
             if (!navController.navigateUp()) super.onBackPressed()
@@ -66,9 +66,4 @@ class MainActivity: AppCompatActivity(), HeroDetailsFragment.Listener {
 
 
     override fun provideAvatarUrl(): String? = heroAvatarUrl
-
-
-    companion object {
-        private const val LOG_TAG = "MainActivity"
-    }
 }

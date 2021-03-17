@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.MuscleGroup
-import com.devtau.ironHeroes.util.Logger
+import timber.log.Timber
 
 class ExerciseRelation {
 
@@ -19,15 +19,10 @@ class ExerciseRelation {
         else null
 
         if (msg != null) {
-            Logger.e(LOG_TAG, msg)
+            Timber.e(msg)
             return exercise
         }
         exercise.muscleGroup = muscleGroup
         return exercise
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "ExerciseRelation"
     }
 }

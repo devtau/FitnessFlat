@@ -34,7 +34,7 @@
 				android:paddingRight="@dimen/marginNormal"
 				android:orientation="horizontal"
 				android:gravity="center_vertical"
-				style="@style/SelectableItemBackground"
+				android:background="?attr/selectableItemBackground"
 				android:onClick="@{() -> viewModel.dateDialogRequested()}">
 				
 				<TextView

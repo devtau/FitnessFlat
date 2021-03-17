@@ -8,19 +8,19 @@ import com.devtau.ironHeroes.data.source.remote.response.BaseResponse
 import com.devtau.ironHeroes.data.source.remote.response.HeroResponse
 import com.devtau.ironHeroes.data.source.remote.response.RegistrationResponse
 import com.devtau.ironHeroes.ui.StandardView
-import com.devtau.ironHeroes.util.Logger
 import com.google.gson.GsonBuilder
 import io.reactivex.functions.Consumer
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class NetworkLayerImpl(val view: StandardView): NetworkLayer {
 
-    private var httpClientLogging = buildClient(true)
-    private var httpClientNotLogging = buildClient(false)
+    private val httpClientLogging = buildClient(true)
+    private val httpClientNotLogging = buildClient(false)
 
 
     //<editor-fold desc="Interface overrides">
@@ -54,7 +54,7 @@ class NetworkLayerImpl(val view: StandardView): NetworkLayer {
         getBackendApiClient(true).updateHero("Bearer $token", hero)
             .enqueue(object: BaseCallback<HeroResponse>(view) {
                 override fun processBody(responseBody: HeroResponse?)
-                        = Logger.d(LOG_TAG, "hero updated. $responseBody")
+                        = Timber.d("hero updated. $responseBody")
             })
     }
     //</editor-fold>
@@ -82,7 +82,6 @@ class NetworkLayerImpl(val view: StandardView): NetworkLayer {
 
 
     companion object {
-        private const val LOG_TAG = "NetworkLayer"
         private const val TIMEOUT_CONNECT = 10L
         private const val TIMEOUT_READ = 60L
         private const val TIMEOUT_WRITE = 120L

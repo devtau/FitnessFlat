@@ -54,9 +54,9 @@ data class Training(
             val denis = Hero.getMockHeroes(c)[0]
 
             return listOf(
-                Training(1, anton.id, denis.id, DateUtils.parseDateTime("27.01.2020 8:00").timeInMillis),
-                Training(2, roma.id, denis.id, DateUtils.parseDateTime("29.01.2020 9:00").timeInMillis),
-                Training(3, roma.id, denis.id, DateUtils.parseDateTime("31.01.2020 8:30").timeInMillis)
+                Training(1, anton.id, denis.id, DateUtils.parseDateTime("25.01.2021 8:00").timeInMillis),
+                Training(2, roma.id, denis.id, DateUtils.parseDateTime("27.01.2021 9:00").timeInMillis),
+                Training(3, roma.id, denis.id, DateUtils.parseDateTime("29.01.2021 8:30").timeInMillis)
             )
         }
     }

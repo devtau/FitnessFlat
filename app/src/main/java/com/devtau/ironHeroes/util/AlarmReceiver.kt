@@ -5,11 +5,12 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import timber.log.Timber
 
 class AlarmReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Logger.d(LOG_TAG, "onReceive")
+        Timber.d("onReceive")
         goAsync()
         val notificationManager =
             context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -21,7 +22,6 @@ class AlarmReceiver: BroadcastReceiver() {
 
 
     companion object {
-        const val LOG_TAG = "AlarmReceiver"
         const val NOTIFICATION_ID = "notification-id"
         const val NOTIFICATION = "notification"
     }

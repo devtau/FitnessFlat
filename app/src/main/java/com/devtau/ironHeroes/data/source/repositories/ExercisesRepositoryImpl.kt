@@ -9,8 +9,8 @@ import com.devtau.ironHeroes.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.*
 
 class ExercisesRepositoryImpl(
-    private val remote: ExerciseLocalDataSource?,
     private val local: ExerciseLocalDataSource,
+    private val remote: ExerciseLocalDataSource? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ExercisesRepository {
 

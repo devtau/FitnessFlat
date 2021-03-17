@@ -25,7 +25,7 @@
 	<fragment
 		android:id="@+id/trainingDetailsFragment"
 		android:name="com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsFragment"
-		android:label=""
+		android:label="{toolbarTitle}"
 		tools:layout="@layout/fragment_training_details">
 		<action
 			android:id="@+id/action_trainingDetailsFragment_to_exerciseDialog"
@@ -33,6 +33,9 @@
 		<argument
 			android:name="trainingId"
 			app:argType="long" />
+		<argument
+			android:name="toolbarTitle"
+			app:argType="string" />
 	</fragment>
 	
 	<dialog
@@ -41,7 +44,7 @@
 		android:label=""
 		tools:layout="@layout/dialog_exercise">
 		<argument
-			android:name="exerciseId"
+			android:name="exerciseInTrainingId"
 			app:argType="long" />
 		<argument
 			android:name="heroId"
@@ -58,8 +61,14 @@
 	<fragment
 		android:id="@+id/heroesFragment"
 		android:name="com.devtau.ironHeroes.ui.fragments.heroesList.HeroesFragment"
-		android:label=""
+		android:label="{toolbarTitle}"
 		tools:layout="@layout/fragment_heroes">
+		<argument
+			android:name="humanType"
+			app:argType="com.devtau.ironHeroes.enums.HumanType" />
+		<argument
+			android:name="toolbarTitle"
+			app:argType="string" />
 		<action
 			android:id="@+id/action_heroesFragment_to_heroDetailsFragment"
 			app:destination="@id/heroDetailsFragment" />
@@ -68,10 +77,16 @@
 	<fragment
 		android:id="@+id/heroDetailsFragment"
 		android:name="com.devtau.ironHeroes.ui.fragments.heroDetails.HeroDetailsFragment"
-		android:label=""
+		android:label="{toolbarTitle}"
 		tools:layout="@layout/fragment_hero_details" >
+		<argument
+			android:name="humanType"
+			app:argType="com.devtau.ironHeroes.enums.HumanType" />
 		<argument
 			android:name="heroId"
 			app:argType="long" />
+		<argument
+			android:name="toolbarTitle"
+			app:argType="string" />
 	</fragment>
 </navigation>

@@ -1,19 +1,20 @@
 package com.devtau.ironHeroes.util
 
 import androidx.lifecycle.Observer
+import timber.log.Timber
+
 /**
  * Used as a wrapper for data that is exposed via a LiveData that represents an event.
  */
 open class Event<out T>(private val content: T) {
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    var hasBeenHandled = false
-        private set // Allow external read but not write
+    private var hasBeenHandled = false
 
     /**
      * Returns the content and prevents its use again.
      */
     fun getContentIfNotHandled(): T? {
+        Timber.d("getContentIfNotHandled. hasBeenHandled=$hasBeenHandled, content=$content")
         return if (hasBeenHandled) {
             null
         } else {
@@ -21,11 +22,6 @@ open class Event<out T>(private val content: T) {
             content
         }
     }
-
-    /**
-     * Returns the content, even if it's already been handled.
-     */
-    fun peekContent(): T = content
 }
 
 /**

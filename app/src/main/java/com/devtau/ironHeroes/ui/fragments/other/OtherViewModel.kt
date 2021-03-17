@@ -6,6 +6,7 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.devtau.ironHeroes.BaseViewModel
 import com.devtau.ironHeroes.R
+import com.devtau.ironHeroes.data.Result
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.data.model.wrappers.ImpExData
@@ -16,6 +17,7 @@ import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.util.Event
 import com.devtau.ironHeroes.util.FileUtils
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class OtherViewModel(
     private val trainingsRepository: TrainingsRepository,
@@ -23,59 +25,71 @@ class OtherViewModel(
     private val heroesRepository: HeroesRepository
 ): BaseViewModel() {
 
-    private val forceUpdateTrainingAndExercises = MutableLiveData<Boolean>(false)
+    private val forceUpdateTrainingAndExercises = MutableLiveData(false)
 
     private val _trainings: LiveData<List<Training>> = forceUpdateTrainingAndExercises.switchMap {
-        trainingsRepository.observeList().switchMap { processTrainingsFromDB(it, _snackbarText) }
+        trainingsRepository.observeList().switchMap(::processTrainingsFromDB)
     }
     val trainings: LiveData<List<Training>> = _trainings
 
+    private fun processTrainingsFromDB(
+        result: Result<List<Training>>,
+    ): LiveData<List<Training>> = if (result is Result.Success) {
+        Timber.d("got new trainings list. size=${result.data.size}")
+        MutableLiveData(result.data)
+    } else {
+        Timber.e("Error loading trainings")
+        snackbarText.value = Event(R.string.error_trainings_list)
+        MutableLiveData(emptyList())
+    }
+
 
     private val _exercises: LiveData<List<ExerciseInTraining>> = forceUpdateTrainingAndExercises.switchMap {
-        exercisesInTrainingsRepository.observeList().switchMap { processExercisesFromDB(it, _snackbarText) }
+        exercisesInTrainingsRepository.observeList().switchMap(::processExercisesFromDB)
     }
     val exercises: LiveData<List<ExerciseInTraining>> = _exercises
 
+    private fun processExercisesFromDB(
+        result: Result<List<ExerciseInTraining>>,
+    ): LiveData<List<ExerciseInTraining>> = if (result is Result.Success) {
+        Timber.d("got new exercisesInTrainings list. size=${result.data.size}")
+        MutableLiveData(result.data)
+    } else {
+        Timber.e("Error loading exercisesInTrainings")
+        snackbarText.value = Event(R.string.error_exercises_list)
+        MutableLiveData(emptyList())
+    }
 
-    private val _openHero = MutableLiveData<Event<HumanType>>()
-    val openHero: LiveData<Event<HumanType>> = _openHero
+
+    val openHero = MutableLiveData<Event<HumanType>>()
     fun openHero(humanType: HumanType) {
-        _openHero.value = Event(humanType)
+        openHero.value = Event(humanType)
     }
 
 
-    private val _openDBViewer = MutableLiveData<Event<Unit>>()
-    val openDBViewer: LiveData<Event<Unit>> = _openDBViewer
-    fun openDBViewer() {
-        _openDBViewer.value = Event(Unit)
-    }
-
-
-    private val _exportToFile = MutableLiveData<Event<Unit>>()
-    val exportToFile: LiveData<Event<Unit>> = _exportToFile
-    private val _exportedToFile = MutableLiveData<Event<ImpExData>>()
-    val exportedToFile: LiveData<Event<ImpExData>> = _exportedToFile
+    val exportToFile = MutableLiveData<Event<Unit>>()
+    val exportedToFile = MutableLiveData<Event<ImpExData>>()
     fun exportToFileRequested() {
-        _exportToFile.value = Event(Unit)
+        exportToFile.value = Event(Unit)
     }
     fun exportToFileConfirmed(exchangeDirName: String) {
         var trainingsExportedCount = 0
         var exercisesExportedCount = 0
         fun showExported() {
             if (trainingsExportedCount > 0 && exercisesExportedCount > 0)
-                _exportedToFile.value = Event(ImpExData(trainingsExportedCount, exercisesExportedCount))
+                exportedToFile.value = Event(ImpExData(trainingsExportedCount, exercisesExportedCount))
         }
 
         val trainings = _trainings.value
         val exercises = _exercises.value
         if (trainings == null || trainings.isEmpty() || exercises == null || exercises.isEmpty()) {
-            _snackbarText.value = Event(R.string.no_exercises_or_trainings_found)
+            snackbarText.value = Event(R.string.no_exercises_or_trainings_found)
             return
         }
         viewModelScope.launch {
             val exported = FileUtils.exportToJSON(trainings, exchangeDirName, FileUtils.TRAININGS_FILE_NAME)
             if (exported == null) {
-                _snackbarText.value = Event(R.string.export_error)
+                snackbarText.value = Event(R.string.export_error)
             } else {
                 trainingsExportedCount = exported
                 showExported()
@@ -85,7 +99,7 @@ class OtherViewModel(
         viewModelScope.launch {
             val exported = FileUtils.exportToJSON(exercises, exchangeDirName, FileUtils.EXERCISES_FILE_NAME)
             if (exported == null) {
-                _snackbarText.value = Event(R.string.export_error)
+                snackbarText.value = Event(R.string.export_error)
             } else {
                 exercisesExportedCount = exported
                 showExported()
@@ -94,19 +108,17 @@ class OtherViewModel(
     }
 
 
-    private val _importFromFile = MutableLiveData<Event<Unit>>()
-    val importFromFile: LiveData<Event<Unit>> = _importFromFile
-    private val _importedFromFile = MutableLiveData<Event<ImpExData>>()
-    val importedFromFile: LiveData<Event<ImpExData>> = _importedFromFile
+    val importFromFile = MutableLiveData<Event<Unit>>()
+    val importedFromFile = MutableLiveData<Event<ImpExData>>()
     fun importFromFileRequested() {
-        _importFromFile.value = Event(Unit)
+        importFromFile.value = Event(Unit)
     }
     fun importFromFileConfirmed(exchangeDirName: String) {
         var trainingsImportedCount = 0
         var exercisesImportedCount = 0
         fun showReadFromFile() {
             if (trainingsImportedCount > 0 && exercisesImportedCount > 0)
-                _importedFromFile.value = Event(ImpExData(trainingsImportedCount, exercisesImportedCount))
+                importedFromFile.value = Event(ImpExData(trainingsImportedCount, exercisesImportedCount))
         }
 
         viewModelScope.launch {
@@ -125,21 +137,24 @@ class OtherViewModel(
     }
 
 
-    private val _clearDB = MutableLiveData<Event<Unit>>()
-    val clearDB: LiveData<Event<Unit>> = _clearDB
+    val clearDB = MutableLiveData<Event<Unit>>()
     fun clearDBRequested() {
-        _clearDB.value = Event(Unit)
+        clearDB.value = Event(Unit)
     }
     fun clearDBConfirmed() {
         viewModelScope.launch {
             trainingsRepository.deleteAll()
             exercisesInTrainingsRepository.deleteAll()
             heroesRepository.deleteAll()
+            snackbarText.value = Event(R.string.database_cleared)
         }
     }
 
 
-    companion object {
-        private const val LOG_TAG = "OtherViewModel"
+    val loadDemoConfig = MutableLiveData<Event<Unit>>()
+    fun loadDemoConfigRequested() {
+        loadDemoConfig.value = Event(Unit)
     }
+
+    val dbIsEmpty: LiveData<Boolean> = MutableLiveData(true)
 }

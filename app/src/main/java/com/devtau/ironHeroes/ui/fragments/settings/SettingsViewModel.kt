@@ -1,8 +1,8 @@
 package com.devtau.ironHeroes.ui.fragments.settings
 
 import androidx.lifecycle.ViewModel
-import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.prefs.PreferencesManager
+import timber.log.Timber
 
 class SettingsViewModel(
     private val prefs: PreferencesManager
@@ -10,36 +10,31 @@ class SettingsViewModel(
 
     var showChampionFilter: Boolean
         get() {
-            Logger.d(LOG_TAG, "get showChampionFilter=${prefs.showChampionFilter}")
+            Timber.d("get showChampionFilter=${prefs.showChampionFilter}")
             return prefs.showChampionFilter
         }
         set(value) {
-            Logger.d(LOG_TAG, "set showChampionFilter=$value")
+            Timber.d("set showChampionFilter=$value")
             prefs.showChampionFilter = value
         }
 
     var showHeroFilter: Boolean
         get() {
-            Logger.d(LOG_TAG, "get showHeroFilter=${prefs.showHeroFilter}")
+            Timber.d("get showHeroFilter=${prefs.showHeroFilter}")
             return prefs.showHeroFilter
         }
         set(value) {
-            Logger.d(LOG_TAG, "set showHeroFilter=$value")
+            Timber.d("set showHeroFilter=$value")
             prefs.showHeroFilter = value
         }
 
     var openEditDialogFromStatistics: Boolean
         get() {
-            Logger.d(LOG_TAG, "get openEditDialogFromStatistics=${prefs.openEditDialogFromStatistics}")
+            Timber.d("get openEditDialogFromStatistics=${prefs.openEditDialogFromStatistics}")
             return prefs.openEditDialogFromStatistics
         }
         set(value) {
-            Logger.d(LOG_TAG, "set openEditDialogFromStatistics=$value")
+            Timber.d("set openEditDialogFromStatistics=$value")
             prefs.openEditDialogFromStatistics = value
         }
-
-
-    companion object {
-        private const val LOG_TAG = "SettingsViewModel"
-    }
 }

@@ -125,7 +125,7 @@
 						android:textOn=""
 						android:textSize="0sp"
 						android:checked="@{viewModel.genderFemaleChecked}"
-						android:onCheckedChanged="@{(_, isChecked) -> isChecked ? viewModel.selectGender(Gender.FEMALE) : void}" />
+						android:onCheckedChanged="@{(_, isChecked) -> viewModel.selectGender(isChecked ? Gender.FEMALE : Gender.MALE)}" />
 					
 					<ToggleButton
 						android:layout_width="80dp"
@@ -135,7 +135,7 @@
 						android:textOn=""
 						android:textSize="0sp"
 						android:checked="@{viewModel.genderMaleChecked}"
-						android:onCheckedChanged="@{(_, isChecked) -> isChecked ? viewModel.selectGender(Gender.MALE) : void}" />
+						android:onCheckedChanged="@{(_, isChecked) -> viewModel.selectGender(isChecked ? Gender.MALE : Gender.FEMALE)}" />
 				</LinearLayout>
 				
 				<TableRow
@@ -187,7 +187,6 @@
 				</TableRow>
 				
 				<TableRow
-					style="@style/SelectableItemBackground"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:gravity="center_vertical"
@@ -196,6 +195,7 @@
 					android:paddingTop="@dimen/marginHalf"
 					android:paddingRight="@dimen/marginNormalPlus"
 					android:paddingBottom="@dimen/marginHalf"
+					android:background="?attr/selectableItemBackground"
 					android:onClick="@{() -> viewModel.showBirthDayDialog()}">
 					
 					<TextView
@@ -212,7 +212,7 @@
 						android:text="@{viewModel.formattedBirthday}" />
 				</TableRow>
 				
-				<Switch
+				<androidx.appcompat.widget.SwitchCompat
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:paddingLeft="@dimen/marginNormalPlus"
@@ -240,7 +240,7 @@
 			android:layout_gravity="bottom|end"
 			android:layout_margin="@dimen/marginNormal"
 			app:srcCompat="@drawable/ic_delete"
-			android:visibility="@{viewModel.deleteVisibility}"
+			android:visibility="@{viewModel.deleteIsVisible ? View.VISIBLE : View.GONE}"
 			android:onClick="@{() -> viewModel.deleteHeroRequested()}" />
 	</androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

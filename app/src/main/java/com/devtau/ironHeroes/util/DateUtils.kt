@@ -1,12 +1,11 @@
 package com.devtau.ironHeroes.util
 
 import com.devtau.ironHeroes.data.model.HourMinute
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
 object DateUtils {
-
-    private const val LOG_TAG = "DateUtils"
 
     private const val DATE_FORMATTER = "dd.MM.yyyy"
     private const val DATE_TIME_FORMATTER = "dd.MM.yyyy HH:mm"
@@ -43,7 +42,7 @@ object DateUtils {
         try {
             if (timeTrimmed != null) date.timeInMillis = timeTrimmed.toLong()
         } catch (e: NumberFormatException) {
-            Logger.e(LOG_TAG, "formatShortDate. bad input=$timeInMillis")
+            Timber.e("formatShortDate. bad input=$timeInMillis")
         }
         return formatAnyDate(date, SHORT_DATE_FORMATTER)
     }

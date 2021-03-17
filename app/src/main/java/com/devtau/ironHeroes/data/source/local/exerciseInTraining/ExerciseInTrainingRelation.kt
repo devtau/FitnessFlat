@@ -6,7 +6,7 @@ import com.devtau.ironHeroes.data.model.Exercise
 import com.devtau.ironHeroes.data.model.ExerciseInTraining
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.data.source.local.exercise.ExerciseRelation
-import com.devtau.ironHeroes.util.Logger
+import timber.log.Timber
 
 class ExerciseInTrainingRelation {
 
@@ -27,16 +27,11 @@ class ExerciseInTrainingRelation {
         }
 
         if (msg != null) {
-            Logger.e(LOG_TAG, msg)
+            Timber.e(msg)
             return exerciseInTraining
         }
         exerciseInTraining.training = training
         exerciseInTraining.exercise = exercise!!.convert()
         return exerciseInTraining
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "ExerciseInTrainingRelation"
     }
 }

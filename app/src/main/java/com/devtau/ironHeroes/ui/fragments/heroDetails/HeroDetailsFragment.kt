@@ -10,6 +10,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -19,10 +20,11 @@ import com.devtau.ironHeroes.R
 import com.devtau.ironHeroes.data.model.wrappers.DatePickerDialogDataWrapper
 import com.devtau.ironHeroes.databinding.FragmentHeroDetailsBinding
 import com.devtau.ironHeroes.ui.fragments.BaseFragment
-import com.devtau.ironHeroes.ui.fragments.getViewModelFactory
-import com.devtau.ironHeroes.ui.fragments.initActionBar
-import com.devtau.ironHeroes.util.*
-import io.reactivex.functions.Action
+import com.devtau.ironHeroes.util.AppUtils
+import com.devtau.ironHeroes.util.EventObserver
+import com.devtau.ironHeroes.util.PermissionHelperImpl
+import com.devtau.ironHeroes.util.showDialog
+import timber.log.Timber
 import java.util.*
 
 class HeroDetailsFragment: BaseFragment() {
@@ -33,14 +35,7 @@ class HeroDetailsFragment: BaseFragment() {
 
 
     //<editor-fold desc="Framework overrides">
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is Listener) listener = context
-
-        else throw RuntimeException("$context must implement $LOG_TAG Listener")
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentHeroDetailsBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = viewLifecycleOwner
@@ -49,6 +44,13 @@ class HeroDetailsFragment: BaseFragment() {
             AppUtils.initPhoneRMR(phoneInput)
         }
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is Listener) listener = context
+
+        else throw RuntimeException("$context must implement $LOG_TAG Listener")
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -66,11 +68,7 @@ class HeroDetailsFragment: BaseFragment() {
 
     //<editor-fold desc="Private methods">
     private fun HeroDetailsViewModel.subscribeToVM() {
-        view?.setupSnackbar(viewLifecycleOwner, snackbarText)
-
-        toolbarTitle.observe(viewLifecycleOwner, EventObserver {
-            activity?.initActionBar(it)
-        })
+        snackbarText.observe(viewLifecycleOwner, ::tryToShowSnackbar)
 
         showBirthDayDialog.observe(viewLifecycleOwner, EventObserver {
             showDateDialog(it)
@@ -99,13 +97,11 @@ class HeroDetailsFragment: BaseFragment() {
         })
 
         confirmExit.observe(viewLifecycleOwner, EventObserver {
-            view?.showDialog(LOG_TAG, it, Action { closeScreenValidated() }, Action {/*NOP*/})
+            view?.showDialog(LOG_TAG, it, { closeScreenValidated() }, {/*NOP*/})
         })
 
         confirmDeleteHero.observe(viewLifecycleOwner, EventObserver {
-            view?.showDialog(LOG_TAG, R.string.confirm_delete, Action {
-                deleteHeroConfirmed()
-            })
+            view?.showDialog(LOG_TAG, R.string.confirm_delete, ::deleteHeroConfirmed)
         })
 
         initInputSubscriptions()
@@ -127,22 +123,24 @@ class HeroDetailsFragment: BaseFragment() {
 
     private fun showDateDialog(wrapper: DatePickerDialogDataWrapper) {
         val context = context ?: return
-        val dialog = DatePickerDialog(context,
-            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth -> onDateSet(year, month, dayOfMonth) },
-            wrapper.selectedDate.get(Calendar.YEAR), wrapper.selectedDate.get(Calendar.MONTH), wrapper.selectedDate.get(Calendar.DAY_OF_MONTH))
+        val dialog = DatePickerDialog(context, ::onDateSet,
+            wrapper.selectedDate.get(Calendar.YEAR),
+            wrapper.selectedDate.get(Calendar.MONTH),
+            wrapper.selectedDate.get(Calendar.DAY_OF_MONTH)
+        )
         dialog.datePicker.minDate = wrapper.minDate.timeInMillis
         dialog.datePicker.maxDate = wrapper.maxDate.timeInMillis
         dialog.show()
     }
 
-    private fun onDateSet(year: Int, month: Int, dayOfMonth: Int) {
+    private fun onDateSet(picker: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
         _viewModel.updateBirthday(year, month, dayOfMonth)
     }
 
     private fun callHero(phone: String) {
         val clearedPhone = AppUtils.clearPhoneFromMask(phone)
-        if (TextUtils.isEmpty(clearedPhone) || clearedPhone.length != Constants.UNMASKED_PHONE_LENGTH) {
-            Logger.d(LOG_TAG, "callHero. phone is incorrect. aborting")
+        if (TextUtils.isEmpty(clearedPhone) || clearedPhone.length != UNMASKED_PHONE_LENGTH) {
+            Timber.d("callHero. phone is incorrect. aborting")
             view?.showDialog(LOG_TAG, R.string.phone_empty)
             return
         }
@@ -171,5 +169,6 @@ class HeroDetailsFragment: BaseFragment() {
 
     companion object {
         private const val LOG_TAG = "HeroDetailsFragment"
+        private const val UNMASKED_PHONE_LENGTH = 12
     }
 }

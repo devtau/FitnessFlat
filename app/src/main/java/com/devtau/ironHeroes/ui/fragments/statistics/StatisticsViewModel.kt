@@ -21,13 +21,13 @@ import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.ui.ResourceResolver
 import com.devtau.ironHeroes.util.DateUtils
 import com.devtau.ironHeroes.util.Event
-import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.prefs.PreferencesManager
 import com.devtau.ironHeroes.util.print
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -48,15 +48,15 @@ class StatisticsViewModel(
             MutableLiveData(if (it is Result.Success) it.data else emptyList())
         }
     }
-    private val _selectedHeroId = MutableLiveData<Long?>(null)
-    val selectedHeroId: LiveData<Long?> = _selectedHeroId
+    val selectedHeroId = MutableLiveData<Long?>(null)
     val heroSelectedListener = object: IronSpinnerAdapter.ItemSelectedListener {
         override fun onItemSelected(item: SpinnerItem?, humanType: HumanType?) {
-            if (_selectedHeroId.value != item?.id) {
-                Logger.d(LOG_TAG, "onHeroSelected. id=${item?.id}")
-                _selectedHeroId.value = item?.id
+            if (selectedHeroId.value != item?.id) {
+                selectedHeroId.value = item?.id
                 filterAndUpdateChart()
-                _exercisesFiltered.value = filterExercises(exercises.value, selectedMuscleGroupId.value, exercisesInTrainings.value)
+                exercisesFiltered.value = filterExercises(
+                    exercises.value, selectedMuscleGroupId.value, exercisesInTrainings.value
+                )
             }
         }
     }
@@ -67,15 +67,15 @@ class StatisticsViewModel(
             MutableLiveData(if (it is Result.Success) it.data else emptyList())
         }
     }
-    private val _selectedMuscleGroupId = MutableLiveData<Long?>(null)
-    val selectedMuscleGroupId: LiveData<Long?> = _selectedMuscleGroupId
+    val selectedMuscleGroupId = MutableLiveData<Long?>(null)
     val muscleGroupSelectedListener = object: IronSpinnerAdapter.ItemSelectedListener {
         override fun onItemSelected(item: SpinnerItem?, humanType: HumanType?) {
-            if (_selectedMuscleGroupId.value != item?.id) {
-                Logger.d(LOG_TAG, "onMuscleGroupSelected. id=${item?.id}")
-                _selectedMuscleGroupId.value = item?.id
+            if (selectedMuscleGroupId.value != item?.id) {
+                selectedMuscleGroupId.value = item?.id
                 filterAndUpdateChart()
-                _exercisesFiltered.value = filterExercises(exercises.value, selectedMuscleGroupId.value, exercisesInTrainings.value)
+                exercisesFiltered.value = filterExercises(
+                    exercises.value, selectedMuscleGroupId.value, exercisesInTrainings.value
+                )
             }
         }
     }
@@ -86,15 +86,12 @@ class StatisticsViewModel(
             MutableLiveData(if (it is Result.Success) it.data else emptyList())
         }
     }
-    private val _exercisesFiltered = MutableLiveData<List<Exercise>>()
-    val exercisesFiltered: LiveData<List<Exercise>> = _exercisesFiltered
-    private val _selectedExerciseId = MutableLiveData<Long?>(null)
-    val selectedExerciseId: LiveData<Long?> = _selectedExerciseId
+    val exercisesFiltered = MutableLiveData<List<Exercise>>()
+    val selectedExerciseId = MutableLiveData<Long?>(null)
     val exerciseSelectedListener = object: IronSpinnerAdapter.ItemSelectedListener {
         override fun onItemSelected(item: SpinnerItem?, humanType: HumanType?) {
-            if (_selectedExerciseId.value != item?.id) {
-                Logger.d(LOG_TAG, "onExerciseSelected. id=${item?.id}")
-                _selectedExerciseId.value = item?.id
+            if (selectedExerciseId.value != item?.id) {
+                selectedExerciseId.value = item?.id
                 filterAndUpdateChart()
             }
         }
@@ -109,25 +106,21 @@ class StatisticsViewModel(
     private var exercisesInTrainingsFiltered = ArrayList<ExerciseInTraining>()
 
 
-    private val _showStatisticsData = MutableLiveData<StatisticsDataWrapper>()
-    val showStatisticsData: LiveData<StatisticsDataWrapper> = _showStatisticsData
+    val showStatisticsData = MutableLiveData<StatisticsDataWrapper>()
 
 
-    private val _showExerciseDetails = MutableLiveData<Event<EditDialogDataWrapper>>()
-    val showExerciseDetails: LiveData<Event<EditDialogDataWrapper>> = _showExerciseDetails
-    val onBalloonClickedListener = object:
-        OnChartBalloonClickedListener {
+    val showExerciseDetails = MutableLiveData<Event<EditDialogDataWrapper>>()
+    val onBalloonClickedListener = object: OnChartBalloonClickedListener {
         override fun onBalloonClicked(trainingId: Long?, exerciseInTrainingId: Long?) {
             if (prefs.openEditDialogFromStatistics) {
                 val heroId = selectedHeroId.value
                 if (heroId == null || trainingId == null || exerciseInTrainingId == null) {
-                    Logger.e(LOG_TAG, "openExercise. bad data. aborting")
+                    Timber.e("openExercise. bad data. aborting")
                     return
                 }
-                _showExerciseDetails.value = Event(EditDialogDataWrapper(heroId, trainingId, exerciseInTrainingId))
+                showExerciseDetails.value = Event(EditDialogDataWrapper(heroId, trainingId, exerciseInTrainingId))
             }
         }
-
     }
 
     private fun filterAndUpdateChart() {
@@ -137,8 +130,7 @@ class StatisticsViewModel(
         val exercises = exercises.value
         val exercisesDone = exercisesInTrainings.value
         if (muscleGroupId == null || heroId == null || exercises == null || exercisesDone == null) return
-        Logger.d(LOG_TAG, "filterAndUpdateChart. muscleGroupId=$muscleGroupId, exerciseId=$exerciseId, heroId=$heroId, " +
-                "exercises size=${exercises.size}, exercisesDone size=${exercisesDone.size}")
+        Timber.d("filterAndUpdateChart. muscleGroupId=$muscleGroupId, exerciseId=$exerciseId, heroId=$heroId, exercises size=${exercises.size}, exercisesDone size=${exercisesDone.size}")
 
         exercisesInTrainingsFiltered = filterExercisesInTrainings(exercisesDone, muscleGroupId, exerciseId, heroId)
         publishDataToChart(exercisesInTrainingsFiltered)
@@ -148,7 +140,7 @@ class StatisticsViewModel(
         val dates = parseTrainingDates(exercisesInTrainingsFiltered)
         val dataSets = convertToDataSets(exercisesInTrainingsFiltered, dates, R.color.colorAccent)
         val xLabelsCount = if (dates.size > X_LABELS_MAX_COUNT) X_LABELS_MAX_COUNT else dates.size
-        _showStatisticsData.value = StatisticsDataWrapper(dataSets, dates, xLabelsCount)
+        showStatisticsData.value = StatisticsDataWrapper(dataSets, dates, xLabelsCount)
     }
 
     private fun filterExercisesInTrainings(
@@ -192,10 +184,7 @@ class StatisticsViewModel(
                 }
             }
         }
-        return EntriesWrapper(
-            values,
-            label
-        )
+        return EntriesWrapper(values, label)
     }
 
     private fun getDateIndex(trainingDate: Long?, list: List<Calendar>?): Float {
@@ -218,8 +207,8 @@ class StatisticsViewModel(
             val firstDateStart = list[0].training?.getDateCal()
             val lastDateEnd = (list[if (list.size == 1) 0 else list.size - 1]).training?.getDateCal()
             if (firstDateStart == null || lastDateEnd == null) {
-                Logger.e(LOG_TAG, "parseTrainingDates. bad data. aborting")
-                _snackbarText.value = Event(R.string.parse_error)
+                Timber.e("parseTrainingDates. bad data. aborting")
+                snackbarText.value = Event(R.string.parse_error)
                 return dates
             }
             firstDateStart.set(Calendar.HOUR_OF_DAY, 0)
@@ -252,15 +241,15 @@ class StatisticsViewModel(
                 val previous = list[i - 1].training?.getDateCal()
                 val current = list[i].training?.getDateCal()
                 if (previous == null || current == null) {
-                    Logger.e(LOG_TAG, "checkSortOrder. bad data. aborting")
-                    _snackbarText.value = Event(R.string.parse_error)
+                    Timber.e("checkSortOrder. bad data. aborting")
+                    snackbarText.value = Event(R.string.parse_error)
                     return false
                 }
                 if (previous.after(current)) {
                     val previousFormatted = DateUtils.formatDateTimeWithWeekDay(previous)
                     val currentFormatted = DateUtils.formatDateTimeWithWeekDay(current)
-                    Logger.e(LOG_TAG, "checkSortOrder. list not sorted because $previousFormatted > $currentFormatted")
-                    _snackbarText.value = Event(R.string.parse_error)
+                    Timber.e("checkSortOrder. list not sorted because $previousFormatted > $currentFormatted")
+                    snackbarText.value = Event(R.string.parse_error)
                     return false
                 }
             } catch (e: IndexOutOfBoundsException) { }
@@ -268,7 +257,11 @@ class StatisticsViewModel(
         return true
     }
 
-    private fun convertToDataSets(exercises: List<ExerciseInTraining>?, dates: List<Calendar>?, markerColorId: Int): LineData? {
+    private fun convertToDataSets(
+        exercises: List<ExerciseInTraining>?,
+        dates: List<Calendar>?,
+        markerColorId: Int
+    ): LineData {
         val valuesMap = LongSparseArray<ArrayList<Entry>>()
         if (exercises != null) for (next in exercises) valuesMap.put(next.exerciseId!!, arrayListOf())
         val dataSets = ArrayList<ILineDataSet>()
@@ -323,7 +316,6 @@ class StatisticsViewModel(
 
 
     companion object {
-        private const val LOG_TAG = "StatisticsViewModel"
         private const val X_LABELS_MAX_COUNT = 8
     }
 }

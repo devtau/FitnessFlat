@@ -33,7 +33,6 @@ abstract class DB: RoomDatabase() {
 
 
     companion object {
-        const val LOG_TAG = "DB_LOG"
         @Volatile private var INSTANCE: DB? = null
 
         fun getInstance(context: Context): DB =

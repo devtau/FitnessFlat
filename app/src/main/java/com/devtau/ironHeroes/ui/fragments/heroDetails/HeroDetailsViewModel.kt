@@ -1,6 +1,5 @@
 package com.devtau.ironHeroes.ui.fragments.heroDetails
 
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
@@ -16,8 +15,8 @@ import com.devtau.ironHeroes.enums.HumanType
 import com.devtau.ironHeroes.util.Constants
 import com.devtau.ironHeroes.util.DateUtils
 import com.devtau.ironHeroes.util.Event
-import com.devtau.ironHeroes.util.Logger
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 
 class HeroDetailsViewModel(
@@ -26,32 +25,26 @@ class HeroDetailsViewModel(
     humanType: HumanType
 ): BaseViewModel() {
 
-
-    private val _hero = MutableLiveData<Hero?>(null)
-    val hero: LiveData<Hero?> = _hero
+    val hero = MutableLiveData<Hero?>(null)
 
 
-    val firstName: MutableLiveData<String> = MutableLiveData()
-    val secondName: MutableLiveData<String> = MutableLiveData()
-    val phone: MutableLiveData<String> = MutableLiveData()
-    val vkId: MutableLiveData<String> = MutableLiveData()
-    val email: MutableLiveData<String> = MutableLiveData()
-    val isChampion: MutableLiveData<Boolean> = MutableLiveData(humanType == HumanType.CHAMPION)
+    val firstName = MutableLiveData<String>()
+    val secondName = MutableLiveData<String>()
+    val phone = MutableLiveData<String>()
+    val vkId = MutableLiveData<String>()
+    val email = MutableLiveData<String>()
+    val isChampion = MutableLiveData(humanType == HumanType.CHAMPION)
 
-
-    private val _genderFemaleChecked = MutableLiveData(false)
-    val genderFemaleChecked: LiveData<Boolean> = _genderFemaleChecked
-    private val _genderMaleChecked = MutableLiveData(false)
-    val genderMaleChecked: LiveData<Boolean> = _genderMaleChecked
+    val genderFemaleChecked = MutableLiveData(false)
+    val genderMaleChecked = MutableLiveData(false)
     fun selectGender(gender: Gender) {
-        Logger.d(LOG_TAG, "selectGender. gender=$gender")
-        _genderFemaleChecked.value = gender == Gender.FEMALE
-        _genderMaleChecked.value = gender == Gender.MALE
+        Timber.d("selectGender. gender=$gender")
+        genderFemaleChecked.value = gender == Gender.FEMALE
+        genderMaleChecked.value = gender == Gender.MALE
     }
 
 
-    private val _formattedBirthday = MutableLiveData(Constants.VALUE_NA)
-    val formattedBirthday: LiveData<String> = _formattedBirthday
+    val formattedBirthday = MutableLiveData(Constants.VALUE_NA)
     fun updateBirthday(year: Int, month: Int, dayOfMonth: Int) {
         val date = Calendar.getInstance()
         date.set(Calendar.YEAR, year)
@@ -61,60 +54,47 @@ class HeroDetailsViewModel(
         date.set(Calendar.MINUTE, 0)
         date.set(Calendar.SECOND, 0)
 
-        _formattedBirthday.value = DateUtils.formatDate(date)
+        formattedBirthday.value = DateUtils.formatDate(date)
     }
 
-    private val _toolbarTitle = isChampion.switchMap {
-        MutableLiveData(Event(if (it) {
-            if (heroId == null) R.string.champion_add else R.string.champion_edit
-        } else {
-            if (heroId == null) R.string.hero_add else R.string.hero_edit
-        }))
-    }
-    val toolbarTitle: LiveData<Event<Int>> = _toolbarTitle
 
-
-    private val _callHero = MutableLiveData<Event<String>>()
-    val callHero: LiveData<Event<String>> = _callHero
+    val callHero = MutableLiveData<Event<String>>()
     fun callHero() {
         val phoneValue = phone.value
         if (phoneValue == null || phoneValue.isEmpty()) {
-            Logger.w(LOG_TAG, "callHero. phone is empty. aborting")
-            _snackbarText.value = Event(R.string.phone_empty)
+            Timber.w("callHero. phone is empty. aborting")
+            snackbarText.value = Event(R.string.phone_empty)
         } else {
-            _callHero.value = Event(phoneValue)
+            callHero.value = Event(phoneValue)
         }
     }
 
 
-    private val _openVk = MutableLiveData<Event<String>>()
-    val openVk: LiveData<Event<String>> = _openVk
+    val openVk = MutableLiveData<Event<String>>()
     fun openVk() {
         val vkIdValue = vkId.value
         if (vkIdValue == null || vkIdValue.isEmpty()) {
-            Logger.w(LOG_TAG, "openVk. vkId is empty. aborting")
-            _snackbarText.value = Event(R.string.vk_id_empty)
+            Timber.w("openVk. vkId is empty. aborting")
+            snackbarText.value = Event(R.string.vk_id_empty)
         } else {
-            _openVk.value = Event(vkIdValue)
+            openVk.value = Event(vkIdValue)
         }
     }
 
 
-    private val _composeEmail = MutableLiveData<Event<String>>()
-    val composeEmail: LiveData<Event<String>> = _composeEmail
+    val composeEmail = MutableLiveData<Event<String>>()
     fun composeEmail() {
         val emailValue = email.value
         if (emailValue == null || emailValue.isEmpty()) {
-            Logger.w(LOG_TAG, "composeEmail. email is empty. aborting")
-            _snackbarText.value = Event(R.string.email_empty)
+            Timber.w("composeEmail. email is empty. aborting")
+            snackbarText.value = Event(R.string.email_empty)
         } else {
-            _composeEmail.value = Event(emailValue)
+            composeEmail.value = Event(emailValue)
         }
     }
 
 
-    private val _showBirthDayDialog = MutableLiveData<Event<DatePickerDialogDataWrapper>>()
-    val showBirthDayDialog: LiveData<Event<DatePickerDialogDataWrapper>> = _showBirthDayDialog
+    val showBirthDayDialog = MutableLiveData<Event<DatePickerDialogDataWrapper>>()
     fun showBirthDayDialog() {
         val nowMinusCentury = Calendar.getInstance()
         nowMinusCentury.add(Calendar.YEAR, -100)
@@ -124,58 +104,59 @@ class HeroDetailsViewModel(
             date.timeInMillis = heroBirthDay
             date
         } else DateUtils.parseDate(formattedBirthday.value)
-        _showBirthDayDialog.value = Event(DatePickerDialogDataWrapper(birthDay, nowMinusCentury, Calendar.getInstance()))
+        showBirthDayDialog.value = Event(DatePickerDialogDataWrapper(birthDay, nowMinusCentury, Calendar.getInstance()))
     }
 
 
-    private val _useVkAvatar = MutableLiveData<Event<Unit>>()
-    val useVkAvatar: LiveData<Event<Unit>> = _useVkAvatar
+    val useVkAvatar = MutableLiveData<Event<Unit>>()
     fun useVkAvatar() {
-        _useVkAvatar.value = Event(Unit)
+        useVkAvatar.value = Event(Unit)
     }
 
 
-    private val _closeScreenValidated = MutableLiveData<Event<Unit>>()
-    val closeScreenValidated: LiveData<Event<Unit>> = _closeScreenValidated
-    private val _confirmExit = MutableLiveData<Event<Int>>()
-    val confirmExit: LiveData<Event<Int>> = _confirmExit
+    val closeScreenValidated = MutableLiveData<Event<Unit>>()
+    val confirmExit = MutableLiveData<Event<Int>>()
     fun tryCloseScreen() {
         if (hero.value == null) {
-            val msgId = if (isChampion.value == true) R.string.champion_not_saved else R.string.hero_not_saved
-            _confirmExit.value = Event(msgId)
+            confirmExit.value = Event(if (isChampion.value == true) {
+                R.string.champion_not_saved
+            } else {
+                R.string.hero_not_saved
+            })
         } else {
-            _closeScreenValidated.value = Event(Unit)
+            closeScreenValidated.value = Event(Unit)
         }
     }
 
 
-    val deleteVisibility: LiveData<Int> = _hero.switchMap {
-        MutableLiveData(if (it == null) View.INVISIBLE else View.VISIBLE)
-    }
-    private val _confirmDeleteHero = MutableLiveData<Event<Unit>>()
-    val confirmDeleteHero: LiveData<Event<Unit>> = _confirmDeleteHero
+    val deleteIsVisible: LiveData<Boolean> = hero.switchMap { MutableLiveData(it != null) }
+    val confirmDeleteHero = MutableLiveData<Event<Unit>>()
     fun deleteHeroRequested() {
-        _confirmDeleteHero.value = Event(Unit)
+        confirmDeleteHero.value = Event(Unit)
     }
     fun deleteHeroConfirmed() {
         viewModelScope.launch {
             hero.value?.let { heroesRepository.deleteItem(it) }
-            _closeScreenValidated.value = Event(Unit)
+            closeScreenValidated.value = Event(Unit)
         }
     }
 
 
     fun updateHero(avatarUrl: String?, avatarId: Int?) {
-        val hero = _hero.value
+        val hero = hero.value
         val gender = readGenderFromInputs()
         val humanType = readHumanTypeFromInputs()
 
         if (!Hero.allObligatoryPartsPresent(firstName.value, secondName.value, phone.value, gender)) {
-            Logger.w(LOG_TAG, "updateHero. some data missing. aborting")
+            Timber.w("updateHero. some data missing. aborting")
             return
         }
 
-        val birthDayLong = if (_formattedBirthday.value == Constants.VALUE_NA) null else DateUtils.parseDate(_formattedBirthday.value).timeInMillis
+        val birthDayLong = if (formattedBirthday.value == Constants.VALUE_NA) {
+            null
+        } else {
+            DateUtils.parseDate(formattedBirthday.value).timeInMillis
+        }
         val avatarIdLoc = avatarId ?: hero?.avatarId
 
         if (heroId == null || hero == null) {
@@ -186,7 +167,7 @@ class HeroDetailsViewModel(
                 )
                 heroId = heroesRepository.saveItem(newHero)
                 newHero.id = heroId
-                _hero.value = newHero
+                this@HeroDetailsViewModel.hero.value = newHero
             }
             return
         }
@@ -196,7 +177,7 @@ class HeroDetailsViewModel(
             birthDayLong, avatarUrl, avatarIdLoc
         )
 
-        Logger.d(LOG_TAG, "updateHeroData. someFieldsChanged=$someFieldsChanged, phone=${phone.value}")
+        Timber.d("updateHeroData. someFieldsChanged=$someFieldsChanged, phone=${phone.value}")
         if (someFieldsChanged) {
             viewModelScope.launch {
                 val updatedHero = Hero(
@@ -204,7 +185,7 @@ class HeroDetailsViewModel(
                     birthDayLong, avatarUrl, avatarIdLoc
                 )
                 heroesRepository.saveItem(updatedHero)
-                _hero.value = updatedHero
+                this@HeroDetailsViewModel.hero.value = updatedHero
             }
         }
     }
@@ -226,28 +207,23 @@ class HeroDetailsViewModel(
         vkId.value = hero?.vkId ?: ""
         email.value = hero?.email ?: ""
         isChampion.value = hero?.humanType == HumanType.CHAMPION
-        _formattedBirthday.value = hero?.getFormattedBirthday() ?: Constants.VALUE_NA
+        formattedBirthday.value = hero?.getFormattedBirthday() ?: Constants.VALUE_NA
         selectGender(hero?.getGenderAsEnum() ?: Gender.MALE)
     }
 
 
     init {
         if (heroId == null) {
-            _hero.value = null
-            showHeroDetails(_hero.value)
+            hero.value = null
+            showHeroDetails(hero.value)
         } else {
             viewModelScope.launch {
                 val heroResult = heroesRepository.getItem(heroId)
                 if (heroResult is Result.Success && heroResult.data != null) {
-                    _hero.value = heroResult.data
-                    showHeroDetails(_hero.value)
+                    hero.value = heroResult.data
+                    showHeroDetails(hero.value)
                 }
             }
         }
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "HeroDetailsViewModel"
     }
 }

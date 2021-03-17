@@ -46,9 +46,4 @@ class TrainingsAdapter(
         override fun areItemsTheSame(oldItem: Training, newItem: Training) = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: Training, newItem: Training) = oldItem == newItem
     }
-
-
-    companion object {
-        private const val LOG_TAG = "TrainingsAdapter"
-    }
 }

@@ -10,7 +10,7 @@
     android:id="@+id/container"
     android:background="@drawable/rounded_rect">
 
-    <!--библиотека не работает, если использовать tools:text-->
+    <!--you cannot use tools:text to enable multiline support in charts library applied-->
     <TextView
         android:id="@+id/content"
         android:text="1234567890\n1234567890\n1234567890123\n1234567890"

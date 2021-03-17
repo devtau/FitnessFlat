@@ -9,12 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.devtau.ironHeroes.data.source.repositories.*
 import com.devtau.ironHeroes.enums.ChannelStats
 import com.devtau.ironHeroes.util.AppUtils
-import com.devtau.ironHeroes.util.Logger
 import com.devtau.ironHeroes.util.prefs.PreferencesManager
 import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
 import com.vk.sdk.*
 import com.vk.sdk.api.VKError
+import timber.log.Timber
 
 class IronHeroesApp: Application() {
 
@@ -37,6 +37,7 @@ class IronHeroesApp: Application() {
     override fun onCreate() {
         super.onCreate()
         PreferencesManager.init(this)
+        Timber.plant(Timber.DebugTree())
 
         initFirebase()
         initVK()
@@ -49,9 +50,9 @@ class IronHeroesApp: Application() {
         FirebaseInstanceId.getInstance().instanceId
             .addOnCompleteListener {
                 if (!it.isSuccessful) {
-                    Logger.w(LOG_TAG, "getInstanceId. failed ${it.exception}")
+                    Timber.w("getInstanceId. failed ${it.exception}")
                 } else {
-                    Logger.d(LOG_TAG, "getInstanceId. firebase token=${it.result?.token}")
+                    Timber.d("getInstanceId. firebase token=${it.result?.token}")
                 }
             }
     }
@@ -62,7 +63,7 @@ class IronHeroesApp: Application() {
             override fun onVKAccessTokenChanged(oldToken: VKAccessToken?, newToken: VKAccessToken?) {
                 if (newToken == null || newToken.isExpired) {
                     PreferencesManager.vkToken = null
-                    Logger.d(LOG_TAG, "vk token expired. logout")
+                    Timber.d("vk token expired. logout")
                     val intent = Intent(LOGOUT)
                     sendBroadcast(intent)
                 }

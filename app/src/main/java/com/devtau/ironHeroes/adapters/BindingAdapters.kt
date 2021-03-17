@@ -18,6 +18,7 @@ import com.devtau.ironHeroes.data.model.Hero
 import com.devtau.ironHeroes.data.model.SpinnerItem
 import com.devtau.ironHeroes.data.model.Training
 import com.devtau.ironHeroes.enums.HumanType
+import timber.log.Timber
 
 @BindingAdapter("humanImage")
 fun ImageView.loadImage(human: Hero?) {
@@ -65,8 +66,9 @@ fun Spinner.init(entries: List<SpinnerItem>?, selectedId: Long?, listener: ItemS
                     R.id.hero -> HumanType.HERO
                     else -> null
                 }
-                val selectedHero = (adapter as IronSpinnerAdapter).getItem(position)
-                listener.onItemSelected(selectedHero, humanType)
+                val selected = (adapter as IronSpinnerAdapter).getItem(position)
+                Timber.d("onItemSelected. id=${selected?.id}, humanType=$humanType")
+                listener.onItemSelected(selected, humanType)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {/*NOP*/}
         }

@@ -6,16 +6,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import com.devtau.ironHeroes.data.source.repositories.*
-import com.devtau.ironHeroes.enums.HumanType
-import com.devtau.ironHeroes.ui.CoordinatorImpl
 import com.devtau.ironHeroes.ui.ResourceResolver
+import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseDialogArgs
 import com.devtau.ironHeroes.ui.dialogs.exerciseDialog.ExerciseViewModel
 import com.devtau.ironHeroes.ui.fragments.functions.FunctionsViewModel
+import com.devtau.ironHeroes.ui.fragments.heroDetails.HeroDetailsFragmentArgs
 import com.devtau.ironHeroes.ui.fragments.heroDetails.HeroDetailsViewModel
-import com.devtau.ironHeroes.ui.fragments.heroesList.HeroesListViewModel
+import com.devtau.ironHeroes.ui.fragments.heroesList.HeroesFragmentArgs
+import com.devtau.ironHeroes.ui.fragments.heroesList.HeroesViewModel
 import com.devtau.ironHeroes.ui.fragments.other.OtherViewModel
 import com.devtau.ironHeroes.ui.fragments.settings.SettingsViewModel
 import com.devtau.ironHeroes.ui.fragments.statistics.StatisticsViewModel
+import com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsFragmentArgs
 import com.devtau.ironHeroes.ui.fragments.trainingDetails.TrainingDetailsViewModel
 import com.devtau.ironHeroes.ui.fragments.trainingsList.TrainingsViewModel
 import com.devtau.ironHeroes.util.Constants
@@ -39,17 +41,15 @@ class ViewModelFactory(
                 TrainingsViewModel(trainingsRepository, heroesRepository, PreferencesManager)
             }
             isAssignableFrom(TrainingDetailsViewModel::class.java) -> {
-                if (argsBundle == null)
-                    throw IllegalArgumentException("HeroDetailsViewModel needs valid argsBundle")
-                val trainingIdFromBundle = argsBundle.getLong(CoordinatorImpl.TRAINING_ID)
-                val trainingId = if (trainingIdFromBundle == Constants.OBJECT_ID_NA) null else trainingIdFromBundle
+                val args = TrainingDetailsFragmentArgs.fromBundle(argsBundle!!)
+                val trainingId = if (args.trainingId == Constants.OBJECT_ID_NA) null else args.trainingId
                 TrainingDetailsViewModel(
                     trainingsRepository, heroesRepository, exercisesInTrainingsRepository,
                     PreferencesManager, trainingId)
             }
-            isAssignableFrom(HeroesListViewModel::class.java) -> {
-                val humanType = argsBundle?.getSerializable(CoordinatorImpl.HUMAN_TYPE) as HumanType? ?: HumanType.HERO
-                HeroesListViewModel(heroesRepository, humanType)
+            isAssignableFrom(HeroesViewModel::class.java) -> {
+                val args = HeroesFragmentArgs.fromBundle(argsBundle!!)
+                HeroesViewModel(heroesRepository, args.humanType)
             }
             isAssignableFrom(OtherViewModel::class.java) -> {
                 OtherViewModel(trainingsRepository, exercisesInTrainingsRepository, heroesRepository)
@@ -60,31 +60,23 @@ class ViewModelFactory(
                 )
             }
             isAssignableFrom(HeroDetailsViewModel::class.java) -> {
-                if (argsBundle == null)
-                    throw IllegalArgumentException("HeroDetailsViewModel needs valid argsBundle")
-                val heroIdFromBundle = argsBundle.getLong(CoordinatorImpl.HERO_ID)
-                val heroId = if (heroIdFromBundle == Constants.OBJECT_ID_NA) null else heroIdFromBundle
-                val humanType = argsBundle.getSerializable(CoordinatorImpl.HUMAN_TYPE) as HumanType
-                HeroDetailsViewModel(heroesRepository, heroId, humanType)
+                val args = HeroDetailsFragmentArgs.fromBundle(argsBundle!!)
+                val heroId = if (args.heroId == Constants.OBJECT_ID_NA) null else args.heroId
+                HeroDetailsViewModel(heroesRepository, heroId, args.humanType)
             }
             isAssignableFrom(SettingsViewModel::class.java) -> {
                 SettingsViewModel(PreferencesManager)
             }
             isAssignableFrom(StatisticsViewModel::class.java) -> {
-                if (resourceResolver == null)
-                    throw IllegalArgumentException("StatisticsViewModel needs valid resourceResolver")
                 StatisticsViewModel(heroesRepository, muscleGroupsRepository, exercisesRepository,
-                    exercisesInTrainingsRepository, PreferencesManager, resourceResolver)
+                    exercisesInTrainingsRepository, PreferencesManager, resourceResolver!!)
             }
             isAssignableFrom(ExerciseViewModel::class.java) -> {
-                if (argsBundle == null)
-                    throw IllegalArgumentException("ExerciseViewModel needs valid argsBundle")
-                val heroId = argsBundle.getLong(CoordinatorImpl.HERO_ID)
-                val trainingId = argsBundle.getLong(CoordinatorImpl.TRAINING_ID)
-                val exerciseInTrainingId = argsBundle.getLong(CoordinatorImpl.EXERCISE_IN_TRAINING_ID)
-                val position = argsBundle.getInt(CoordinatorImpl.POSITION)
-                ExerciseViewModel(trainingsRepository, muscleGroupsRepository, exercisesRepository,
-                    exercisesInTrainingsRepository, heroId, trainingId, exerciseInTrainingId, position)
+                val args = ExerciseDialogArgs.fromBundle(argsBundle!!)
+                ExerciseViewModel(
+                    trainingsRepository, muscleGroupsRepository, exercisesRepository, exercisesInTrainingsRepository,
+                    args.exerciseInTrainingId, args.heroId, args.position, args.trainingId
+                )
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

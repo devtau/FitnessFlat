@@ -30,8 +30,6 @@
             </intent-filter>
         </activity>
     
-        <activity android:name=".ui.activities.DBViewerActivity"/>
-    
         <activity
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"

@@ -5,7 +5,6 @@
     
     <data>
         <import type="com.devtau.ironHeroes.enums.HumanType" />
-        <import type="com.devtau.ironHeroes.BuildConfig" />
         <import type="android.view.View" />
         
         <variable
@@ -13,69 +12,42 @@
             type="com.devtau.ironHeroes.ui.fragments.other.OtherViewModel" />
     </data>
     
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
         
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            
-            <TextView
-                android:id="@+id/heroes"
-                android:text="@string/trainees"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/marginNormal"
-                style="@style/SelectableItemBackground"
-                android:onClick="@{() -> viewModel.openHero(HumanType.HERO)}"/>
-            
-            <TextView
-                android:id="@+id/champions"
-                android:text="@string/trainers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/marginNormal"
-                style="@style/SelectableItemBackground"
-                android:onClick="@{() -> viewModel.openHero(HumanType.CHAMPION)}"/>
-            
-            <TextView
-                android:id="@+id/database"
-                android:text="@string/database"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/marginNormal"
-                style="@style/SelectableItemBackground"
-                android:visibility="@{BuildConfig.DEBUG ? View.VISIBLE : View.GONE}"
-                android:onClick="@{() -> viewModel.openDBViewer()}"/>
-            
-            <TextView
-                android:id="@+id/exportToFile"
-                android:text="@string/export_to_file"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/marginNormal"
-                style="@style/SelectableItemBackground"
-                android:onClick="@{() -> viewModel.exportToFileRequested()}"/>
-            
-            <TextView
-                android:id="@+id/importFromFile"
-                android:text="@string/import_from_file"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/marginNormal"
-                style="@style/SelectableItemBackground"
-                android:onClick="@{() -> viewModel.importFromFileRequested()}"/>
-            
-            <TextView
-                android:id="@+id/clearDB"
-                android:text="@string/clear_db"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/marginNormal"
-                style="@style/SelectableItemBackground"
-				android:onClick="@{() -> viewModel.clearDBRequested()}"/>
-        </LinearLayout>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <TextView
+            android:text="@string/trainees"
+            style="@style/SelectableTextRow"
+            android:onClick="@{() -> viewModel.openHero(HumanType.HERO)}"/>
+        
+        <TextView
+            android:text="@string/trainers"
+            style="@style/SelectableTextRow"
+            android:onClick="@{() -> viewModel.openHero(HumanType.CHAMPION)}"/>
+        
+        <TextView
+            android:text="@string/export_to_file"
+            style="@style/SelectableTextRow"
+            android:onClick="@{() -> viewModel.exportToFileRequested()}"
+            android:visibility="gone"/>
+        
+        <TextView
+            android:text="@string/import_from_file"
+            style="@style/SelectableTextRow"
+            android:onClick="@{() -> viewModel.importFromFileRequested()}"
+            android:visibility="gone"/>
+        
+        <TextView
+            android:text="@string/clear_db"
+            style="@style/SelectableTextRow"
+            android:onClick="@{() -> viewModel.clearDBRequested()}"/>
+        
+        <TextView
+            android:text="@string/load_demo_configuration"
+            style="@style/SelectableTextRow"
+            android:visibility="@{viewModel.dbIsEmpty ? View.VISIBLE : View.GONE}"
+            android:onClick="@{() -> viewModel.loadDemoConfigRequested()}"/>
+    </LinearLayout>
 </layout>

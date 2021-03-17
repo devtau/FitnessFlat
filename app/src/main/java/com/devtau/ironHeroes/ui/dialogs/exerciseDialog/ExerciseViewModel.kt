@@ -14,8 +14,12 @@ import com.devtau.ironHeroes.data.source.repositories.MuscleGroupsRepository
 import com.devtau.ironHeroes.data.source.repositories.TrainingsRepository
 import com.devtau.ironHeroes.enums.DialogAction
 import com.devtau.ironHeroes.enums.HumanType
-import com.devtau.ironHeroes.util.*
+import com.devtau.ironHeroes.util.Constants
+import com.devtau.ironHeroes.util.DateUtils
+import com.devtau.ironHeroes.util.Event
+import com.devtau.ironHeroes.util.print
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 
 class ExerciseViewModel(
@@ -23,10 +27,10 @@ class ExerciseViewModel(
     private val muscleGroupsRepository: MuscleGroupsRepository,
     private val exercisesRepository: ExercisesRepository,
     private val exercisesInTrainingsRepository: ExercisesInTrainingsRepository,
-    private val heroId: Long,
-    private val trainingId: Long,
     private var exerciseInTrainingId: Long,
-    private val position: Int
+    private val heroId: Long,
+    private val position: Int,
+    private val trainingId: Long
 ): BaseViewModel() {
 
     private var training: Training? = null
@@ -40,7 +44,6 @@ class ExerciseViewModel(
     val muscleGroupSelectedListener = object: IronSpinnerAdapter.ItemSelectedListener {
         override fun onItemSelected(item: SpinnerItem?, humanType: HumanType?) {
             if (_selectedMuscleGroupId.value != item?.id) {
-                Logger.d(LOG_TAG, "onMuscleGroupSelected. id=${item?.id}")
                 _selectedMuscleGroupId.value = item?.id
                 _exercisesFiltered.value = filterExercises(exercises, selectedMuscleGroupId.value)
             }
@@ -56,7 +59,6 @@ class ExerciseViewModel(
     val exerciseSelectedListener = object: IronSpinnerAdapter.ItemSelectedListener {
         override fun onItemSelected(item: SpinnerItem?, humanType: HumanType?) {
             if (_selectedExerciseId.value != item?.id) {
-                Logger.d(LOG_TAG, "onExerciseSelected. id=${item?.id}")
                 _selectedExerciseId.value = item?.id
                 updatePreviousExerciseData(exerciseInTraining)
             }
@@ -84,7 +86,7 @@ class ExerciseViewModel(
     private val _dismissDialog = MutableLiveData<Event<Unit>>()
     val dismissDialog: LiveData<Event<Unit>> = _dismissDialog
     fun dialogActionClicked(action: DialogAction) {
-        Logger.d(LOG_TAG, "dialogActionClicked. action=$action")
+        Timber.d("dialogActionClicked. action=$action")
         when(action) {
             DialogAction.CANCEL -> {/*no specific action required*/}
             DialogAction.DELETE -> deleteExercise()
@@ -147,7 +149,7 @@ class ExerciseViewModel(
             val maxDate = Calendar.getInstance()
             maxDate.timeInMillis = trainingDate
             maxDate.add(Calendar.HOUR_OF_DAY, -2)
-            Logger.d(LOG_TAG, "getPreviousExerciseData. maxDate=${DateUtils.formatDateTimeWithWeekDay(maxDate)}")
+            Timber.d("getPreviousExerciseData. maxDate=${DateUtils.formatDateTimeWithWeekDay(maxDate)}")
             exercisesInTrainings.print("getPreviousExerciseData")
             for (next in exercisesInTrainings) {
                 val nextTrainingDate = Calendar.getInstance()
@@ -220,10 +222,5 @@ class ExerciseViewModel(
                 initDataForExistingExerciseInTraining(trainingId, exerciseInTrainingId)
             }
         }
-    }
-
-
-    companion object {
-        private const val LOG_TAG = "ExerciseViewModel"
     }
 }
